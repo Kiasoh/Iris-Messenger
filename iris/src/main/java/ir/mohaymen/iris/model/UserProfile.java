@@ -15,7 +15,7 @@ public class UserProfile {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "userId")
-    private Users user;
+    private User user;
     @OneToOne
     @JoinColumn(name = "mediaId")
     private Media media;

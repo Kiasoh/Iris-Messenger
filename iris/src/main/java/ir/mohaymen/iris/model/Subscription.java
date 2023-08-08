@@ -13,7 +13,7 @@ public class Subscription {
     private Long subId;
     @ManyToOne
     @JoinColumn(name = "userId")
-    private Users user;
+    private User user;
     @ManyToOne
     @JoinColumn(name = "chatId")
     private Chat chat;

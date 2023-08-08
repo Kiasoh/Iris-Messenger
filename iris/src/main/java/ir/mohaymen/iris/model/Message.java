@@ -2,7 +2,6 @@ package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
 
@@ -20,7 +19,7 @@ public class Message {
     private Chat originChat;
     @JoinColumn(name = "userId")
     @ManyToOne
-    private Users sender;
+    private User sender;
     @JoinColumn(name = "mediaId")
     @OneToOne
     private Media media;

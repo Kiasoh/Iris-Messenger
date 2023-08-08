@@ -2,12 +2,11 @@ package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Table(name = "users")
 @Data
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
