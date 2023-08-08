@@ -1,7 +1,6 @@
 package ir.mohaymen.iris.model;
 
 import ir.mohaymen.iris.token.Token;
-import ir.mohaymen.iris.user.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Entity
@@ -30,18 +30,14 @@ public class Users implements UserDetails {
     private String userName;
     private String bio;
 
-
     private String password;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+        return new HashSet<GrantedAuthority>();
     }
 
     @Override
@@ -74,5 +70,3 @@ public class Users implements UserDetails {
         return true;
     }
 }
-
-

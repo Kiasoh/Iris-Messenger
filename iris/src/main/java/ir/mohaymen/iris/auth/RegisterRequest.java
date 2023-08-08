@@ -1,6 +1,5 @@
 package ir.mohaymen.iris.auth;
 
-import ir.mohaymen.iris.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +15,4 @@ public class RegisterRequest {
   private String lastname;
   private String phoneNumber;
   private String password;
-  private Role role;
 }
