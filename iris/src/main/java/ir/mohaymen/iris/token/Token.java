@@ -1,6 +1,6 @@
 package ir.mohaymen.iris.token;
 
-import ir.mohaymen.iris.model.Users;
+import ir.mohaymen.iris.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,5 +38,5 @@ public class Token {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  public Users user;
+  public User user;
 }

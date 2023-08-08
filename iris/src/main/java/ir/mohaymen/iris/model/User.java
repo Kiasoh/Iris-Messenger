@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Users implements UserDetails {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +29,6 @@ public class Users implements UserDetails {
     private String userName;
     private String bio;
 
-    private String password;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
@@ -42,7 +40,8 @@ public class Users implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        //"password" encoded using bcrypt
+        return "$2a$10$BfAHeaJGH9qGshWKnZwHfOugl9cwf4zd5/GMTPtXTLJqSRte5pj.S";
     }
 
     @Override

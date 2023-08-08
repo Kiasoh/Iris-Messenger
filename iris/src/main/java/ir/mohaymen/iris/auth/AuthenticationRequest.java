@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
 
   private String phoneNumber;
-  String password;
 }

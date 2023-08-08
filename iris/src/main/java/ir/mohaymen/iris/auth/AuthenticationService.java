@@ -1,7 +1,7 @@
 package ir.mohaymen.iris.auth;
 
 import ir.mohaymen.iris.config.JwtService;
-import ir.mohaymen.iris.model.Users;
+import ir.mohaymen.iris.model.User;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.token.TokenType;
@@ -28,11 +28,11 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
 
   public AuthenticationResponse register(RegisterRequest request) {
-    var user = Users.builder()
+    var user = User.builder()
         .firstName(request.getFirstname())
         .lastName(request.getLastname())
         .phoneNumber(request.getPhoneNumber())
-        .password(passwordEncoder.encode(request.getPassword()))
+//        .password(passwordEncoder.encode(request.getPassword()))
         .build();
     var savedUser = repository.save(user);
     var jwtToken = jwtService.generateToken(user);
@@ -47,8 +47,7 @@ public class AuthenticationService {
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-            request.getPhoneNumber(),
-            request.getPassword()));
+            request.getPhoneNumber(), "password"));
     var user = repository.findByPhoneNumber(request.getPhoneNumber())
         .orElseThrow();
     var jwtToken = jwtService.generateToken(user);
@@ -61,7 +60,7 @@ public class AuthenticationService {
         .build();
   }
 
-  private void saveUserToken(Users user, String jwtToken) {
+  private void saveUserToken(User user, String jwtToken) {
     var token = Token.builder()
         .user(user)
         .token(jwtToken)
@@ -72,7 +71,7 @@ public class AuthenticationService {
     tokenRepository.save(token);
   }
 
-  private void revokeAllUserTokens(Users user) {
+  private void revokeAllUserTokens(User user) {
     var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
     if (validUserTokens.isEmpty())
       return;

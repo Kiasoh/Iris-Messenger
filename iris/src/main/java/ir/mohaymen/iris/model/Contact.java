@@ -9,10 +9,10 @@ import lombok.Data;
 public class Contact {
     @ManyToOne
     @JoinColumn(name = "users" , referencedColumnName = "userName")
-    private Users userInterest;
+    private User userInterest;
     @ManyToOne
     @JoinColumn(name = "users" , referencedColumnName = "userName")
-    private Users userTarget;
+    private User userTarget;
     private String firstName;
     private String lastName;
 }

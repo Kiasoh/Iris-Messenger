@@ -2,11 +2,11 @@ package ir.mohaymen.iris.reposetory;
 
 import java.util.Optional;
 
-import ir.mohaymen.iris.model.Users;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ir.mohaymen.iris.model.User;
+import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
 
-  Optional<Users> findByPhoneNumber(String phoneNumber);
+  Optional<User> findByPhoneNumber(String phoneNumber);
 
 }
