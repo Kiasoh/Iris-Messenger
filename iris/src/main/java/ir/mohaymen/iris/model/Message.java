@@ -6,21 +6,22 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
 
+
+@Entity
 @Table(name = "messages")
 @Data
-@Entity
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long messageId;
     private String text;
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "chatId")
     @ManyToOne
     private Chat originChat;
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "userId")
     @ManyToOne
-    private User sender;
-    @JoinColumn(name = "id")
+    private Users sender;
+    @JoinColumn(name = "mediaId")
     @OneToOne
     private Media media;
     private Timestamp sendAt;

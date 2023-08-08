@@ -10,11 +10,11 @@ public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long subId;
     @ManyToOne
-    @JoinColumn(name = "id")
-    private User user;
+    @JoinColumn(name = "userId")
+    private Users user;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "chatId")
     private Chat chat;
 }

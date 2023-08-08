@@ -14,10 +14,10 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "id")
-    private User user;
+    @JoinColumn(name = "userId")
+    private Users user;
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "mediaId")
     private Media media;
     private Instant setAt;
 }

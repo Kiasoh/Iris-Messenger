@@ -1,23 +1,21 @@
 package ir.mohaymen.iris.model;
 
-import jakarta.annotation.Generated;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
     private String phoneNumber;
+    @Column(unique = true)
     private String userName;
     private String bio;
 }

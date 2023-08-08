@@ -10,7 +10,7 @@ public class Media {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long mediaId;
     private String fileName;
     private String fileContentType;
     private String filePath;

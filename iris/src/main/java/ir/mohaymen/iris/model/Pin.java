@@ -8,11 +8,11 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Pin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long pinId;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "messageId" )
     private Message message;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "chatId")
     private Chat chat;
 }

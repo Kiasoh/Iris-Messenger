@@ -10,11 +10,9 @@ public class Contact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "id")
-    private User fistUser;
-    @ManyToOne
-    @JoinColumn(name = "id")
-    private User secondUser;
+    @JoinColumn(name = "userId")
+    private Users fistUser;
+    private Long secondUser;
     private String firstName;
     private String lastName;
 }

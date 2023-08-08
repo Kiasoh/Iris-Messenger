@@ -10,10 +10,10 @@ public class ChatProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "chatId")
     private Chat chat;
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "mediaId")
     private Media media;
     private Instant setAt;
 }

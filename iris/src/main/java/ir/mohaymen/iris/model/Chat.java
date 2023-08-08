@@ -10,9 +10,10 @@ public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long chatId;
     private String title;
     private String bio;
+    @Column(unique = true)
     private String link;
     private boolean isPublic;
     @Enumerated(EnumType.ORDINAL)
