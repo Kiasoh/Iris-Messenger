@@ -7,6 +7,7 @@ import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +24,13 @@ public class ChatController extends BaseController {
     private final ChatService chatService;
     private final SubscriptionService subscriptionService;
     private final UserService userService;
+    private final ModelMapper modelMapper;
 //    public ChatController(ChatService chatService) {this.chatService = chatService}
     @RequestMapping("/add-chat")
     public ResponseEntity<Chat> createChat(@RequestBody ChatDto chatDto) {
         Chat chat;
         try {
-            chatService.createOrUpdate(chat = ChetMapper.toChat(chatDto));
+            chatService.createOrUpdate(chat = this.modelMapper.map(chatDto, Chat.class));
             subscriptionService.createOrUpdate(new Subscription(null ,  getUserByToken(), chat));
             for (Long id: chatDto.getUserIds() )
                 subscriptionService.createOrUpdate(new Subscription(null , userService.getById (id) , chat));

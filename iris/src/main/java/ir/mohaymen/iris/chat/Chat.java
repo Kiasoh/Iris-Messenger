@@ -3,6 +3,7 @@ package ir.mohaymen.iris.chat;
 import ir.mohaymen.iris.subscription.Subscription;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class Chat {
     private String link;
     private boolean isPublic;
     @Enumerated(EnumType.ORDINAL)
-    @NotBlank
+    @NotNull
     private ChatType chatType;
     @OneToMany
     public ArrayList<Subscription> subs;
