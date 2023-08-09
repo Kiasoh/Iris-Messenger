@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.chat.ChatRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,12 +9,13 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ChatProfileServiceImpl implements ChatProfileService{
+public class ChatProfileServiceImpl implements ChatProfileService {
 
     private final ChatProfileRepository chatProfileRepository;
+    private final ChatRepository chatRepository;
 
     @Override
-    public Iterable<ChatProfile> get() {
+    public Iterable<ChatProfile> getAll() {
         return chatProfileRepository.findAll();
     }
 
@@ -23,15 +25,22 @@ public class ChatProfileServiceImpl implements ChatProfileService{
     }
 
     @Override
-    public ChatProfile create(ChatProfile chatProfile) {
+    public Iterable<ChatProfile> getByChat(Chat chat) {
+        return chatProfileRepository.findByChat(chat);
+    }
+
+    @Override
+    public ChatProfile createOrUpdate(ChatProfile chatProfile) {
         return chatProfileRepository.save(chatProfile);
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
-        if(getById(id) != null)
-            chatProfileRepository.deleteById(id);
-        else
-            throw new Exception();
+    public void deleteById(Long id) {
+        chatProfileRepository.deleteById(id);
+    }
+
+    public Iterable<ChatProfile> getByChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        return getByChat(chat);
     }
 }

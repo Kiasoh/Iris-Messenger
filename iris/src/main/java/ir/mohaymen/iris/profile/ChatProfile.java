@@ -16,12 +16,15 @@ public class ChatProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "chatId")
     private Chat chat;
+
     @OneToOne
     @JoinColumn(name = "mediaId")
     private Media media;
+
     @NotBlank
     private Instant setAt;
 }
