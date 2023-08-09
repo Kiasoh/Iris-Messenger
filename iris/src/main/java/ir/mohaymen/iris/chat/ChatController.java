@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Set;
+
 
 @RestController
 @RequestMapping("/chats")
@@ -25,18 +27,25 @@ public class ChatController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ModelMapper modelMapper;
-//    public ChatController(ChatService chatService) {this.chatService = chatService}
     @RequestMapping("/add-chat")
     public ResponseEntity<Chat> createChat(@RequestBody ChatDto chatDto) {
         Chat chat;
         try {
             chatService.createOrUpdate(chat = this.modelMapper.map(chatDto, Chat.class));
             subscriptionService.createOrUpdate(new Subscription(null ,  getUserByToken(), chat));
-            for (Long id: chatDto.getUserIds() )
+            for (Long id: chatDto.getUserIds() ){
+                User user = userService.getById (id);
+                if ((chat.getSubs().size() > 1 && chat.getChatType()== ChatType.PV) || isInChat(chat , user))
+                    throw new Exception();
                 subscriptionService.createOrUpdate(new Subscription(null , userService.getById (id) , chat));
+            }
         }
         catch (Exception e) {throw new HttpClientErrorException(HttpStatusCode.valueOf(403));}
         return new ResponseEntity<>(chat , HttpStatus.OK);
+    }
+    public boolean isInChat(Chat chat , User user) {
+        Set<Subscription> subs = chatService.getById(chat.getChatId()).getSubs();
+        return subs.stream().anyMatch(s -> s.getUser().getUserId() == user.getUserId());
     }
 
 }

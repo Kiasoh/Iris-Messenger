@@ -4,15 +4,14 @@ import ir.mohaymen.iris.subscription.Subscription;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 @Entity
 @Table(name = "chats")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Chat {
@@ -35,6 +34,6 @@ public class Chat {
     @NotNull
     private ChatType chatType;
 
-    @OneToMany
-    public ArrayList<Subscription> subs;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
+    public Set<Subscription> subs;
 }

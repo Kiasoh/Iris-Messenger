@@ -5,14 +5,15 @@ import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
-
 @Entity
 @Table(name = "messages")
-@Data
+@Getter
+@Setter
 public class Message {
 
     @Id

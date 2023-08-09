@@ -3,13 +3,12 @@ package ir.mohaymen.iris.subscription;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "subscriptions")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Subscription {

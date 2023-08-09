@@ -5,10 +5,13 @@ import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "chat_profiles")
 public class ChatProfile {

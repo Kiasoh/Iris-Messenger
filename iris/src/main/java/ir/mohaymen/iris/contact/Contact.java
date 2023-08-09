@@ -4,10 +4,13 @@ import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "contacts")
-@Data
+@Getter
+@Setter
 public class Contact {
 
     @Id
