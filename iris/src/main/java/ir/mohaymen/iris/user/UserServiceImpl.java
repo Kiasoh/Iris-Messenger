@@ -1,16 +1,24 @@
 package ir.mohaymen.iris.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
+
     private UserRepository userRepository;
 
     @Override
     public User getById(Long id) {
         return userRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Iterable<User> getById(List<Long> ids) {
+        return userRepository.findAllById(ids);
     }
 
     @Override

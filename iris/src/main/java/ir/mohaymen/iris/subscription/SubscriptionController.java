@@ -24,7 +24,7 @@ public class SubscriptionController {
     public ResponseEntity<Chat> addToChat(@RequestBody SubDto subDto) {
         try {
             for (Long id: subDto.getUserIds() )
-                subscriptionService.create (Subscription(null , userService.getById (id) , chatService.getById(subDto.getChatId())));
+                subscriptionService.create (new Subscription(null , userService.getById (id) , chatService.getById(subDto.getChatId())));
         }
         catch (Exception e) {return new ResponseEntity<>(null , HttpStatus.BAD_REQUEST);}
         return new ResponseEntity<>(chat , HttpStatus.OK);

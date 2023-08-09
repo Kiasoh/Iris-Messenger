@@ -25,7 +25,8 @@ public class ChatController {
         Chat chat;
         try {
             chatService.create (chat = ChetMapper.toChat(chatDto));
-            subscriptionService.create(Subscription(null , user , chat));
+            // TODO: 8/9/2023
+//            subscriptionService.create(new Subscription(null , user , chat));
             for (Long id: chatDto.getUserIds() )
                 subscriptionService.create (new Subscription(null , userService.getById (id) , chat));
         }

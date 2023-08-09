@@ -2,14 +2,11 @@ package ir.mohaymen.iris.subscription;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
-import ir.mohaymen.iris.chat.ChatServiceImpl;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import ir.mohaymen.iris.user.UserServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @AllArgsConstructor
