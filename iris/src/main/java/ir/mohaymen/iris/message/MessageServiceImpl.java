@@ -31,29 +31,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Iterable<Message> getByUser(Long userId) throws Exception {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) return getByUser(user);
-        else throw new Exception("No such user exists.");
-    }
-
-    @Override
-    public Iterable<Message> getByUser(String userName) throws Exception {
-        User user = userRepository.findByUserName(userName).orElse(null);
-        if (user != null) return getByUser(user);
-        else throw new Exception("No such user exists.");
-    }
-
-    @Override
     public Iterable<Message> getByChat(Chat chat) {
         return messageRepository.findByOriginChat(chat);
-    }
-
-    @Override
-    public Iterable<Message> getByChat(Long chatId) throws Exception {
-        Chat chat = chatRepository.findById(chatId).orElse(null);
-        if (chat != null) return getByChat(chat);
-        else throw new Exception("No such chat exists");
     }
 
     @Override
@@ -62,9 +41,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
-        if (getById(id) != null) messageRepository.deleteById(id);
-        else throw new Exception("No such message exists.");
+    public void deleteById(Long id) {
+        messageRepository.deleteById(id);
     }
 
     @Override
@@ -74,31 +52,41 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void deleteByUser(User user) {
-        Iterable<Message> messages = getByUser(user);
-        messageRepository.deleteAll(messages);
-    }
-
-    @Override
-    public void deleteByUser(Long userId) throws Exception {
-        Iterable<Message> messages = getByUser(userId);
-        messageRepository.deleteAll(messages);
-    }
-
-    @Override
-    public void deleteByUser(String userName) throws Exception {
-        Iterable<Message> messages = getByUser(userName);
-        messageRepository.deleteAll(messages);
+        messageRepository.deleteBySender(user);
     }
 
     @Override
     public void deleteByChat(Chat chat) {
-        Iterable<Message> messages = getByChat(chat);
-        messageRepository.deleteAll(messages);
+        messageRepository.deleteByOriginChat(chat);
     }
 
-    @Override
-    public void deleteByChat(Long chatId) throws Exception {
-        Iterable<Message> messages = getByChat(chatId);
-        messageRepository.deleteAll(messages);
+    public Iterable<Message> getByUser(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        return getByUser(user);
+    }
+
+    public Iterable<Message> getByUser(String userName) {
+        User user = userRepository.findByUserName(userName).orElse(null);
+        return getByUser(user);
+    }
+
+    public Iterable<Message> getByChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        return getByChat(chat);
+    }
+
+    public void deleteByUser(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        deleteByUser(user);
+    }
+
+    public void deleteByUser(String userName) {
+        User user = userRepository.findByUserName(userName).orElse(null);
+        deleteByUser(user);
+    }
+
+    public void deleteByChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        deleteByChat(chat);
     }
 }
