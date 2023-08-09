@@ -24,8 +24,8 @@ public class ChatController {
     public ResponseEntity<Chat> createChat(@RequestBody ChatDto chatDto) {
         Chat chat;
         try {
-            chatService.create (chat = ChetMapper.toChat(chatDto));
-            subscriptionService.create(Subscription(null , user , chat));
+            chatService.create(chat = ChetMapper.toChat(chatDto));
+            subscriptionService.create(Subscription(null , user, chat));
             for (Long id: chatDto.getUserIds() )
                 subscriptionService.create (new Subscription(null , userService.getById (id) , chat));
         }
