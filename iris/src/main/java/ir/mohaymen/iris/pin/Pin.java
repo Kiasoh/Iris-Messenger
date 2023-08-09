@@ -9,12 +9,15 @@ import lombok.Data;
 @Table(name = "pinned_messages")
 @Data
 public class Pin {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pinId;
+
     @OneToOne
     @JoinColumn(name = "messageId")
     private Message message;
+
     @ManyToOne
     @JoinColumn(name = "chatId")
     private Chat chat;

@@ -11,25 +11,19 @@ public interface PinService {
 
     Pin getByMessage(Message message);
 
-    Pin getByMessage(Long messageId) throws Exception;
-
     Iterable<Pin> getByChat(Chat chat);
-
-    Iterable<Pin> getByChat(Long chatId) throws Exception;
 
     boolean isMessagePinned(Message message);
 
     Long numberOfPinsInChat(Chat chat);
 
-    Long numberOfPinsInChat(Long chatId) throws Exception;
-
     Pin createOrUpdate(Pin pin);
 
-    void deleteById(Long id) throws Exception;
+    void deleteById(Long id);
 
     void delete(Pin pin);
 
-    void deleteByChat(Chat chat);
+    void deleteByMessage(Message message);
 
-    void deleteByChat(Long chatId) throws Exception;
+    void deleteByChat(Chat chat);
 }

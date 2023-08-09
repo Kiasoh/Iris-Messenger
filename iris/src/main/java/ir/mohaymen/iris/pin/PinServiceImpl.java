@@ -33,22 +33,8 @@ public class PinServiceImpl implements PinService {
     }
 
     @Override
-    public Pin getByMessage(Long messageId) throws Exception {
-        Message message = messageRepository.findById(messageId).orElse(null);
-        if (message != null) return getByMessage(message);
-        else throw new Exception("No such message exists.");
-    }
-
-    @Override
     public Iterable<Pin> getByChat(Chat chat) {
         return pinRepository.findByChat(chat);
-    }
-
-    @Override
-    public Iterable<Pin> getByChat(Long chatId) throws Exception {
-        Chat chat = chatRepository.findById(chatId).orElse(null);
-        if (chat != null) return getByChat(chat);
-        else throw new Exception("No such chat exists.");
     }
 
     @Override
@@ -63,20 +49,13 @@ public class PinServiceImpl implements PinService {
     }
 
     @Override
-    public Long numberOfPinsInChat(Long chatId) throws Exception {
-        Iterable<Pin> pins = getByChat(chatId);
-        return StreamSupport.stream(pins.spliterator(), false).count();
-    }
-
-    @Override
     public Pin createOrUpdate(Pin pin) {
         return pinRepository.save(pin);
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
-        if (getById(id) != null) pinRepository.deleteById(id);
-        else throw new Exception("No such pin exists.");
+    public void deleteById(Long id) {
+        pinRepository.deleteById(id);
     }
 
     @Override
@@ -85,14 +64,37 @@ public class PinServiceImpl implements PinService {
     }
 
     @Override
-    public void deleteByChat(Chat chat) {
-        Iterable<Pin> pins = getByChat(chat);
-        pinRepository.deleteAll(pins);
+    public void deleteByMessage(Message message) {
+        pinRepository.deleteByMessage(message);
     }
 
     @Override
-    public void deleteByChat(Long chatId) throws Exception {
-        Iterable<Pin> pins = getByChat(chatId);
-        pinRepository.deleteAll(pins);
+    public void deleteByChat(Chat chat) {
+        pinRepository.deleteByChat(chat);
+    }
+
+    public Pin getByMessage(Long messageId) {
+        Message message = messageRepository.findById(messageId).orElse(null);
+        return getByMessage(message);
+    }
+
+    public Iterable<Pin> getByChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        return getByChat(chat);
+    }
+
+    public Long numberOfPinsInChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        return numberOfPinsInChat(chat);
+    }
+
+    public void deleteByMessage(Long messageId) {
+        Message message = messageRepository.findById(messageId).orElse(null);
+        deleteByMessage(message);
+    }
+
+    public void deleteByChat(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        deleteByChat(chat);
     }
 }
