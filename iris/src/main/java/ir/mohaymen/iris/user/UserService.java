@@ -1,8 +1,12 @@
 package ir.mohaymen.iris.user;
 
+import java.util.List;
+
 public interface UserService {
 
     User getById(Long id);
+
+    List<User> getById(List<Long> ids);
 
     Iterable<User> getByFirstName(String firstName);
 
