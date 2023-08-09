@@ -9,7 +9,7 @@ public class BaseController {
     public User getUserByToken() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null) {
+        if (authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
             return (User) authentication.getPrincipal();
         }
         return null;
