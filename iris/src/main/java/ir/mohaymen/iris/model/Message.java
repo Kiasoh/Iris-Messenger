@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ public class Message {
     @JoinColumn(name = "mediaId")
     @OneToOne
     private Media media;
+    @NotBlank
     private Instant sendAt;
     private Instant editedAt;
 }

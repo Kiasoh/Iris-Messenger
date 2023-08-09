@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 @Entity
 @Table(name = "contacts")
@@ -14,6 +15,7 @@ public class Contact {
     private User fistUser;
     @ManyToOne
     private User secondUser;
+    @NotBlank
     private String firstName;
     private String lastName;
 }
