@@ -1,0 +1,8 @@
+{
+    "platform": "docker",
+    "app": "iris-api",
+    "build": {
+       "dockerfile": "./iris/Dockerfile"
+    },
+    "port": 8080
+}
