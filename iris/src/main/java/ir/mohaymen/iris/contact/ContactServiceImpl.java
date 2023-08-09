@@ -25,24 +25,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Iterable<Contact> getContactByFirstUser(Long firstUserId) throws Exception {
-        User user = userRepository.findById(firstUserId).orElse(null);
-        if (user == null) throw new Exception("No such user exists.");
-        return getContactByFirstUser(user);
-    }
-
-    @Override
     public Iterable<Contact> getContactByFirstUser(User firstUser) {
         return contactRepository.findByFirstUser(firstUser);
-    }
-
-    @Override
-    public Iterable<User> getUserByFirstUser(Long firstUserId) throws Exception {
-        Iterable<Contact> contacts = getContactByFirstUser(firstUserId);
-        ArrayList<User> users = new ArrayList<>();
-        for (Contact contact : contacts)
-            users.add(contact.getSecondUser());
-        return users;
     }
 
     @Override
@@ -55,24 +39,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Iterable<Contact> getContactBySecondUser(Long secondUserId) throws Exception {
-        User user = userRepository.findById(secondUserId).orElse(null);
-        if (user == null) throw new Exception("No such user exists.");
-        return getContactByFirstUser(user);
-    }
-
-    @Override
     public Iterable<Contact> getContactBySecondUser(User secondUser) {
         return contactRepository.findBySecondUser(secondUser);
-    }
-
-    @Override
-    public Iterable<User> getUserBySecondUser(Long secondUserId) throws Exception {
-        Iterable<Contact> contacts = getContactBySecondUser(secondUserId);
-        ArrayList<User> users = new ArrayList<>();
-        for (Contact contact : contacts)
-            users.add(contact.getSecondUser());
-        return users;
     }
 
     @Override
@@ -90,16 +58,9 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
+    public void deleteById(Long id) {
         Contact contact = getById(id);
-        if (contact != null) contactRepository.delete(contact);
-        else throw new Exception("No such relationship exists.");
-    }
-
-    @Override
-    public void deleteByFirstUser(Long firstUserName) throws Exception {
-        Iterable<Contact> contacts = getContactByFirstUser(firstUserName);
-        contactRepository.deleteAll(contacts);
+        contactRepository.delete(contact);
     }
 
     @Override
@@ -109,14 +70,44 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteBySecondUser(Long secondUserName) throws Exception {
-        Iterable<Contact> contacts = getContactBySecondUser(secondUserName);
+    public void deleteBySecondUser(User secondUser) {
+        Iterable<Contact> contacts = getContactBySecondUser(secondUser);
         contactRepository.deleteAll(contacts);
     }
 
-    @Override
-    public void deleteBySecondUser(User secondUser) {
-        Iterable<Contact> contacts = getContactBySecondUser(secondUser);
+    public Iterable<Contact> getContactByFirstUser(Long firstUserId) {
+        User user = userRepository.findById(firstUserId).orElse(null);
+        return getContactByFirstUser(user);
+    }
+
+    public Iterable<User> getUserByFirstUser(Long firstUserId) {
+        Iterable<Contact> contacts = getContactByFirstUser(firstUserId);
+        ArrayList<User> users = new ArrayList<>();
+        for (Contact contact : contacts)
+            users.add(contact.getSecondUser());
+        return users;
+    }
+
+    public Iterable<Contact> getContactBySecondUser(Long secondUserId) {
+        User user = userRepository.findById(secondUserId).orElse(null);
+        return getContactByFirstUser(user);
+    }
+
+    public Iterable<User> getUserBySecondUser(Long secondUserId) {
+        Iterable<Contact> contacts = getContactBySecondUser(secondUserId);
+        ArrayList<User> users = new ArrayList<>();
+        for (Contact contact : contacts)
+            users.add(contact.getSecondUser());
+        return users;
+    }
+
+    public void deleteByFirstUser(Long firstUserName) {
+        Iterable<Contact> contacts = getContactByFirstUser(firstUserName);
+        contactRepository.deleteAll(contacts);
+    }
+
+    public void deleteBySecondUser(Long secondUserName) {
+        Iterable<Contact> contacts = getContactBySecondUser(secondUserName);
         contactRepository.deleteAll(contacts);
     }
 }

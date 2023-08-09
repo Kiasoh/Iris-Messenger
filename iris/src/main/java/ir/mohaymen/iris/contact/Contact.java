@@ -12,12 +12,16 @@ public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "userId")
     private User firstUser;
+
     @ManyToOne
     private User secondUser;
+
     @NotBlank
     private String firstName;
+
     private String lastName;
 }
