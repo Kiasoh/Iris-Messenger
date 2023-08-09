@@ -36,4 +36,5 @@ public class ChatController extends BaseController {
         catch (Exception e) {throw new HttpClientErrorException(HttpStatusCode.valueOf(403));}
         return new ResponseEntity<>(chat , HttpStatus.OK);
     }
+
 }
