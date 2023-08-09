@@ -16,19 +16,25 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Chat {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatId;
+
     @NotBlank
     private String title;
+
     private String bio;
+
     @Column(unique = true)
     private String link;
+
     private boolean isPublic;
+
     @Enumerated(EnumType.ORDINAL)
     @NotNull
     private ChatType chatType;
+
     @OneToMany
     public ArrayList<Subscription> subs;
-
 }

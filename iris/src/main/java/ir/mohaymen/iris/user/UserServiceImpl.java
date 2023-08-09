@@ -11,10 +11,6 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
 
-    public Iterable<User> getById(List<Long> ids) {
-        return userRepository.findAllById(ids);
-    }
-
     @Override
     public User getById(Long id) {
         return userRepository.findById(id).orElse(null);
@@ -63,5 +59,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteByPhoneNumber(String phoneNumber) {
         userRepository.deleteByPhoneNumber(phoneNumber);
+    }
+
+    public Iterable<User> getById(List<Long> ids) {
+        return userRepository.findAllById(ids);
     }
 }

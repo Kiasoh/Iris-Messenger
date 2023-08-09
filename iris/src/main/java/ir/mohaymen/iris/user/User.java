@@ -24,13 +24,18 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @NotBlank
     private String firstName;
+
     private String lastName;
+
     @Column(unique = true)
     private String phoneNumber;
+
     @Column(unique = true)
     private String userName;
+
     private String bio;
 
     @OneToMany(mappedBy = "user")
@@ -38,7 +43,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<GrantedAuthority>();
+        return new HashSet<>();
     }
 
     @Override

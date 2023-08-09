@@ -15,16 +15,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Chat getByLink(String link) {
-        return chatRepository.findByLink(link).orElse(null);
-    }
-
-    @Override
-    public Iterable<Chat> getByTitle(String title) {
-        return chatRepository.findByTitle(title);
-    }
-
-    @Override
     public Iterable<Chat> getAll() {
         return chatRepository.findAll();
     }
@@ -35,8 +25,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
-        if (getById(id) != null) chatRepository.deleteById(id);
-        else throw new Exception("No such chat exists.");
+    public void deleteById(Long id) {
+        chatRepository.deleteById(id);
+    }
+
+    public Chat getByLink(String link) {
+        return chatRepository.findByLink(link).orElse(null);
+    }
+
+    public Iterable<Chat> getByTitle(String title) {
+        return chatRepository.findByTitle(title);
     }
 }
