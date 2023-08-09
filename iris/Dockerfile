@@ -2,9 +2,9 @@ FROM maven:3.9.3-eclipse-temurin-20-alpine as build
 ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
-ADD pom.xml $HOME
+ADD iris/pom.xml $HOME
 RUN mvn verify --fail-never
-ADD . $HOME
+ADD ./iris $HOME
 RUN mvn package -DskipTests
 
 FROM openjdk:19-alpine
