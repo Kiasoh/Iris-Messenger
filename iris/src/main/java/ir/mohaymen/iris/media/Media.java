@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.media;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,7 +1,9 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.contact;
 
+import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Entity
 @Table(name = "contacts")
 @Data

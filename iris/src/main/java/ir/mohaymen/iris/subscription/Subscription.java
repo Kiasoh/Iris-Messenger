@@ -1,5 +1,7 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.subscription;
 
+import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 

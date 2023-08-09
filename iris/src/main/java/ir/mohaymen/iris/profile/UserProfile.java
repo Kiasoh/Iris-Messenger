@@ -1,20 +1,24 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.profile;
 
+import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
-@Data
+
+import ir.mohaymen.iris.user.User;
+
 @Entity
-@Table(name = "chat_profiles")
-public class ChatProfile {
+@Table(name = "user_profiles")
+@Data
+public class UserProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "chatId")
-    private Chat chat;
+    @JoinColumn(name = "userId")
+    private User user;
     @OneToOne
     @JoinColumn(name = "mediaId")
     private Media media;
