@@ -4,7 +4,7 @@ public interface MediaService {
 
     Media getById(Long id);
 
-    Media create(Media media);
+    Media createOrUpdate(Media media);
 
     void deleteById(Long id) throws Exception;
 

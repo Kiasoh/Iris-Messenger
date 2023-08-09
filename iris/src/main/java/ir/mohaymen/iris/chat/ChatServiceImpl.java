@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ChatServiceImpl implements ChatService{
+public class ChatServiceImpl implements ChatService {
 
     private ChatRepository chatRepository;
 
@@ -30,7 +30,7 @@ public class ChatServiceImpl implements ChatService{
     }
 
     @Override
-    public Chat create(Chat chat) {
+    public Chat createOrUpdate(Chat chat) {
         return chatRepository.save(chat);
     }
 

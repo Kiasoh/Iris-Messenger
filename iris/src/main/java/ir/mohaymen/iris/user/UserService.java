@@ -18,7 +18,7 @@ public interface UserService {
 
     Iterable<User> getAll();
 
-    User create(User user);
+    User createOrUpdate(User user);
 
     void deleteById(Long id) throws Exception;
 

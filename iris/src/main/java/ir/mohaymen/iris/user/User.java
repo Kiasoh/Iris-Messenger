@@ -2,7 +2,6 @@ package ir.mohaymen.iris.user;
 
 import ir.mohaymen.iris.token.Token;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

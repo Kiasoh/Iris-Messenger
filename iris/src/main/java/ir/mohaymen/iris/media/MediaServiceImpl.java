@@ -15,14 +15,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Media create(Media media) {
+    public Media createOrUpdate(Media media) {
         return mediaRepository.save(media);
     }
 
     @Override
     public void deleteById(Long id) throws Exception {
         if (getById(id) != null) mediaRepository.deleteById(id);
-        else throw new Exception("No such media exists.");
+        else throw new Exception("No such file exists.");
     }
 
     @Override

@@ -2,8 +2,6 @@ package ir.mohaymen.iris.subscription;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
-import ir.mohaymen.iris.chat.ChetMapper;
-import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +22,7 @@ public class SubscriptionController {
     public ResponseEntity<Chat> addToChat(@RequestBody SubDto subDto) {
         try {
             for (Long id: subDto.getUserIds() )
-                subscriptionService.create (new Subscription(null , userService.getById (id) , chatService.getById(subDto.getChatId())));
+                subscriptionService.createOrUpdate(new Subscription(null , userService.getById (id) , chatService.getById(subDto.getChatId())));
         }
         catch (Exception e) {return new ResponseEntity<>(null , HttpStatus.BAD_REQUEST);}
         return new ResponseEntity<>(chat , HttpStatus.OK);
