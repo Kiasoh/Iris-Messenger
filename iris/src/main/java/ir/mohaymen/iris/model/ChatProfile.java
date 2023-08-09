@@ -1,9 +1,12 @@
 package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.Instant;
-
+@Data
+@Entity
+@Table(name = "chat_profiles")
 public class ChatProfile {
 
     @Id

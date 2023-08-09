@@ -1,9 +1,11 @@
 package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "pinnedmessages")
+@Data
 public class Pin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
