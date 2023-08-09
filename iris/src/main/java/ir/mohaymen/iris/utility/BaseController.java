@@ -6,7 +6,7 @@ import ir.mohaymen.iris.user.User;
 
 public class BaseController {
 
-    protected User getUserByToken() {
+    public User getUserByToken() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
