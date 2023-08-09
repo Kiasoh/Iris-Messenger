@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    private SubscriptionRepository subscriptionRepository;
-    private UserRepository userRepository;
-    private ChatRepository chatRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
 
     @Override
     public Subscription getSubscriptionBySubscriptionId(Long subscriptionId) {

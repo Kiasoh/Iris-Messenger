@@ -11,8 +11,8 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
-    private ContactRepository contactRepository;
-    private UserRepository userRepository;
+    private final ContactRepository contactRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Contact getById(Long id) {

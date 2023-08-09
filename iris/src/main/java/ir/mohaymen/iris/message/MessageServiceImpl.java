@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    private MessageRepository messageRepository;
-    private UserRepository userRepository;
-    private ChatRepository chatRepository;
+    private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
 
     @Override
     public Message getById(Long id) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class MediaServiceImpl implements MediaService {
 
-    private MediaRepository mediaRepository;
+    private final MediaRepository mediaRepository;
 
     @Override
     public Media getById(Long id) {

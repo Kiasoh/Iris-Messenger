@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
     @Override
     public Chat getById(Long id) {

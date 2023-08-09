@@ -13,9 +13,9 @@ import java.util.stream.StreamSupport;
 @AllArgsConstructor
 public class PinServiceImpl implements PinService {
 
-    private PinRepository pinRepository;
-    private MessageRepository messageRepository;
-    private ChatRepository chatRepository;
+    private final PinRepository pinRepository;
+    private final MessageRepository messageRepository;
+    private final ChatRepository chatRepository;
 
     @Override
     public Pin getById(Long id) {
