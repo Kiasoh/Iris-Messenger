@@ -3,6 +3,7 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
@@ -21,5 +22,6 @@ public class ChatProfile {
     @OneToOne
     @JoinColumn(name = "mediaId")
     private Media media;
+    @NotBlank
     private Instant setAt;
 }
