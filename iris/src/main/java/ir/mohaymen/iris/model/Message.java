@@ -3,8 +3,7 @@ package ir.mohaymen.iris.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Timestamp;
-
+import java.time.Instant;
 
 @Entity
 @Table(name = "messages")
@@ -23,6 +22,6 @@ public class Message {
     @JoinColumn(name = "mediaId")
     @OneToOne
     private Media media;
-    private Timestamp sendAt;
-    private Timestamp editedAt;
+    private Instant sendAt;
+    private Instant editedAt;
 }

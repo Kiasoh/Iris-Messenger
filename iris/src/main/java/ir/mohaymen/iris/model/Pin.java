@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "pinnedmessages")
+@Table(name = "pinned_messages")
 @Data
 public class Pin {
     @Id
