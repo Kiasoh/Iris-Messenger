@@ -14,7 +14,7 @@ public class Contact {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User fistUser;
+    private User firstUser;
     @ManyToOne
     private User secondUser;
     @NotBlank
