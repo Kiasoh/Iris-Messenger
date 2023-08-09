@@ -19,5 +19,3 @@ public class Chat {
     @Enumerated(EnumType.ORDINAL)
     private ChatType chatType;
 }
-
-

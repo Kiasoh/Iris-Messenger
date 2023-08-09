@@ -53,6 +53,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    public Iterable<Subscription> getAll() {
+        return subscriptionRepository.findAll();
+    }
+
+    @Override
     public Subscription create(Subscription subscription) {
         return subscriptionRepository.save(subscription);
     }

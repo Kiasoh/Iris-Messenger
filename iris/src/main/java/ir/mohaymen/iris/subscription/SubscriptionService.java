@@ -15,6 +15,8 @@ public interface SubscriptionService {
 
     Iterable<Subscription> getAllSubscriptionByChatId(Long chatId);
 
+    Iterable<Subscription> getAll();
+
     Subscription create(Subscription subscription);
 
     void deleteById(Long subscriptionId) throws Exception;
