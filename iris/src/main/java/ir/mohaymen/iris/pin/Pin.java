@@ -4,10 +4,13 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.chat.Chat;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "pinned_messages")
-@Data
+@Getter
+@Setter
 public class Pin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

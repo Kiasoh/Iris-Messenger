@@ -9,10 +9,13 @@ import lombok.Data;
 import java.time.Instant;
 
 import ir.mohaymen.iris.user.User;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "messages")
-@Data
+@Getter
+@Setter
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

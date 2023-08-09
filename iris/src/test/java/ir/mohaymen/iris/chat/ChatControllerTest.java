@@ -4,6 +4,7 @@ import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
+import jakarta.validation.constraints.AssertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,10 +34,12 @@ class ChatControllerTest {
         chat3.setChatType(ChatType.CHANNEL);
         user1 = userService.createOrUpdate(user1);
         chat1 = chatService.createOrUpdate(chat1); chat2 = chatService.createOrUpdate(chat2);chat3 = chatService.createOrUpdate(chat3);
-        Subscription sub = new Subscription(null, userService.getById(user1.getUserId()) , chatService.getById(chat1.getChatId()));
-//        Subscription sub1 = new Subscription(null, user1 , chat1);
+        Subscription sub = new Subscription(null, userService.getById(user1.getUserId()) , chat1);
+        Subscription sub1 = new Subscription(null, user1 , chat1);
         subscriptionService.createOrUpdate(sub);
-
+        subscriptionService.createOrUpdate(sub1);
+        User user4 =userService.getById(user1.getUserId());
+        assertTrue(true);
 
 
 //        }
