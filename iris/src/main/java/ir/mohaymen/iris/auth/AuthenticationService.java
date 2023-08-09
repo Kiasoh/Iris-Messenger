@@ -4,6 +4,7 @@ import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.token.TokenType;
+import ir.mohaymen.iris.user.UserCreationDto;
 import ir.mohaymen.iris.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,11 +27,11 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthenticationResponse register(RegisterRequest request) {
+  public AuthenticationResponse register(UserCreationDto userDto) {
     var user = User.builder()
-        .firstName(request.getFirstname())
-        .lastName(request.getLastname())
-        .phoneNumber(request.getPhoneNumber())
+        .firstName(userDto.getFirstName())
+        .lastName(userDto.getLastName())
+        .phoneNumber(userDto.getPhoneNumber())
         // .password(passwordEncoder.encode(request.getPassword()))
         .build();
     var savedUser = repository.save(user);

@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.auth;
 
+import ir.mohaymen.iris.user.UserCreationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register(
-      @RequestBody RegisterRequest request) {
-    return ResponseEntity.ok(service.register(request));
+      @RequestBody UserCreationDto user) {
+    return ResponseEntity.ok(service.register(user));
   }
 
   @PostMapping("/login")
