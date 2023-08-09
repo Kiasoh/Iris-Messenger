@@ -1,11 +1,10 @@
 package ir.mohaymen.iris.auth;
 
-import ir.mohaymen.iris.config.JwtService;
-import ir.mohaymen.iris.model.User;
+import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.token.TokenType;
-import ir.mohaymen.iris.reposetory.UserRepository;
+import ir.mohaymen.iris.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

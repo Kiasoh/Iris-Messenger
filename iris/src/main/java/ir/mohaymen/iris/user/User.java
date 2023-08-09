@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.user;
 
 import ir.mohaymen.iris.token.Token;
 import jakarta.persistence.*;

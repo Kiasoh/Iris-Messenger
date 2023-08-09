@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.config;
+package ir.mohaymen.iris.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

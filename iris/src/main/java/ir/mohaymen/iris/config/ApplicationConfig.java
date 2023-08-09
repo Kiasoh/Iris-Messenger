@@ -1,6 +1,6 @@
 package ir.mohaymen.iris.config;
 
-import ir.mohaymen.iris.reposetory.UserRepository;
+import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

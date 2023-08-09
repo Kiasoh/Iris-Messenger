@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.config;
+package ir.mohaymen.iris.auth;
 
 import ir.mohaymen.iris.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
