@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.chat;
 
 public enum ChatType {
     PV,

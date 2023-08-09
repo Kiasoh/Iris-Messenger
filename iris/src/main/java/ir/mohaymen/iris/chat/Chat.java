@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.chat;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

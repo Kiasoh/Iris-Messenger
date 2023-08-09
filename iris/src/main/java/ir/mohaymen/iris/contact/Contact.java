@@ -1,8 +1,10 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.contact;
 
+import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
 @Entity
 @Table(name = "contacts")
 @Data

@@ -1,5 +1,7 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.pin;
 
+import ir.mohaymen.iris.message.Message;
+import ir.mohaymen.iris.chat.Chat;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,7 +13,7 @@ public class Pin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pinId;
     @ManyToOne
-    @JoinColumn(name = "messageId" )
+    @JoinColumn(name = "messageId")
     private Message message;
     @ManyToOne
     @JoinColumn(name = "chatId")

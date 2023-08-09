@@ -1,9 +1,12 @@
-package ir.mohaymen.iris.model;
+package ir.mohaymen.iris.profile;
 
+import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
+
+import ir.mohaymen.iris.user.User;
 
 @Entity
 @Table(name = "user_profiles")
