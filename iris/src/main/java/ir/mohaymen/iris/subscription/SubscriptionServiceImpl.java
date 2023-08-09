@@ -55,7 +55,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Subscription create(Subscription subscription) {
+    public Subscription createOrUpdate(Subscription subscription) {
         return subscriptionRepository.save(subscription);
     }
 
@@ -69,14 +69,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public void deleteByUserId(Long userId) throws Exception {
         Iterable<Subscription> subscriptions = getAllSubscriptionByUserId(userId);
-        if (subscriptions!=null) subscriptionRepository.deleteAll(subscriptions);
+        if (subscriptions != null) subscriptionRepository.deleteAll(subscriptions);
         else throw new Exception("No such user exists.");
     }
 
     @Override
-    public void deleteByChatId(Long chatId) throws Exception{
+    public void deleteByChatId(Long chatId) throws Exception {
         Iterable<Subscription> subscriptions = getAllSubscriptionByChatId(chatId);
-        if (subscriptions!=null) subscriptionRepository.deleteAll(subscriptions);
+        if (subscriptions != null) subscriptionRepository.deleteAll(subscriptions);
         else throw new Exception("No such chat exists.");
     }
 }

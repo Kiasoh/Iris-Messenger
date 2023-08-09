@@ -10,7 +10,7 @@ public interface ChatService {
 
     Iterable<Chat> getAll();
 
-    Chat create(Chat chat);
+    Chat createOrUpdate(Chat chat);
 
     void deleteById(Long id) throws Exception;
 }

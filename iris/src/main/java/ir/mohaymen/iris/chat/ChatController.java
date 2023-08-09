@@ -7,7 +7,6 @@ import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +28,10 @@ public class ChatController extends BaseController {
     public ResponseEntity<Chat> createChat(@RequestBody ChatDto chatDto) {
         Chat chat;
         try {
-            chatService.create(chat = ChetMapper.toChat(chatDto));
-            subscriptionService.create(new Subscription(null ,  getUserByToken(), chat));
+            chatService.createOrUpdate(chat = ChetMapper.toChat(chatDto));
+            subscriptionService.createOrUpdate(new Subscription(null ,  getUserByToken(), chat));
             for (Long id: chatDto.getUserIds() )
-                subscriptionService.create (new Subscription(null , userService.getById (id) , chat));
+                subscriptionService.createOrUpdate(new Subscription(null , userService.getById (id) , chat));
         }
         catch (Exception e) {throw new HttpClientErrorException(HttpStatusCode.valueOf(403));}
         return new ResponseEntity<>(chat , HttpStatus.OK);

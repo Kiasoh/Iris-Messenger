@@ -24,7 +24,7 @@ public interface ContactService {
 
     Iterable<User> getUserBySecondUser(User secondUser);
 
-    Contact create(Contact contact);
+    Contact createOrUpdate(Contact contact);
 
     void deleteById(Long id) throws Exception;
 

@@ -17,11 +17,11 @@ public interface SubscriptionService {
 
     Iterable<Subscription> getAll();
 
-    Subscription create(Subscription subscription);
+    Subscription createOrUpdate(Subscription subscription);
 
     void deleteById(Long subscriptionId) throws Exception;
 
     void deleteByUserId(Long userId) throws Exception;
 
-    void deleteByChatId(Long chatId)throws Exception;
+    void deleteByChatId(Long chatId) throws Exception;
 }

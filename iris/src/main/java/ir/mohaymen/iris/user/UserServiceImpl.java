@@ -47,25 +47,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) {
+    public User createOrUpdate(User user) {
         return userRepository.save(user);
     }
 
     @Override
     public void deleteById(Long id) throws Exception {
         if (getById(id) != null) userRepository.deleteById(id);
-        else throw new Exception();
+        else throw new Exception("No such user exists.");
     }
 
     @Override
     public void deleteByUserName(String userName) throws Exception {
         if (getByUserName(userName) != null) userRepository.deleteByUserName(userName);
-        else throw new Exception();
+        else throw new Exception("No such username exists.");
     }
 
     @Override
     public void deleteByPhoneNumber(String phoneNumber) throws Exception {
         if (getByPhoneNumber(phoneNumber) != null) userRepository.deleteByPhoneNumber(phoneNumber);
-        else throw new Exception();
+        else throw new Exception("No such phone number exists.");
     }
 }

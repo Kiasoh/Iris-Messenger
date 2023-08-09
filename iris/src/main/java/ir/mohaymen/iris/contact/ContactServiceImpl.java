@@ -27,7 +27,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public Iterable<Contact> getContactByFirstUser(Long firstUserId) throws Exception {
         User user = userRepository.findById(firstUserId).orElse(null);
-        if (user == null) throw new Exception();
+        if (user == null) throw new Exception("No such user exists.");
         return getContactByFirstUser(user);
     }
 
@@ -57,7 +57,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public Iterable<Contact> getContactBySecondUser(Long secondUserId) throws Exception {
         User user = userRepository.findById(secondUserId).orElse(null);
-        if (user == null) throw new Exception();
+        if (user == null) throw new Exception("No such user exists.");
         return getContactByFirstUser(user);
     }
 
@@ -85,17 +85,15 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact create(Contact contact) {
+    public Contact createOrUpdate(Contact contact) {
         return contactRepository.save(contact);
     }
 
     @Override
     public void deleteById(Long id) throws Exception {
         Contact contact = getById(id);
-        if (contact!= null)
-            contactRepository.delete(contact);
-        else
-            throw new Exception();
+        if (contact != null) contactRepository.delete(contact);
+        else throw new Exception("No such relationship exists.");
     }
 
     @Override
@@ -105,7 +103,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteByFirstUser(User firstUSer){
+    public void deleteByFirstUser(User firstUSer) {
         Iterable<Contact> contacts = getContactByFirstUser(firstUSer);
         contactRepository.deleteAll(contacts);
     }
@@ -117,7 +115,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteBySecondUser(User secondUser){
+    public void deleteBySecondUser(User secondUser) {
         Iterable<Contact> contacts = getContactBySecondUser(secondUser);
         contactRepository.deleteAll(contacts);
     }
