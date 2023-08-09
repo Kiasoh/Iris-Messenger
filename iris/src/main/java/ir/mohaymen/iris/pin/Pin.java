@@ -15,7 +15,7 @@ public class Pin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pinId;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "messageId")
     private Message message;
     @ManyToOne
