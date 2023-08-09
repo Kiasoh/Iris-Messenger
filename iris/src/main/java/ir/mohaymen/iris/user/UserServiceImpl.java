@@ -11,14 +11,13 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
 
-    @Override
-    public User getById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public Iterable<User> getById(List<Long> ids) {
+        return userRepository.findAllById(ids);
     }
 
     @Override
-    public Iterable<User> getById(List<Long> ids) {
-        return userRepository.findAllById(ids);
+    public User getById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -52,20 +51,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(Long id) throws Exception {
-        if (getById(id) != null) userRepository.deleteById(id);
-        else throw new Exception("No such user exists.");
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
-    public void deleteByUserName(String userName) throws Exception {
-        if (getByUserName(userName) != null) userRepository.deleteByUserName(userName);
-        else throw new Exception("No such username exists.");
+    public void deleteByUserName(String userName) {
+        userRepository.deleteByUserName(userName);
     }
 
     @Override
-    public void deleteByPhoneNumber(String phoneNumber) throws Exception {
-        if (getByPhoneNumber(phoneNumber) != null) userRepository.deleteByPhoneNumber(phoneNumber);
-        else throw new Exception("No such phone number exists.");
+    public void deleteByPhoneNumber(String phoneNumber) {
+        userRepository.deleteByPhoneNumber(phoneNumber);
     }
 }

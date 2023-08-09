@@ -1,12 +1,8 @@
 package ir.mohaymen.iris.user;
 
-import java.util.List;
-
 public interface UserService {
 
     User getById(Long id);
-
-    Iterable<User> getById(List<Long> ids);
 
     Iterable<User> getByFirstName(String firstName);
 
@@ -22,7 +18,7 @@ public interface UserService {
 
     void deleteById(Long id) throws Exception;
 
-    void deleteByUserName(String userName) throws Exception;
+    void deleteByUserName(String userName);
 
-    void deleteByPhoneNumber(String phoneNumber) throws Exception;
+    void deleteByPhoneNumber(String phoneNumber);
 }
