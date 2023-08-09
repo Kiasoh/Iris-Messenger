@@ -11,8 +11,9 @@ public class Contact {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "userId")
-    private Users fistUser;
-    private Long secondUser;
+    private User fistUser;
+    @ManyToOne
+    private User secondUser;
     private String firstName;
     private String lastName;
 }

@@ -1,15 +1,11 @@
 package ir.mohaymen.iris.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.relational.core.mapping.Table;
-
-import java.sql.Timestamp;
+import java.time.Instant;
 
 
 @Entity
 @Table(name = "messages")
-@Data
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +16,10 @@ public class Message {
     private Chat originChat;
     @JoinColumn(name = "userId")
     @ManyToOne
-    private Users sender;
+    private User sender;
     @JoinColumn(name = "mediaId")
     @OneToOne
     private Media media;
-    private Timestamp sendAt;
-    private Timestamp editedAt;
+    private Instant sendAt;
+    private Instant editedAt;
 }
