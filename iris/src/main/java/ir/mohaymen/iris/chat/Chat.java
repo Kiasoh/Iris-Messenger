@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "chats")
@@ -27,7 +29,7 @@ public class Chat {
     @Enumerated(EnumType.ORDINAL)
     @NotNull
     private ChatType chatType;
-    @OneToMany
-    public ArrayList<Subscription> subs;
+    @OneToMany(fetch = FetchType.EAGER , mappedBy = "chat")
+    public Set<Subscription> subs;
 
 }

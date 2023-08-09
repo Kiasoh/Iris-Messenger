@@ -36,10 +36,16 @@ class ChatControllerTest {
         chat1 = chatService.createOrUpdate(chat1); chat2 = chatService.createOrUpdate(chat2);chat3 = chatService.createOrUpdate(chat3);
         Subscription sub = new Subscription(null, userService.getById(user1.getUserId()) , chat1);
         Subscription sub1 = new Subscription(null, user1 , chat1);
-        subscriptionService.createOrUpdate(sub);
+        sub = subscriptionService.createOrUpdate(sub);
         subscriptionService.createOrUpdate(sub1);
+        subscriptionService.createOrUpdate(sub1);
+        chat1 = chatService.createOrUpdate(chat1);
         User user4 =userService.getById(user1.getUserId());
-        assertTrue(true);
+        System.out.println(chatService.getById(chat1.getChatId()).getSubs());
+        System.out.println(sub.getUser().getFirstName());
+
+        User finalUser = user1;
+        assertTrue(chatService.getById(chat1.getChatId()).getSubs().stream().anyMatch(s -> s.getUser().getUserId() == finalUser.getUserId()));
 
 
 //        }
