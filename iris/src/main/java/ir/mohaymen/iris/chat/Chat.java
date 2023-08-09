@@ -2,11 +2,15 @@ package ir.mohaymen.iris.chat;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "chats")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +24,7 @@ public class Chat {
     @Enumerated(EnumType.ORDINAL)
     @NotBlank
     private ChatType chatType;
+
 }
 
 
