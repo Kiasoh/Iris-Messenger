@@ -22,20 +22,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public User getUserBySubscriptionId(Long subscriptionId) {
-        Subscription subscription = getSubscriptionBySubscriptionId(subscriptionId);
-        if (subscription == null) return null;
-        return subscription.getUser();
-    }
-
-    @Override
-    public Chat getChatBySubscriptionId(Long subscriptionId) {
-        Subscription subscription = getSubscriptionBySubscriptionId(subscriptionId);
-        if (subscription == null) return null;
-        return subscription.getChat();
-    }
-
-    @Override
     public Iterable<Subscription> getAllSubscriptionByUserId(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) return null;
@@ -60,23 +46,31 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void deleteById(Long subscriptionId) throws Exception {
-        if (getSubscriptionBySubscriptionId(subscriptionId) != null)
-            subscriptionRepository.deleteById(subscriptionId);
-        else throw new Exception("No such subscription exists.");
+    public void deleteById(Long subscriptionId) {
+        subscriptionRepository.deleteById(subscriptionId);
     }
 
     @Override
-    public void deleteByUserId(Long userId) throws Exception {
+    public void deleteByUserId(Long userId) {
         Iterable<Subscription> subscriptions = getAllSubscriptionByUserId(userId);
-        if (subscriptions != null) subscriptionRepository.deleteAll(subscriptions);
-        else throw new Exception("No such user exists.");
+        subscriptionRepository.deleteAll(subscriptions);
     }
 
     @Override
-    public void deleteByChatId(Long chatId) throws Exception {
+    public void deleteByChatId(Long chatId) {
         Iterable<Subscription> subscriptions = getAllSubscriptionByChatId(chatId);
-        if (subscriptions != null) subscriptionRepository.deleteAll(subscriptions);
-        else throw new Exception("No such chat exists.");
+        subscriptionRepository.deleteAll(subscriptions);
+    }
+
+    public User getUserBySubscriptionId(Long subscriptionId) {
+        Subscription subscription = getSubscriptionBySubscriptionId(subscriptionId);
+        if (subscription == null) return null;
+        return subscription.getUser();
+    }
+
+    public Chat getChatBySubscriptionId(Long subscriptionId) {
+        Subscription subscription = getSubscriptionBySubscriptionId(subscriptionId);
+        if (subscription == null) return null;
+        return subscription.getChat();
     }
 }

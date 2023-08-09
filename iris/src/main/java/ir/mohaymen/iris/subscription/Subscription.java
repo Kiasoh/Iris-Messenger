@@ -13,12 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Subscription {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subId;
+
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
+
     @ManyToOne
     @JoinColumn(name = "chatId")
     private Chat chat;

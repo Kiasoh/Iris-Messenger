@@ -8,6 +8,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class SubDto {
+
     private Long chatId;
     private ArrayList<Long> userIds;
 }
