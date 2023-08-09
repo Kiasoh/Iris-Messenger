@@ -1,14 +1,16 @@
 package ir.mohaymen.iris.profile;
 
-import org.springframework.web.server.ResponseStatusException;
+import ir.mohaymen.iris.user.User;
 
 public interface UserProfileService {
 
-    Iterable<UserProfile> get();
-
     UserProfile getById(Long id);
 
-    UserProfile create(UserProfile userProfile);
+    Iterable<UserProfile> getByUser(User user);
+
+    Iterable<UserProfile> getAll();
+
+    UserProfile createOrUpdate(UserProfile userProfile);
 
     void deleteById(Long id);
 }
