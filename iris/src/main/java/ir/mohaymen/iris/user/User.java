@@ -24,7 +24,6 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @NotBlank
     private String firstName;
 
     private String lastName;

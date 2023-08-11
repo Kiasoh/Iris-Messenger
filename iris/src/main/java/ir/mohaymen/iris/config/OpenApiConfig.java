@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
-@OpenAPIDefinition(info = @Info(contact = @Contact(name = "MSPoulaei", email = "sadeghpoolaee@gmail.com", url = "https://github.com/MSPoulaei"), description = "OpenApi documentation for Iris", title = "OpenApi specification - Alibou", version = "1.0", license = @License(name = "Licence name", url = "https://some-url.com"), termsOfService = "Terms of service"), servers = {
+@OpenAPIDefinition(info = @Info(contact = @Contact(name = "MSPoulaei", email = "sadeghpoolaee@gmail.com", url = "https://github.com/MSPoulaei"), description = "OpenApi documentation for Iris", title = "OpenApi specification", version = "1.0", license = @License(name = "Licence name", url = "https://some-url.com"), termsOfService = "Terms of service"), servers = {
         @Server(description = "Default Server URL", url = "/")
 }, security = {
         @SecurityRequirement(name = "bearerAuth")

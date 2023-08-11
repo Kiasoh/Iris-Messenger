@@ -27,9 +27,6 @@ public class Token {
   @NotNull
   private Instant expiresAt;
 
-  // @Enumerated(EnumType.ORDINAL)
-  // public TokenType tokenType = TokenType.BEARER;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   public User user;
