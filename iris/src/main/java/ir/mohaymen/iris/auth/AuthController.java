@@ -1,5 +1,7 @@
 package ir.mohaymen.iris.auth;
 
+import ir.mohaymen.iris.code.ActivationCode;
+import ir.mohaymen.iris.code.ActivationCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -27,5 +29,6 @@ public class AuthController {
   public void sendActivationCode(@RequestParam String phoneNumber) {
     authService.sendActivationCode(phoneNumber);
   }
+
 
 }
