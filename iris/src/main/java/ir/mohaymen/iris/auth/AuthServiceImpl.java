@@ -7,7 +7,6 @@ import ir.mohaymen.iris.user.UserRepository;
 import ir.mohaymen.iris.utility.CodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,16 +43,16 @@ public class AuthServiceImpl implements AuthService {
         .build();
   }
 
-  public AuthTokensDto login(UserDto userDto) {
+  public AuthTokensDto login(LoginDto loginDto) {
     //TODO: check activation code from redis
     String jwtToken,refreshToken;
-    if (!userRepository.existsByPhoneNumber(userDto.getPhoneNumber())){
-      var result=register(userDto.getPhoneNumber());
+    if (!userRepository.existsByPhoneNumber(loginDto.getPhoneNumber())){
+      var result=register(loginDto.getPhoneNumber());
       jwtToken=result.getAccessToken();
       refreshToken=result.getRefreshToken();
     }
     else{
-      var user = userRepository.findByPhoneNumber(userDto.getPhoneNumber())
+      var user = userRepository.findByPhoneNumber(loginDto.getPhoneNumber())
               .orElseThrow();
       jwtToken = jwtService.generateToken(user);
       var refreshTokenObj = jwtService.generateRefreshToken();
@@ -62,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     }
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-            userDto.getPhoneNumber(), "password"));
+            loginDto.getPhoneNumber(), "password"));
 
     return AuthTokensDto.builder()
         .accessToken(jwtToken)

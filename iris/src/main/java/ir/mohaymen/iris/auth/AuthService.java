@@ -2,7 +2,7 @@ package ir.mohaymen.iris.auth;
 
 public interface AuthService {
 
-    AuthTokensDto login(UserDto userDto);
+    AuthTokensDto login(LoginDto loginDto);
 
     String refreshToken(AuthTokensDto authTokensDto);
 
