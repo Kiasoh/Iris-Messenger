@@ -44,9 +44,4 @@ public class ApplicationConfig {
     return new BCryptPasswordEncoder();
   }
 
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
-
 }

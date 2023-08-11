@@ -4,6 +4,7 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,6 @@ public class ChatProfile {
     @JoinColumn(name = "mediaId")
     private Media media;
 
-    @NotBlank
+    @NotNull
     private Instant setAt;
 }

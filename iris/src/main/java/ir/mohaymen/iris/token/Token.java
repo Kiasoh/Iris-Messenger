@@ -1,7 +1,10 @@
 package ir.mohaymen.iris.token;
 
+import java.time.Instant;
+
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,12 +24,11 @@ public class Token {
   @Column(unique = true)
   public String token;
 
-  @Enumerated(EnumType.STRING)
-  public TokenType tokenType = TokenType.BEARER;
+  @NotNull
+  private Instant expiresAt;
 
-  public boolean revoked;
-
-  public boolean expired;
+  // @Enumerated(EnumType.ORDINAL)
+  // public TokenType tokenType = TokenType.BEARER;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")

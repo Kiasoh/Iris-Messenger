@@ -5,6 +5,7 @@ import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +35,7 @@ public class Message {
     @OneToOne
     private Media media;
 
-    @NotBlank
+    @NotNull
     private Instant sendAt;
 
     private Instant editedAt;

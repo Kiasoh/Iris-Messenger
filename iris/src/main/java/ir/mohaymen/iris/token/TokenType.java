@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.token;
 
 public enum TokenType {
-  BEARER
+  BEARER,
+  REFRESH_TOKEN
 }

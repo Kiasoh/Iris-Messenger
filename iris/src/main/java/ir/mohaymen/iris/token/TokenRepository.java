@@ -11,9 +11,15 @@ public interface TokenRepository extends CrudRepository<Token, Integer> {
   @Query(value = """
       select t from Token t inner join User u\s
       on t.user.userId = u.userId\s
-      where u.userId = :id and (t.expired = false or t.revoked = false)\s
+      where u.userId = :id and t.expiresAt >= current_timestamp\s
       """)
   List<Token> findAllValidTokenByUser(Long id);
+  @Query(value = """
+      select t from Token t inner join User u\s
+      on t.user.userId = u.userId\s
+      where u.userId = :phoneNumber and t.expiresAt >= current_timestamp\s
+      """)
+  List<Token> findAllValidTokenByUserPhoneNumber(String phoneNumber);
 
   Optional<Token> findByToken(String token);
 }
