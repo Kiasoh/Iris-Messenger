@@ -42,6 +42,9 @@ public class SubscriptionSeeder implements Seeder {
         subscription.setSubId(id);
         subscription.setUser(user);
         subscription.setChat(chat);
+
+        chat.getSubs().add(subscription);
+
         return subscription;
     }
 }
