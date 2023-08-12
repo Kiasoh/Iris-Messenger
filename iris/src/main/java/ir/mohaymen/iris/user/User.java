@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.user;
 
+import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -38,6 +40,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "firstUser")
+    private Set<Contact> contacts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
