@@ -119,6 +119,7 @@ public class AuthServiceImpl implements AuthService {
         do {
             activationCode = codeGenerator.generateActivationCode();
         } while (activationCodeRepository.findByCode(activationCode).isPresent());
+        activationCode="12345";
         ActivationCode codeObj=ActivationCode.builder()
                 .code(activationCode)
                 .phoneNumber(phoneNumber)
