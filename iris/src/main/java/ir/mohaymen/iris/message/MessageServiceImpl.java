@@ -5,7 +5,13 @@ import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -88,5 +94,14 @@ public class MessageServiceImpl implements MessageService {
     public void deleteByChat(Long chatId) {
         Chat chat = chatRepository.findById(chatId).orElse(null);
         deleteByChat(chat);
+    }
+    public Page<Message> getMessagesByPage (Long chatId, int pageNum , int pageSize) {
+//        Iterable<Message> messages = getByChat(chatId);
+        var chat=new Chat();
+        chat.setChatId(chatId);
+        var message=new Message();
+        message.setOriginChat(chat);
+        return messageRepository.findAll(Example.of(message) ,Pageable.ofSize(pageSize).withPage(pageNum) );
+//         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
     }
 }
