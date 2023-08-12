@@ -12,6 +12,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=toor
       - SPRING_JWT_SECRET_KEY=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      - REDIS_HOST=redis
+      - RAYGAN_SMS_SENDER_NUMBER=null
+      - RAYGAN_SMS_USERNAME=null
+      - RAYGAN_SMS_PASSWORD=null
     restart: unless-stopped
   db:
     image: 'postgres:latest'
