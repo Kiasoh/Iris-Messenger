@@ -13,6 +13,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper=new ModelMapper();
         configMapping(modelMapper);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
         return modelMapper;
     }
     private void configMapping(ModelMapper modelMapper){

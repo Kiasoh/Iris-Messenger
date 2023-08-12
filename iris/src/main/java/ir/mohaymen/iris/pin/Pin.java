@@ -2,6 +2,7 @@ package ir.mohaymen.iris.pin;
 
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -20,6 +21,10 @@ public class Pin {
     @OneToOne
     @JoinColumn(name = "messageId")
     private Message message;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "chatId")
