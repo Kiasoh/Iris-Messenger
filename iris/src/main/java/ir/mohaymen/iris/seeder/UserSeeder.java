@@ -6,14 +6,16 @@ import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+@Component
+@RequiredArgsConstructor
 public class UserSeeder implements Seeder {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void load() {
@@ -35,7 +37,7 @@ public class UserSeeder implements Seeder {
         String lastName = id%4==2 ?  name.lastName() : null;
         String userName = name.username() + fakeValuesService.regexify("[\\d_]{1,10}");
         String phoneNumber = faker.phoneNumber().phoneNumber();
-        String bio = id%3==1 ? fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,10}") : null;
+        String bio = id%3==1 ? fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
         user.setUserId(id);

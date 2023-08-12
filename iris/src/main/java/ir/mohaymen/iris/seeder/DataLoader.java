@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
+    private final UserSeeder userSeeder;
+
     @Override
     public void run(String... args) throws Exception {
-        new UserSeeder().load();
+        userSeeder.load();
     }
 }
