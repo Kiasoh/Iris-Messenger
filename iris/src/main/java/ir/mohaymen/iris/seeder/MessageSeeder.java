@@ -45,7 +45,7 @@ public class MessageSeeder implements Seeder {
         Chat chat = chatRepository.findById(chatId).orElse(null);
 
         long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        Media media = mediaRepository.findById(chatId).orElse(null);
+        Media media = mediaRepository.findById(mediaId).orElse(null);
 
         DateAndTime date = faker.date();
         Instant sendingTime = date.birthday().toInstant();
