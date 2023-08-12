@@ -1,5 +1,11 @@
 package ir.mohaymen.iris.message;
 
-public class EditMessageDto {
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+public class EditMessageDto {
+    private Long messageId;
+    private String text;
 }

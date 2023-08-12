@@ -34,16 +34,20 @@ public class MessageController {
     public ResponseEntity<Message> sendMessage (@RequestBody MessageDto messageDto) {
         Media media = modelMapper.map(messageDto , Media.class);
         mediaService.createOrUpdate(media);
-        Message message = modelMapper.map(messageDto , Message.class);
+        Message message = new Message();
+        message.setText(message.getText());
+        message.setOriginChat(chatService.getById(messageDto.getChatId()));
+        message.setSender(userService.getById(messageDto.getUserId()));
         message.setMedia(media);
         message.setSendAt(Instant.now());
         return new ResponseEntity<>(messageService.createOrUpdate(message) , HttpStatus.OK);
     }
     @PatchMapping ("/edit-message")
     public ResponseEntity<Message> editMessage (@RequestBody EditMessageDto editMessageDto) {
-        Message message = modelMapper.map(editMessageDto , Message.class);
+        Message message = messageService.getById(editMessageDto.getMessageId());
+        message.setText(editMessageDto.getText());
         message.setEditedAt(Instant.now());
-        return new ResponseEntity<>(message , HttpStatus.OK);
+        return new ResponseEntity<>(messageService.createOrUpdate(message) , HttpStatus.OK);
     }
 
 }
