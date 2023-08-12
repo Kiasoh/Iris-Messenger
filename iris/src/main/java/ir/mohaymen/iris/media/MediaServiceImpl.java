@@ -1,10 +1,10 @@
 package ir.mohaymen.iris.media;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService {
 
     private final MediaRepository mediaRepository;

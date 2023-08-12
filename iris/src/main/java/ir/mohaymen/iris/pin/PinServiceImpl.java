@@ -4,13 +4,13 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.StreamSupport;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PinServiceImpl implements PinService {
 
     private final PinRepository pinRepository;

@@ -2,13 +2,13 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
@@ -22,6 +22,7 @@ public class ChatServiceImpl implements ChatService {
     public Iterable<Chat> getAll() {
         return chatRepository.findAll();
     }
+
     @Override
     public boolean isInChat(Chat chat, User user) {
         Set<Subscription> subs = chat.getSubs();

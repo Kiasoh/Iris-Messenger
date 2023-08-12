@@ -2,11 +2,11 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository userProfileRepository;

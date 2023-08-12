@@ -5,16 +5,14 @@ import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
@@ -95,13 +93,14 @@ public class MessageServiceImpl implements MessageService {
         Chat chat = chatRepository.findById(chatId).orElse(null);
         deleteByChat(chat);
     }
-    public Page<Message> getMessagesByPage (Long chatId, int pageNum , int pageSize) {
+
+    public Page<Message> getMessagesByPage(Long chatId, int pageNum, int pageSize) {
 //        Iterable<Message> messages = getByChat(chatId);
-        var chat=new Chat();
+        var chat = new Chat();
         chat.setChatId(chatId);
-        var message=new Message();
+        var message = new Message();
         message.setOriginChat(chat);
-        return messageRepository.findAll(Example.of(message) ,Pageable.ofSize(pageSize).withPage(pageNum) );
+        return messageRepository.findAll(Example.of(message), Pageable.ofSize(pageSize).withPage(pageNum));
 //         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
     }
 }

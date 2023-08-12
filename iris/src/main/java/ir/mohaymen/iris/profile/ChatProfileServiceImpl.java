@@ -2,13 +2,11 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatProfileServiceImpl implements ChatProfileService {
 
     private final ChatProfileRepository chatProfileRepository;

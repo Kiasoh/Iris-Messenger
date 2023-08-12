@@ -2,13 +2,13 @@ package ir.mohaymen.iris.contact;
 
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
     private final ContactRepository contactRepository;

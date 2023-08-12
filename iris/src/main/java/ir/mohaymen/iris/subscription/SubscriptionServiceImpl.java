@@ -4,12 +4,11 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
