@@ -29,7 +29,7 @@ public class ChatController extends BaseController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    @PostMapping("/add-chat")
+    @PostMapping("/create-chat")
     public ResponseEntity<Chat> createChat(@RequestBody ChatDto chatDto) {
         Chat chat;
         chatService.createOrUpdate(chat = this.modelMapper.map(chatDto, Chat.class));

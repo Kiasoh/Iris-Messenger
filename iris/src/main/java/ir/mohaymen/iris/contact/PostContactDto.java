@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostContactDto {
+    private Long id;
     private User secondUser;
     private String firstName;
     private String lastName;
