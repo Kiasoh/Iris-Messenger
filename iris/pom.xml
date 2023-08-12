@@ -114,6 +114,10 @@
 			<artifactId>redis-om-spring</artifactId>
 			<version>0.8.7-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
 
 	</dependencies>
 	<repositories>

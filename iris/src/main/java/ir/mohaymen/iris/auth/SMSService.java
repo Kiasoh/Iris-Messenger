@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.auth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -8,9 +9,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +29,10 @@ public class SMSService {
     private String password;
     @Value("${application.security.sms.enabled}")
     private boolean isEnabled;
+    private Logger logger= LoggerFactory.getLogger(SMSService.class);;
     public void sendSms(String number, String message)
     {
-        //TODO: log
+        logger.info(MessageFormat.format("sms {0} to phone number:{1} with message:{2}",(isEnabled?"sent":"not sent"),number,message));
         if(!isEnabled) return;
         try {
             sendSmsMessageWithPost(number, message, username, password, senderNumber);
