@@ -1,11 +1,10 @@
 package ir.mohaymen.iris.user;
 
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -19,7 +18,21 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
-        return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id){
+        UserDto userDto = UserMapper.mapToUserDto(userService.getById(id));
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@RequestBody EditUserDto editUserDto, @PathVariable Long id){
+        User user = userService.getById(id);
+        user.setFirstName(editUserDto.getFirstName());
+        user.setLastName(editUserDto.getLastName());
+        user.setUserName(editUserDto.getUserName());
+        user.setBio(editUserDto.getBio());
+        userService.createOrUpdate(user);
+        return ResponseEntity.ok("success");
+    }
+
+
 }
