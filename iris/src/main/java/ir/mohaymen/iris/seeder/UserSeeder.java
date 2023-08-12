@@ -29,7 +29,7 @@ public class UserSeeder implements Seeder {
         String lastName = id % 4 == 2 ? name.lastName() : null;
         String userName = name.username() + fakeValuesService.regexify("[\\d_]{1,10}");
         String phoneNumber = faker.phoneNumber().phoneNumber();
-        String bio = id % 3 == 1 ? fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
+        String bio = id % 3 == 1 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
         user.setUserId(id);

@@ -2,7 +2,6 @@ package ir.mohaymen.iris.media;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +18,7 @@ public class Media {
     @NotBlank
     private String fileName;
 
-    private String fileContentType;
+    private String fileMimeType;
 
     @NotBlank
     private String filePath;
