@@ -19,7 +19,7 @@ public class MediaSeeder implements Seeder {
     public void load() {
         if (mediaRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 200;
+        final int NUMBER_OF_INSTANCES = 1000;
         final List<Media> medias = new ArrayList<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)

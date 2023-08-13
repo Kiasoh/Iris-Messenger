@@ -49,8 +49,6 @@ public class SubscriptionSeeder implements Seeder {
         subscription.setUser(user);
         subscription.setChat(chat);
 
-        chat.getSubs().add(subscription);
-
         subscriptionList.add(subscription);
         userToChatMap.get(userId).add(chatId);
     }

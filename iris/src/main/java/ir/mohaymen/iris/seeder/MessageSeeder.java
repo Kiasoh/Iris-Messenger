@@ -9,9 +9,12 @@ import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -26,14 +29,14 @@ public class MessageSeeder implements Seeder {
 
         final int NUMBER_OF_INSTANCES = 2000;
         final List<Message> messages = new ArrayList<>();
-        final List<Long> mediaIds = new ArrayList<>();
+        final Set<Long> mediaIds = new HashSet<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomMessage(messages, mediaIds);
         messageRepository.saveAll(messages);
     }
 
-    private void generateRandomMessage(List<Message> messageList, List<Long> mediaIdList) {
+    private void generateRandomMessage(List<Message> messageList, Set<Long> mediaIdList) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
         String text = generateRandomText(id);
@@ -75,14 +78,16 @@ public class MessageSeeder implements Seeder {
         };
     }
 
-    private Media generateRandomMedia(Long seed, String messageText, List<Long> mediaIdList) {
+    private Media generateRandomMedia(Long seed, String messageText, Set<Long> mediaIdList) {
         Media media;
 
         media = new Media();
-        if (seed % 5 == 0 || messageText.isBlank()) {
+        if (seed % 25 == 0 || messageText.isBlank()) {
             long mediaId;
             do {
-                mediaId = faker.random().nextInt(1, 200);
+                mediaId = faker.random().nextInt(1,1000);
+//                mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+                System.out.println(MessageFormat.format("id:{0} seed:{1} count:{2}",mediaId,seed, mediaIdList.size()));
             } while (mediaIdList.contains(mediaId));
             media.setMediaId(mediaId);
             mediaIdList.add(mediaId);
