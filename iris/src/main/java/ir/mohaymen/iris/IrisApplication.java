@@ -1,11 +1,13 @@
 package ir.mohaymen.iris;
 
 import com.redis.om.spring.annotations.EnableRedisDocumentRepositories;
+import ir.mohaymen.iris.config.MyKeyspaceConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
 
 @SpringBootApplication
-@EnableRedisDocumentRepositories(basePackages = "ir.mohaymen.iris.*")//,keyspaceConfiguration = MyKeyspaceConfiguration.class)
+@EnableRedisDocumentRepositories(basePackages = "ir.mohaymen.iris.*",keyspaceConfiguration = MyKeyspaceConfiguration.class)
 public class IrisApplication {
 
 	public static void main(String[] args) {
