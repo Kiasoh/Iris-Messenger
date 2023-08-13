@@ -20,8 +20,8 @@ public class UserSeeder implements Seeder {
         if (userRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 100;
+        final List<User> users = new ArrayList<>();
 
-        List<User> users = new ArrayList<>();
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomUser(users);
         userRepository.saveAll(users);

@@ -23,8 +23,8 @@ public class ContactSeeder implements Seeder {
         if (contactRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 200;
-        List<Contact> contacts = new ArrayList<>();
-        Map<Long, List<Long>> userIds = new HashMap<>();
+        final List<Contact> contacts = new ArrayList<>();
+        final Map<Long, List<Long>> userIds = new HashMap<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomContact(contacts, userIds);

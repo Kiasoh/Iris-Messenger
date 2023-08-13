@@ -21,7 +21,7 @@ public class ChatSeeder implements Seeder {
         if (chatRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 100;
-        List<Chat> chats = new ArrayList<>();
+        final List<Chat> chats = new ArrayList<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomChat(chats);

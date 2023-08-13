@@ -25,8 +25,8 @@ public class SubscriptionSeeder implements Seeder {
         if (subscriptionRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 500;
-        List<Subscription> subscriptions = new ArrayList<>();
-        Map<Long, List<Long>> userToChatMap = new HashMap<>();
+        final List<Subscription> subscriptions = new ArrayList<>();
+        final Map<Long, List<Long>> userToChatMap = new HashMap<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription(subscriptions, userToChatMap);
