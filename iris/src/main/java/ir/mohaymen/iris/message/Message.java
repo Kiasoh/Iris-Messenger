@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 
@@ -24,6 +26,7 @@ public class Message {
 
     @JoinColumn(name = "chatId")
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat originChat;
 
     @JoinColumn(name = "userId")
