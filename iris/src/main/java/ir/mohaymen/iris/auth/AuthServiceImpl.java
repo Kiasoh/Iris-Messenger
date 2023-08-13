@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final ModelMapper mapper;
     private final SMSService smsService;
     private final ActivationCodeRepository activationCodeRepository;
-    private Logger logger= LoggerFactory.getLogger(AuthService.class);;
+    private Logger logger= LoggerFactory.getLogger(AuthService.class);
     private AuthTokensDto register(String phoneNumber) {
         var user = User.builder()
                 .firstName("کاربر")

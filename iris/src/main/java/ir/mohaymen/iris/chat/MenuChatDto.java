@@ -1,21 +1,19 @@
 package ir.mohaymen.iris.chat;
 
+import ir.mohaymen.iris.media.Media;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-
 @Getter
 @AllArgsConstructor
 @Setter
 @NoArgsConstructor
-public class CreateChatDto {
+public class MenuChatDto {
+    private Long chatId;
     private String title;
-    private String bio;
-    private String link;
-    private boolean isPublic;
-    private ChatType chatType;
-    private ArrayList<Long> userIds;
+    private String lastMessage;
+    private String userFirstName;
+    private Media media;
 }

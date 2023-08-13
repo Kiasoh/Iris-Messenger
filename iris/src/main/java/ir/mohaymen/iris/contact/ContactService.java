@@ -11,6 +11,7 @@ public interface ContactService {
     Iterable<Contact> getContactByFirstUser(User firstUser);
 
     Iterable<User> getUserByFirstUser(User firstUser);
+    boolean isInContact (User firstUser , Long secondUserId);
 
     Iterable<Contact> getContactBySecondUser(User secondUser);
 

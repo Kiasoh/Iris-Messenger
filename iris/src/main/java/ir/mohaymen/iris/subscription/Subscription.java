@@ -4,6 +4,8 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 // @Table(name = "subscriptions", uniqueConstraints = {
@@ -25,6 +27,7 @@ public class Subscription {
     private User user;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "chatId")
     private Chat chat;
 }

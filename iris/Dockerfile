@@ -7,7 +7,7 @@ RUN mvn verify --fail-never
 ADD ./iris $HOME
 RUN mvn package -DskipTests
 
-FROM openjdk:19-alpine
+FROM amazoncorretto:17.0.7-alpine
 COPY --from=build /usr/app/target/iris-0.0.1-SNAPSHOT.jar /app/runner.jar
 ENTRYPOINT ["java","-jar","/app/runner.jar"]
 

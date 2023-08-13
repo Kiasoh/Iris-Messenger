@@ -1,6 +1,8 @@
 package ir.mohaymen.iris.user;
 
 import ir.mohaymen.iris.contact.Contact;
+import ir.mohaymen.iris.profile.UserProfile;
+import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +45,12 @@ public class User implements UserDetails {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "firstUser")
     private Set<Contact> contacts;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<Subscription> subs;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private List<UserProfile> profiles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

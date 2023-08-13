@@ -24,7 +24,7 @@ public class ContactController extends BaseController {
 
     @PostMapping("/add-contact")
     public ResponseEntity<PostContactDto> addContact(@RequestBody GetContactDto getContactDto) {
-        if (isInContact(getUserByToken() , getContactDto.getContactId()))
+        if (contactService.isInContact(getUserByToken() , getContactDto.getContactId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         Contact contact = modelMapper.map(getContactDto, Contact.class);
         contact.setSecondUser(userService.getById(getContactDto.getContactId()));
@@ -41,13 +41,9 @@ public class ContactController extends BaseController {
     }
     @GetMapping("/get-contact")
     public ResponseEntity<PostContactDto> getContact(@RequestBody Long userId) throws Exception {
-        if(!isInContact(getUserByToken() , userId))
+        if(!contactService.isInContact(getUserByToken() , userId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(getContactFromList(getUserByToken() , userId) , HttpStatus.OK);
-    }
-
-    public boolean isInContact (User firstUser , Long secondUserId) {
-        return firstUser.getContacts().stream().anyMatch(c -> c.getSecondUser().getUserId() == secondUserId);
     }
     public PostContactDto getContactFromList(User user , Long userId) throws Exception {
         for (Contact con: user.getContacts())

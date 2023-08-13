@@ -7,13 +7,11 @@ import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -27,16 +25,15 @@ public class SubscriptionController extends BaseController {
     // public SubscriptionController(SubscriptionService subscriptionService)
     // {this.subscriptionService = subscriptionService;}
     @PostMapping("/add-user-to-chat")
-    public ResponseEntity<Chat> addToChat(@RequestBody SubDto subDto) {
+    public ResponseEntity<Chat> addToChat(@RequestBody AddSubDto addSubDto) {
 
-        Chat chat = chatService.getById(subDto.getChatId());
+        Chat chat = chatService.getById(addSubDto.getChatId());
 
-        for (Long id : subDto.getUserIds()) {
+        for (Long id : addSubDto.getUserIds()) {
             if (chat.getSubs().size() > 1 && chat.getChatType() == ChatType.PV)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id), chat));
         }
-
-        return new ResponseEntity<>(chatService.getById(subDto.getChatId()), HttpStatus.OK);
+        return new ResponseEntity<>(chatService.getById(addSubDto.getChatId()), HttpStatus.OK);
     }
 }

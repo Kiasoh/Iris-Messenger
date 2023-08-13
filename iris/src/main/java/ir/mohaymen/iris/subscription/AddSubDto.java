@@ -1,13 +1,15 @@
 package ir.mohaymen.iris.subscription;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 
 @Getter
 @Setter
-public class SubDto {
+@NoArgsConstructor
+public class AddSubDto {
 
     private Long chatId;
     private ArrayList<Long> userIds;

@@ -28,6 +28,10 @@ public class ContactServiceImpl implements ContactService {
     public Iterable<Contact> getContactByFirstUser(User firstUser) {
         return contactRepository.findByFirstUser(firstUser);
     }
+    @Override
+    public boolean isInContact (User firstUser , Long secondUserId) {
+        return firstUser.getContacts().stream().anyMatch(c -> c.getSecondUser().getUserId() == secondUserId);
+    }
 
     @Override
     public Iterable<User> getUserByFirstUser(User firstUser) {
