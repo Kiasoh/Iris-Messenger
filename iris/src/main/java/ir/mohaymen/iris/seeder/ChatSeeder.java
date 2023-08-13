@@ -16,6 +16,8 @@ public class ChatSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!chatRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 100;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {

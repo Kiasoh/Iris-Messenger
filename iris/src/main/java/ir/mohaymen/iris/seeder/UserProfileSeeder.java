@@ -22,6 +22,8 @@ public class UserProfileSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!userProfileRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 30;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -39,9 +41,12 @@ public class UserProfileSeeder implements Seeder {
         long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Media media = mediaRepository.findById(mediaId).orElse(null);
 
-        Instant sendingTime = faker.date().past(50, TimeUnit.DAYS).toInstant();
+        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
 
         if (user == null || media == null) return null;
+
+        for (UserProfile userProfile : userProfileRepository.findByUser(user))
+            if (userProfile.getMedia().equals(media)) return null;
 
         UserProfile userProfile = new UserProfile();
         userProfile.setId(id);

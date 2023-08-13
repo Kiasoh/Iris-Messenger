@@ -14,6 +14,8 @@ public class UserSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!userRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 100;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -28,8 +30,8 @@ public class UserSeeder implements Seeder {
         String firstName = name.firstName();
         String lastName = id % 4 == 2 ? name.lastName() : null;
         String userName = name.username() + fakeValuesService.regexify("(\\d|_){1,10}");
-        String phoneNumber = faker.phoneNumber().phoneNumber();
-        String bio = id % 3 == 1 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
+        String phoneNumber = faker.phoneNumber().cellPhone();
+        String bio = id % 3 == 0 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
         user.setUserId(id);

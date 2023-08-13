@@ -17,6 +17,8 @@ public class ContactSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!contactRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 200;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -28,13 +30,16 @@ public class ContactSeeder implements Seeder {
     private Contact generateRandomUser() {
         long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long firstUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long firstUserId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         User firstUser = userRepository.findById(firstUserId).orElse(null);
 
-        long secondUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long secondUserId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         User secondUser = userRepository.findById(secondUserId).orElse(null);
 
         if (firstUser == null || secondUser == null || firstUser == secondUser) return null;
+
+        for (Contact contact : contactRepository.findByFirstUser(firstUser))
+            if (contact.getSecondUser().equals(secondUser)) return null;
 
         Name name = faker.name();
         String firstName = name.firstName();

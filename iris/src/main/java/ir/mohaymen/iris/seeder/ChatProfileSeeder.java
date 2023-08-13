@@ -21,6 +21,8 @@ public class ChatProfileSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!chatProfileRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 30;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -41,6 +43,9 @@ public class ChatProfileSeeder implements Seeder {
         Instant sendingTime = faker.date().birthday().toInstant();
 
         if (chat == null || media == null) return null;
+
+        for (ChatProfile chatProfile : chatProfileRepository.findByChat(chat))
+            if (chatProfile.getMedia().equals(media)) return null;
 
         ChatProfile chatProfile = new ChatProfile();
         chatProfile.setId(id);

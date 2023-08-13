@@ -9,8 +9,6 @@ import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-
 @Component
 @RequiredArgsConstructor
 public class SubscriptionSeeder implements Seeder {
@@ -21,6 +19,8 @@ public class SubscriptionSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!subscriptionRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 500;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {

@@ -14,6 +14,8 @@ public class MediaSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!mediaRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 200;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -24,7 +26,6 @@ public class MediaSeeder implements Seeder {
 
     private Media generateRandomUser() {
         long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
-
         File file = faker.file();
         String name = file.fileName();
         String mimeType = file.mimeType();

@@ -17,6 +17,8 @@ public class PinSeeder implements Seeder {
 
     @Override
     public void load() {
+        if (!pinRepository.findAll().isEmpty()) return;
+
         final int NUMBER_OF_INSTANCES = 40;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
@@ -32,6 +34,8 @@ public class PinSeeder implements Seeder {
         Message message = messageRepository.findById(messageId).orElse(null);
 
         if (message == null) return null;
+
+        if (pinRepository.findByMessage(message).orElse(null) == null) return null;
 
         Chat chat = message.getOriginChat();
 

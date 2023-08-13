@@ -26,7 +26,9 @@ public class MessageSeeder implements Seeder {
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 1000;
+        if (!messageRepository.findAll().isEmpty()) return;
+
+        final int NUMBER_OF_INSTANCES = 2000;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
             Message message = generateRandomUser();
@@ -48,8 +50,8 @@ public class MessageSeeder implements Seeder {
         Media media = mediaRepository.findById(mediaId).orElse(null);
 
         DateAndTime date = faker.date();
-        Instant sendingTime = faker.date().past(50, TimeUnit.DAYS).toInstant();
-        Instant editingTime = id % 6 == 0 ? date.future(50, TimeUnit.DAYS).toInstant() : null;
+        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
+        Instant editingTime = id % 6 == 0 ? date.future(200, TimeUnit.DAYS).toInstant() : null;
 
         if (user == null || chat == null) return null;
         if (text.isBlank() && media == null) return null;
