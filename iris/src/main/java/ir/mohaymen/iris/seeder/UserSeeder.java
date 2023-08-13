@@ -28,13 +28,13 @@ public class UserSeeder implements Seeder {
     }
 
     private void generateRandomUser(List<User> userList) {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         Name name = faker.name();
         String firstName = name.firstName();
         String lastName = id % 4 == 2 ? name.lastName() : null;
-        String userName = name.username() + fakeValuesService.regexify("(\\d|_){1,10}");
+        String userName = name.username() + faker.regexify("(\\d|_){1,10}");
         String phoneNumber = faker.phoneNumber().cellPhone();
-        String bio = id % 3 == 0 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
+        String bio = id % 3 == 0 ? name.title() + faker.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
         user.setUserName(userName);

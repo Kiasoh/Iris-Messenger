@@ -34,15 +34,15 @@ public class MessageSeeder implements Seeder {
     }
 
     private void generateRandomMessage(List<Message> messageList, List<Long> mediaIdList) {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
         String text = generateRandomText(id);
 
-        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        long userId = faker.random().nextInt(1, 100);
         User user = new User();
         user.setUserId(userId);
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        long chatId = faker.random().nextInt(1, 100);
         Chat chat = new Chat();
         chat.setChatId(chatId);
 
@@ -82,7 +82,7 @@ public class MessageSeeder implements Seeder {
         if (seed % 5 == 0 || messageText.isBlank()) {
             long mediaId;
             do {
-                mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+                mediaId = faker.random().nextInt(1, 200);
             } while (mediaIdList.contains(mediaId));
             media.setMediaId(mediaId);
             mediaIdList.add(mediaId);

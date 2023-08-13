@@ -32,7 +32,7 @@ public class SubscriptionSeeder implements Seeder {
     }
 
     private void generateRandomSubscription(List<Subscription> subscriptionList, Map<Long, List<Long>> userToChatMap) {
-        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        long userId = faker.random().nextInt(1, 100);
         User user = new User();
         user.setUserId(userId);
 
@@ -40,7 +40,7 @@ public class SubscriptionSeeder implements Seeder {
 
         long chatId;
         do {
-            chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+            chatId = faker.random().nextInt(1, 100);
         } while (userToChatMap.get(userId).contains(chatId));
         Chat chat = new Chat();
         chat.setChatId(chatId);

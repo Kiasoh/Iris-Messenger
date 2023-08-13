@@ -31,7 +31,7 @@ public class MediaSeeder implements Seeder {
         File file = faker.file();
         String name = file.fileName();
         String mimeType = file.mimeType();
-        String path = fakeValuesService.letterify("./?????/???????");
+        String path = faker.letterify("./?????/???????");
 
         Media media = new Media();
         media.setFileName(name);

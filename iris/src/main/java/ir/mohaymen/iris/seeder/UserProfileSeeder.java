@@ -32,13 +32,13 @@ public class UserProfileSeeder implements Seeder {
     }
 
     private void generateRandomUserProfile(List<UserProfile> userProfileList, List<Long> mediaIdList) {
-        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        long userId = faker.random().nextInt(1, 100);
         User user = new User();
         user.setUserId(userId);
 
         long mediaId;
         do {
-            mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+            mediaId = faker.random().nextInt(1, 200);
         } while (mediaIdList.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

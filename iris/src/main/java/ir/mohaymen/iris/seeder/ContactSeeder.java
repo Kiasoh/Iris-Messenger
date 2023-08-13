@@ -32,9 +32,9 @@ public class ContactSeeder implements Seeder {
     }
 
     private void generateRandomContact(List<Contact> contactList, Map<Long, List<Long>> ids) {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        long firstUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        long firstUserId = faker.random().nextInt(1, 100);
         User firstUser = new User();
         firstUser.setUserId(firstUserId);
 
@@ -42,7 +42,7 @@ public class ContactSeeder implements Seeder {
 
         long secondUserId;
         do {
-            secondUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+            secondUserId = faker.random().nextInt(1, 100);
         } while (secondUserId == firstUserId || ids.get(firstUserId).contains(secondUserId));
         User secondUser = new User();
         secondUser.setUserId(secondUserId);

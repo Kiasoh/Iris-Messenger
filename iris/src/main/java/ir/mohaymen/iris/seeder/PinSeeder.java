@@ -30,11 +30,11 @@ public class PinSeeder implements Seeder {
     }
 
     private void generateRandomPin(List<Pin> pinList, List<Long> messageIdList) {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
         long messageId;
         do {
-            messageId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?[0-9]?|1000"));
+            messageId = faker.random().nextInt(1, 1000);
         } while (messageIdList.contains(messageId));
         Message message = new Message();
         message.setMessageId(messageId);

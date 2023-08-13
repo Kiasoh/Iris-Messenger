@@ -33,13 +33,13 @@ public class ChatProfileSeeder implements Seeder {
 
     private void generateRandomChatProfile(List<ChatProfile> chatProfileList, List<Long> mediaIdList) {
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
-        Chat chat=  new Chat();
+        long chatId = faker.random().nextInt(1, 100);
+        Chat chat = new Chat();
         chat.setChatId(chatId);
 
         long mediaId;
         do {
-            mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+            mediaId = faker.random().nextInt(1, 200);
         } while (mediaIdList.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

@@ -20,14 +20,14 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-         userSeeder.load();
-         contactSeeder.load();
-         chatSeeder.load();
-         subscriptionSeeder.load();
-         mediaSeeder.load();
-         messageSeeder.load();
-         pinSeeder.load();
-         userProfileSeeder.load();
-         chatProfileSeeder.load();
+        userSeeder.load();
+        contactSeeder.load();
+        chatSeeder.load();
+        subscriptionSeeder.load();
+        mediaSeeder.load();
+        messageSeeder.load();
+        pinSeeder.load();
+        userProfileSeeder.load();
+        chatProfileSeeder.load();
     }
 }
