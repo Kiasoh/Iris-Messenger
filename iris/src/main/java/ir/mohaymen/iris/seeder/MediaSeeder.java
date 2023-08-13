@@ -23,7 +23,7 @@ public class MediaSeeder implements Seeder {
     }
 
     private Media generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
         File file = faker.file();
         String name = file.fileName();

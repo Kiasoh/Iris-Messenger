@@ -35,20 +35,20 @@ public class MessageSeeder implements Seeder {
     }
 
     private Message generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
-        String text = fakeValuesService.regexify(".{0, 200}");
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+        String text = fakeValuesService.regexify("(\\w|\\d|\\.| ){0,200}");
 
-        long userId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         User user = userRepository.findById(userId).orElse(null);
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Chat chat = chatRepository.findById(chatId).orElse(null);
 
-        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Media media = mediaRepository.findById(mediaId).orElse(null);
 
         DateAndTime date = faker.date();
-        Instant sendingTime = date.birthday().toInstant();
+        Instant sendingTime = faker.date().past(50, TimeUnit.DAYS).toInstant();
         Instant editingTime = id % 6 == 0 ? date.future(50, TimeUnit.DAYS).toInstant() : null;
 
         if (user == null || chat == null) return null;

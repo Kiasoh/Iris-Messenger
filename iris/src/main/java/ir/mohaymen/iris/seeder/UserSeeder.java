@@ -14,7 +14,7 @@ public class UserSeeder implements Seeder {
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 50;
+        final int NUMBER_OF_INSTANCES = 100;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
             User user = generateRandomUser();
@@ -23,11 +23,11 @@ public class UserSeeder implements Seeder {
     }
 
     private User generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
         Name name = faker.name();
         String firstName = name.firstName();
         String lastName = id % 4 == 2 ? name.lastName() : null;
-        String userName = name.username() + fakeValuesService.regexify("[\\d_]{1,10}");
+        String userName = name.username() + fakeValuesService.regexify("(\\d|_){1,10}");
         String phoneNumber = faker.phoneNumber().phoneNumber();
         String bio = id % 3 == 1 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 

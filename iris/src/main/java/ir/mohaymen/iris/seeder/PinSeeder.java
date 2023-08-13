@@ -26,9 +26,9 @@ public class PinSeeder implements Seeder {
     }
 
     private Pin generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long messageId = Long.parseLong(fakeValuesService.regexify("\\d{3}"));
+        long messageId = Long.parseLong(fakeValuesService.regexify("\\d{1,3}"));
         Message message = messageRepository.findById(messageId).orElse(null);
 
         if (message == null) return null;

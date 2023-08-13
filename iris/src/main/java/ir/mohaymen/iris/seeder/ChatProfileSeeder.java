@@ -30,12 +30,12 @@ public class ChatProfileSeeder implements Seeder {
     }
 
     private ChatProfile generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Chat chat = chatRepository.findById(chatId).orElse(null);
 
-        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Media media = mediaRepository.findById(mediaId).orElse(null);
 
         Instant sendingTime = faker.date().birthday().toInstant();

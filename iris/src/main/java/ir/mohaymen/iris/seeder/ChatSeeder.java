@@ -16,7 +16,7 @@ public class ChatSeeder implements Seeder {
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 50;
+        final int NUMBER_OF_INSTANCES = 100;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
             Chat chat = generateRandomUser();
@@ -25,12 +25,12 @@ public class ChatSeeder implements Seeder {
     }
 
     private Chat generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
         String title = faker.book().title();
-        String link = id % 5 == 1 ? fakeValuesService.regexify("\\w[\\w\\d_]{2,10}") : null;
+        String link = id % 5 == 0 ? fakeValuesService.regexify("\\w(\\w|\\d|_){2,10}") : null;
         boolean isPublic = id % 2 == 0;
         ChatType chatType = ChatType.values()[(int) id % ChatType.values().length];
-        String bio = id % 3 == 1 ? fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
+        String bio = id % 3 == 0 ? fakeValuesService.regexify("(\\w|\\d| |,|\\.){5,50}") : null;
 
         Chat chat = new Chat();
         chat.setChatId(id);

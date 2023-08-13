@@ -9,6 +9,8 @@ import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
+
 @Component
 @RequiredArgsConstructor
 public class SubscriptionSeeder implements Seeder {
@@ -19,7 +21,7 @@ public class SubscriptionSeeder implements Seeder {
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 200;
+        final int NUMBER_OF_INSTANCES = 500;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
             Subscription subscription = generateRandomUser();
@@ -28,15 +30,18 @@ public class SubscriptionSeeder implements Seeder {
     }
 
     private Subscription generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long userId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         User user = userRepository.findById(userId).orElse(null);
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Chat chat = chatRepository.findById(chatId).orElse(null);
 
         if (user == null || chat == null) return null;
+
+        for (Subscription value : subscriptionRepository.findSubscriptionByChat(chat))
+            if (value.getUser().equals(user)) return null;
 
         Subscription subscription = new Subscription();
         subscription.setSubId(id);

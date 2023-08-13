@@ -26,19 +26,19 @@ public class ContactSeeder implements Seeder {
     }
 
     private Contact generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
         long firstUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
         User firstUser = userRepository.findById(firstUserId).orElse(null);
 
-        long SecondUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        User secondUser = userRepository.findById(SecondUserId).orElse(null);
+        long secondUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
+        User secondUser = userRepository.findById(secondUserId).orElse(null);
 
         if (firstUser == null || secondUser == null || firstUser == secondUser) return null;
 
         Name name = faker.name();
         String firstName = name.firstName();
-        String lastName = id % 2 == 1 ? name.lastName() : null;
+        String lastName = id % 5 == 0 ? name.lastName() : null;
 
         Contact contact = new Contact();
         contact.setId(id);
