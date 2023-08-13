@@ -6,6 +6,6 @@ public interface AuthService {
 
     String refreshToken(AuthTokensDto authTokensDto);
 
-    void sendActivationCode(String phoneNumber);
+    String sendActivationCode(String phoneNumber);
 
 }

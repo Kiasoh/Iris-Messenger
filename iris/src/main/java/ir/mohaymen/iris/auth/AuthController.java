@@ -26,8 +26,8 @@ public class AuthController {
   }
 
   @GetMapping("/send-activation-code")
-  public void sendActivationCode(@RequestParam String phoneNumber) {
-    authService.sendActivationCode(phoneNumber);
+  public String sendActivationCode(@RequestParam String phoneNumber) {
+    return authService.sendActivationCode(phoneNumber);
   }
 
 

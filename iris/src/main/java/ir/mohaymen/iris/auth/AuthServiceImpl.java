@@ -113,19 +113,19 @@ public class AuthServiceImpl implements AuthService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public void sendActivationCode(String phoneNumber) {
+    public String sendActivationCode(String phoneNumber) {
         String activationCode;
         activationCodeRepository.deleteByPhoneNumber(phoneNumber);
         do {
             activationCode = codeGenerator.generateActivationCode();
         } while (activationCodeRepository.findByCode(activationCode).isPresent());
-        activationCode="12345";
         ActivationCode codeObj=ActivationCode.builder()
                 .code(activationCode)
                 .phoneNumber(phoneNumber)
                 .build();
         activationCodeRepository.save(codeObj);
         smsService.sendSms(phoneNumber, "کد فعالسازی شما:" + activationCode);
+        return activationCode;
     }
 
 }
