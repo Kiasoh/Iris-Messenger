@@ -19,7 +19,7 @@ import java.util.Map;
 public class SubscriptionSeeder implements Seeder {
 
     private final SubscriptionRepository subscriptionRepository;
-    
+
     @Override
     public void load() {
         if (subscriptionRepository.count() != 0) return;

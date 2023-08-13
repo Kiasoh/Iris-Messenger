@@ -6,6 +6,9 @@ import ir.mohaymen.iris.media.MediaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class MediaSeeder implements Seeder {
@@ -14,28 +17,27 @@ public class MediaSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (!mediaRepository.findAll().isEmpty()) return;
+        if (mediaRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 200;
+        List<Media> medias = new ArrayList<>();
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            Media media = generateRandomUser();
-            mediaRepository.save(media);
-        }
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomMedia(medias);
+        mediaRepository.saveAll(medias);
     }
 
-    private Media generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+    private void generateRandomMedia(List<Media> mediaList) {
         File file = faker.file();
         String name = file.fileName();
         String mimeType = file.mimeType();
         String path = fakeValuesService.letterify("./?????/???????");
 
         Media media = new Media();
-//        media.setMediaId(id);
         media.setFileName(name);
         media.setFileMimeType(mimeType);
         media.setFilePath(path);
-        return media;
+
+        mediaList.add(media);
     }
 }
