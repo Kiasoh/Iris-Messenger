@@ -2,7 +2,6 @@ package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.message.Message;
-import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.pin.Pin;
 import ir.mohaymen.iris.pin.PinRepository;
 import lombok.RequiredArgsConstructor;

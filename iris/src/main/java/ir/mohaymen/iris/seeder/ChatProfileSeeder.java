@@ -1,12 +1,9 @@
 package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
-import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaRepository;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.profile.ChatProfileRepository;
-import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +45,7 @@ public class ChatProfileSeeder implements Seeder {
         media.setMediaId(mediaId);
 
         Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
-        
+
         ChatProfile chatProfile = new ChatProfile();
         chatProfile.setChat(chat);
         chatProfile.setMedia(media);

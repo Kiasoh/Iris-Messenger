@@ -1,11 +1,9 @@
 package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaRepository;
 import ir.mohaymen.iris.profile.UserProfile;
 import ir.mohaymen.iris.profile.UserProfileRepository;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

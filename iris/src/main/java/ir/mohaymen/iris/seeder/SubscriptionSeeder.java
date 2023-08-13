@@ -1,11 +1,9 @@
 package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
-import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

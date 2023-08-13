@@ -2,15 +2,11 @@ package ir.mohaymen.iris.seeder;
 
 import com.github.javafaker.DateAndTime;
 import ir.mohaymen.iris.chat.Chat;
-import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaRepository;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
