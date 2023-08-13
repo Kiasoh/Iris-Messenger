@@ -27,11 +27,11 @@ public class ContactSeeder implements Seeder {
         List<Contact> contacts = new ArrayList<>();
         Map<Long, List<Long>> ids = new HashMap<>();
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomUser(contacts, ids);
+            generateRandomContact(contacts, ids);
         contactRepository.saveAll(contacts);
     }
 
-    private void generateRandomUser(List<Contact> contactList, Map<Long, List<Long>> ids) {
+    private void generateRandomContact(List<Contact> contactList, Map<Long, List<Long>> ids) {
         long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
         long firstUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
