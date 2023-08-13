@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -19,48 +19,40 @@ import java.util.concurrent.TimeUnit;
 public class UserProfileSeeder implements Seeder {
 
     private final UserProfileRepository userProfileRepository;
-    private final UserRepository userRepository;
-    private final MediaRepository mediaRepository;
-    private final Set<Long> mediaIds = new HashSet<>();
-
 
     @Override
     public void load() {
-        if (!userProfileRepository.findAll().isEmpty()) return;
+        if (userProfileRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 30;
+        final List<UserProfile> userProfiles = new ArrayList<>();
+        final List<Long> mediaIds = new ArrayList<>();
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            UserProfile userProfile = generateRandomUser();
-            if (userProfile != null) userProfileRepository.save(userProfile);
-        }
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomUserProfile(userProfiles, mediaIds);
+        userProfileRepository.saveAll(userProfiles);
     }
 
-    private UserProfile generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
+    private void generateRandomUserProfile(List<UserProfile> userProfiles, List<Long> mediaIds) {
+        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        User user = new User();
+        user.setUserId(userId);
 
-        long userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
-        User user = userRepository.findById(userId).orElse(null);
-
-        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
-        Media media = mediaRepository.findById(mediaId).orElse(null);
+        long mediaId;
+        do {
+            mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+        } while (mediaIds.contains(mediaId));
+        Media media = new Media();
+        media.setMediaId(mediaId);
 
         Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
 
-        if (user == null || media == null) return null;
-
-        if (mediaIds.contains(mediaId))return null;
-        else mediaIds.add(mediaId);
-
-        for (UserProfile userProfile : userProfileRepository.findByUser(user))
-            if (userProfile.getMedia().equals(media)) return null;
-
-
         UserProfile userProfile = new UserProfile();
-        userProfile.setId(id);
         userProfile.setUser(user);
         userProfile.setMedia(media);
         userProfile.setSetAt(sendingTime);
-        return userProfile;
+
+        mediaIds.add(mediaId);
+        userProfiles.add(userProfile);
     }
 }
