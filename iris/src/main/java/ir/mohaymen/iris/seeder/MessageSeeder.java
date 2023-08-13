@@ -2,17 +2,16 @@ package ir.mohaymen.iris.seeder;
 
 import com.github.javafaker.DateAndTime;
 import ir.mohaymen.iris.chat.Chat;
-import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaRepository;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -20,48 +19,76 @@ import java.util.concurrent.TimeUnit;
 public class MessageSeeder implements Seeder {
 
     private final MessageRepository messageRepository;
-    private final ChatRepository chatRepository;
-    private final UserRepository userRepository;
-    private final MediaRepository mediaRepository;
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 1000;
+        if (messageRepository.count() != 0) return;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            Message message = generateRandomUser();
-            if (message != null) messageRepository.save(message);
-        }
+        final int NUMBER_OF_INSTANCES = 2000;
+        final List<Message> messages = new ArrayList<>();
+        final List<Long> mediaIds = new ArrayList<>();
+
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomMessage(messages, mediaIds);
+        messageRepository.saveAll(messages);
     }
 
-    private Message generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
-        String text = fakeValuesService.regexify(".{0, 200}");
+    private void generateRandomMessage(List<Message> messageList, List<Long> mediaIdList) {
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long userId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        User user = userRepository.findById(userId).orElse(null);
+        String text = generateRandomText(id);
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        User user = new User();
+        user.setUserId(userId);
 
-        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        Media media = mediaRepository.findById(mediaId).orElse(null);
+        long chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        Chat chat = new Chat();
+        chat.setChatId(chatId);
+
+        Media media = generateRandomMedia(id, text, mediaIdList);
 
         DateAndTime date = faker.date();
-        Instant sendingTime = date.birthday().toInstant();
-        Instant editingTime = id % 6 == 0 ? date.future(50, TimeUnit.DAYS).toInstant() : null;
-
-        if (user == null || chat == null) return null;
-        if (text.isBlank() && media == null) return null;
+        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
+        Instant editingTime = id % 6 == 0 ? date.future(200, TimeUnit.DAYS).toInstant() : null;
 
         Message message = new Message();
-        message.setMessageId(id);
         message.setText(text);
         message.setOriginChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(sendingTime);
         message.setEditedAt(editingTime);
-        return message;
+
+        messageList.add(message);
+    }
+
+    private String generateRandomText(Long seed) {
+        return switch ((int) (seed % 7)) {
+            case 0 -> faker.harryPotter().quote();
+            case 1 -> faker.howIMetYourMother().quote();
+            case 2 -> faker.gameOfThrones().quote();
+            case 3 -> faker.hobbit().quote();
+            case 4 -> faker.dune().quote();
+            case 5 -> faker.rickAndMorty().quote();
+            default -> "";
+        };
+    }
+
+    private Media generateRandomMedia(Long seed, String messageText, List<Long> mediaIdList) {
+        Media media;
+
+        media = new Media();
+        if (seed % 5 == 0 || messageText.isBlank()) {
+            long mediaId;
+            do {
+                mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+            } while (mediaIdList.contains(mediaId));
+            media.setMediaId(mediaId);
+            mediaIdList.add(mediaId);
+        } else
+            media = null;
+
+        return media;
     }
 }

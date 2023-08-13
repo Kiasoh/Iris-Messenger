@@ -3,7 +3,6 @@ package ir.mohaymen.iris.seeder;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import org.aspectj.weaver.ISourceContext;
 
 import java.util.Locale;
 

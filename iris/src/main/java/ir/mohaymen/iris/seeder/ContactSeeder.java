@@ -4,48 +4,60 @@ import com.github.javafaker.Name;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactRepository;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class ContactSeeder implements Seeder {
 
     private final ContactRepository contactRepository;
-    private final UserRepository userRepository;
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 200;
+        if (contactRepository.count() != 0) return;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            Contact contact = generateRandomUser();
-            if (contact != null) contactRepository.save(contact);
-        }
+        final int NUMBER_OF_INSTANCES = 200;
+        final List<Contact> contacts = new ArrayList<>();
+        final Map<Long, List<Long>> userIds = new HashMap<>();
+
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomContact(contacts, userIds);
+        contactRepository.saveAll(contacts);
     }
 
-    private Contact generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+    private void generateRandomContact(List<Contact> contactList, Map<Long, List<Long>> ids) {
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long firstUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        User firstUser = userRepository.findById(firstUserId).orElse(null);
+        long firstUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        User firstUser = new User();
+        firstUser.setUserId(firstUserId);
 
-        long SecondUserId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        User secondUser = userRepository.findById(SecondUserId).orElse(null);
+        ids.computeIfAbsent(firstUserId, k -> new ArrayList<>());
 
-        if (firstUser == null || secondUser == null || firstUser == secondUser) return null;
+        long secondUserId;
+        do {
+            secondUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        } while (secondUserId == firstUserId || ids.get(firstUserId).contains(secondUserId));
+        User secondUser = new User();
+        secondUser.setUserId(secondUserId);
 
         Name name = faker.name();
         String firstName = name.firstName();
-        String lastName = id % 2 == 1 ? name.lastName() : null;
+        String lastName = id % 5 == 0 ? name.lastName() : null;
 
         Contact contact = new Contact();
-        contact.setId(id);
         contact.setFirstUser(firstUser);
         contact.setSecondUser(secondUser);
         contact.setFirstName(firstName);
         contact.setLastName(lastName);
-        return contact;
+
+        contactList.add(contact);
+        ids.get(firstUserId).add(secondUserId);
     }
 }

@@ -1,52 +1,57 @@
 package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
-import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaRepository;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.profile.ChatProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class ChatProfileSeeder implements Seeder {
 
     private final ChatProfileRepository chatProfileRepository;
-    private final ChatRepository chatRepository;
-    private final MediaRepository mediaRepository;
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 30;
+        if (chatProfileRepository.count() != 0) return;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            ChatProfile chatProfile = generateRandomUser();
-            if (chatProfile != null) chatProfileRepository.save(chatProfile);
-        }
+        final int NUMBER_OF_INSTANCES = 30;
+        final List<ChatProfile> chatProfiles = new ArrayList<>();
+        final List<Long> mediaIds = new ArrayList<>();
+
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomChatProfile(chatProfiles, mediaIds);
+        chatProfileRepository.saveAll(chatProfiles);
     }
 
-    private ChatProfile generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+    private void generateRandomChatProfile(List<ChatProfile> chatProfileList, List<Long> mediaIdList) {
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        long chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        Chat chat=  new Chat();
+        chat.setChatId(chatId);
 
-        long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{2}"));
-        Media media = mediaRepository.findById(mediaId).orElse(null);
+        long mediaId;
+        do {
+            mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
+        } while (mediaIdList.contains(mediaId));
+        Media media = new Media();
+        media.setMediaId(mediaId);
 
-        Instant sendingTime = faker.date().birthday().toInstant();
-
-        if (chat == null || media == null) return null;
+        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
 
         ChatProfile chatProfile = new ChatProfile();
-        chatProfile.setId(id);
         chatProfile.setChat(chat);
         chatProfile.setMedia(media);
         chatProfile.setSetAt(sendingTime);
-        return chatProfile;
+
+        mediaIdList.add(mediaId);
+        chatProfileList.add(chatProfile);
     }
 }

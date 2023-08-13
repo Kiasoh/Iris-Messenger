@@ -2,36 +2,42 @@ package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.message.Message;
-import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.pin.Pin;
 import ir.mohaymen.iris.pin.PinRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class PinSeeder implements Seeder {
 
     private final PinRepository pinRepository;
-    private final MessageRepository messageRepository;
 
     @Override
     public void load() {
-        final int NUMBER_OF_INSTANCES = 40;
+        if (pinRepository.count() != 0) return;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            Pin pin = generateRandomUser();
-            if (pin != null) pinRepository.save(pin);
-        }
+        final int NUMBER_OF_INSTANCES = 40;
+        final List<Pin> pins = new ArrayList<>();
+        final List<Long> messageIds = new ArrayList<>();
+
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomPin(pins, messageIds);
+        pinRepository.saveAll(pins);
     }
 
-    private Pin generateRandomUser() {
-        long id = Long.parseLong(fakeValuesService.regexify("\\d{1-5}"));
+    private void generateRandomPin(List<Pin> pinList, List<Long> messageIdList) {
+        long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
 
-        long messageId = Long.parseLong(fakeValuesService.regexify("\\d{3}"));
-        Message message = messageRepository.findById(messageId).orElse(null);
-
-        if (message == null) return null;
+        long messageId;
+        do {
+            messageId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?[0-9]?|1000"));
+        } while (messageIdList.contains(messageId));
+        Message message = new Message();
+        message.setMessageId(messageId);
 
         Chat chat = message.getOriginChat();
 
@@ -39,6 +45,8 @@ public class PinSeeder implements Seeder {
         pin.setPinId(id);
         pin.setMessage(message);
         pin.setChat(chat);
-        return pin;
+
+        messageIdList.add(messageId);
+        pinList.add(pin);
     }
 }

@@ -3,11 +3,11 @@ services:
     build:
       context: .
       dockerfile: ./iris/Dockerfile
-    platform: linux/x86_64
     ports:
       - "8080:8080"
     depends_on:
-     - db
+      - db
+      - redis
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iris
       - SPRING_DATASOURCE_USERNAME=root
@@ -18,6 +18,8 @@ services:
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
     restart: unless-stopped
+    volumes:
+      - "./iris:/usr/app/iris"
   db:
     image: 'postgres:latest'
     environment:
