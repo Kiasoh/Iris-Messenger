@@ -18,8 +18,7 @@ services:
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
     restart: unless-stopped
-    volumes:
-      - "./iris:/usr/app/iris"
+
   db:
     image: 'postgres:latest'
     environment:
@@ -29,9 +28,16 @@ services:
     ports:
       - '5432'
     restart: unless-stopped
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
   redis:
     image: 'redis/redis-stack:latest'
     ports:
       - "6379:6379"
       - "8001:8001"
     restart: unless-stopped
+    volumes:
+      - "redis_data:/data"
+volumes:
+  redis_data:
+  postgres_data:
