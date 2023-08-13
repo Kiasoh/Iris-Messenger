@@ -33,7 +33,7 @@ public class UserProfileSeeder implements Seeder {
         userProfileRepository.saveAll(userProfiles);
     }
 
-    private void generateRandomUserProfile(List<UserProfile> userProfiles, List<Long> mediaIds) {
+    private void generateRandomUserProfile(List<UserProfile> userProfileList, List<Long> mediaIdList) {
         long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
         User user = new User();
         user.setUserId(userId);
@@ -41,7 +41,7 @@ public class UserProfileSeeder implements Seeder {
         long mediaId;
         do {
             mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
-        } while (mediaIds.contains(mediaId));
+        } while (mediaIdList.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);
 
@@ -52,7 +52,7 @@ public class UserProfileSeeder implements Seeder {
         userProfile.setMedia(media);
         userProfile.setSetAt(sendingTime);
 
-        mediaIds.add(mediaId);
-        userProfiles.add(userProfile);
+        mediaIdList.add(mediaId);
+        userProfileList.add(userProfile);
     }
 }
