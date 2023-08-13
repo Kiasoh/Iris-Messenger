@@ -41,7 +41,7 @@ public class SubscriptionSeeder implements Seeder {
         if (user == null || chat == null) return null;
 
         for (Subscription value : subscriptionRepository.findSubscriptionByChat(chat))
-            if (value.getUser().equals(user)) return null;
+            if (value.getUser().getUserId().equals(user.getUserId())) return null;
 
         Subscription subscription = new Subscription();
         subscription.setSubId(id);

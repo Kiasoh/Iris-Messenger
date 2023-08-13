@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class ChatProfileSeeder implements Seeder {
     private final ChatProfileRepository chatProfileRepository;
     private final ChatRepository chatRepository;
     private final MediaRepository mediaRepository;
+    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
@@ -43,6 +46,9 @@ public class ChatProfileSeeder implements Seeder {
         Instant sendingTime = faker.date().birthday().toInstant();
 
         if (chat == null || media == null) return null;
+
+        if (mediaIds.contains(mediaId)) return null;
+        else mediaIds.add(mediaId);
 
         for (ChatProfile chatProfile : chatProfileRepository.findByChat(chat))
             if (chatProfile.getMedia().equals(media)) return null;

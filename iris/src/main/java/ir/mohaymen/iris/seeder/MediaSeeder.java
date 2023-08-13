@@ -32,7 +32,7 @@ public class MediaSeeder implements Seeder {
         String path = fakeValuesService.letterify("./?????/???????");
 
         Media media = new Media();
-        media.setMediaId(id);
+//        media.setMediaId(id);
         media.setFileName(name);
         media.setFileMimeType(mimeType);
         media.setFilePath(path);

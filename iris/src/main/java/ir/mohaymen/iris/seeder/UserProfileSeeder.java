@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -19,6 +21,8 @@ public class UserProfileSeeder implements Seeder {
     private final UserProfileRepository userProfileRepository;
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
+    private final Set<Long> mediaIds = new HashSet<>();
+
 
     @Override
     public void load() {
@@ -45,8 +49,12 @@ public class UserProfileSeeder implements Seeder {
 
         if (user == null || media == null) return null;
 
+        if (mediaIds.contains(mediaId))return null;
+        else mediaIds.add(mediaId);
+
         for (UserProfile userProfile : userProfileRepository.findByUser(user))
             if (userProfile.getMedia().equals(media)) return null;
+
 
         UserProfile userProfile = new UserProfile();
         userProfile.setId(id);

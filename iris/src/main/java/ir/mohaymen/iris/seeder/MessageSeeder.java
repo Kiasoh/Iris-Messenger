@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -23,6 +25,7 @@ public class MessageSeeder implements Seeder {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
+    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
@@ -38,10 +41,22 @@ public class MessageSeeder implements Seeder {
 
     private Message generateRandomUser() {
         long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
-        String text = fakeValuesService.regexify("(\\w|\\d|\\.| ){0,200}");
-
-        long userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
-        User user = userRepository.findById(userId).orElse(null);
+        String text = switch ((int) (id % 7)) {
+            case 0 -> faker.harryPotter().quote();
+            case 1 -> faker.howIMetYourMother().quote();
+            case 2 -> faker.gameOfThrones().quote();
+            case 3 -> faker.hobbit().quote();
+            case 4 -> faker.dune().quote();
+            case 5 -> faker.buffy().quotes();
+            default -> "";
+        };
+        //                fakeValuesService.regexify("(\\w|\\d|\\.| ){0,200}");
+        long userId;
+        do {
+            userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
+        }while (userId==0);
+        User user = new User();
+        user.setUserId(userId);
 
         long chatId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Chat chat = chatRepository.findById(chatId).orElse(null);
@@ -53,8 +68,13 @@ public class MessageSeeder implements Seeder {
         Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
         Instant editingTime = id % 6 == 0 ? date.future(200, TimeUnit.DAYS).toInstant() : null;
 
+        if (mediaIds.contains(mediaId)) media = null;
+        else mediaIds.add(mediaId);
+
         if (user == null || chat == null) return null;
         if (text.isBlank() && media == null) return null;
+
+
 
         Message message = new Message();
         message.setMessageId(id);

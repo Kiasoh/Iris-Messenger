@@ -20,6 +20,7 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
 
+    @Column(columnDefinition = "TEXT")
     private String text;
 
     @JoinColumn(name = "chatId")

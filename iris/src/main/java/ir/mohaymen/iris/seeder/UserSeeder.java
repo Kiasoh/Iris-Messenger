@@ -34,7 +34,7 @@ public class UserSeeder implements Seeder {
         String bio = id % 3 == 0 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
-        user.setUserId(id);
+//        user.setUserId(id);
         user.setUserName(userName);
         user.setFirstName(firstName);
         user.setLastName(lastName);

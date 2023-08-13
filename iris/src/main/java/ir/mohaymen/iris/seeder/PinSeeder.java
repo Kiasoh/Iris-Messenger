@@ -35,7 +35,7 @@ public class PinSeeder implements Seeder {
 
         if (message == null) return null;
 
-        if (pinRepository.findByMessage(message).orElse(null) == null) return null;
+        if (pinRepository.findByMessage(message).orElse(null) != null) return null;
 
         Chat chat = message.getOriginChat();
 
