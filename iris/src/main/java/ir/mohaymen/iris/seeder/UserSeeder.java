@@ -6,6 +6,9 @@ import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class UserSeeder implements Seeder {
@@ -14,17 +17,17 @@ public class UserSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (!userRepository.findAll().isEmpty()) return;
+        if (userRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 100;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++) {
-            User user = generateRandomUser();
-            userRepository.save(user);
-        }
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+            generateRandomUser(users);
+        userRepository.saveAll(users);
     }
 
-    private User generateRandomUser() {
+    private void generateRandomUser(List<User> userList) {
         long id = Long.parseLong(fakeValuesService.regexify("\\d{1,5}"));
         Name name = faker.name();
         String firstName = name.firstName();
@@ -34,13 +37,12 @@ public class UserSeeder implements Seeder {
         String bio = id % 3 == 0 ? name.title() + fakeValuesService.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
         User user = new User();
-//        user.setUserId(id);
         user.setUserName(userName);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
         user.setBio(bio);
 
-        return user;
+        userList.add(user);
     }
 }

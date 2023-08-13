@@ -47,19 +47,17 @@ public class MessageSeeder implements Seeder {
             case 2 -> faker.gameOfThrones().quote();
             case 3 -> faker.hobbit().quote();
             case 4 -> faker.dune().quote();
-            case 5 -> faker.buffy().quotes();
+            case 5 -> faker.rickAndMorty().quote();
             default -> "";
         };
-        //                fakeValuesService.regexify("(\\w|\\d|\\.| ){0,200}");
-        long userId;
-        do {
-            userId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
-        }while (userId==0);
+
+        long userId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
         User user = new User();
         user.setUserId(userId);
 
-        long chatId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        long chatId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
+        Chat chat = new Chat();
+        chat.setChatId(chatId);
 
         long mediaId = Long.parseLong(fakeValuesService.regexify("\\d{1,2}"));
         Media media = mediaRepository.findById(mediaId).orElse(null);
@@ -71,9 +69,7 @@ public class MessageSeeder implements Seeder {
         if (mediaIds.contains(mediaId)) media = null;
         else mediaIds.add(mediaId);
 
-        if (user == null || chat == null) return null;
         if (text.isBlank() && media == null) return null;
-
 
 
         Message message = new Message();
