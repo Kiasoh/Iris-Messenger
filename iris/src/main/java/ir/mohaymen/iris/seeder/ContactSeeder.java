@@ -23,11 +23,11 @@ public class ContactSeeder implements Seeder {
         if (contactRepository.count() != 0) return;
 
         final int NUMBER_OF_INSTANCES = 200;
-
         List<Contact> contacts = new ArrayList<>();
-        Map<Long, List<Long>> ids = new HashMap<>();
+        Map<Long, List<Long>> userIds = new HashMap<>();
+
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomContact(contacts, ids);
+            generateRandomContact(contacts, userIds);
         contactRepository.saveAll(contacts);
     }
 
@@ -37,6 +37,8 @@ public class ContactSeeder implements Seeder {
         long firstUserId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|100"));
         User firstUser = new User();
         firstUser.setUserId(firstUserId);
+
+        ids.computeIfAbsent(firstUserId, k -> new ArrayList<>());
 
         long secondUserId;
         do {
@@ -56,7 +58,6 @@ public class ContactSeeder implements Seeder {
         contact.setLastName(lastName);
 
         contactList.add(contact);
-        if (ids.get(firstUserId) != null) ids.get(firstUserId).add(secondUserId);
-        else ids.put(firstUserId, List.of(secondUserId));
+        ids.get(firstUserId).add(secondUserId);
     }
 }
