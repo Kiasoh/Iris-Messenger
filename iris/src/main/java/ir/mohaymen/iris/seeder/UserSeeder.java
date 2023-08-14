@@ -32,7 +32,7 @@ public class UserSeeder implements Seeder {
         Name name = faker.name();
         String firstName = name.firstName();
         String lastName = id % 4 == 2 ? name.lastName() : null;
-        String userName = name.username() + faker.regexify("(\\d|_){1,10}");
+        String userName = id % 5 == 3 ? name.username() + faker.regexify("(\\d|_){1,10}") : null;
         String phoneNumber = faker.phoneNumber().cellPhone().replaceAll("\\s", "");
         String bio = id % 3 == 0 ? name.title() + faker.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
