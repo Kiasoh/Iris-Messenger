@@ -1,20 +1,18 @@
 package ir.mohaymen.iris.auth;
 
-import com.redis.om.spring.search.stream.EntityStream;
 import ir.mohaymen.iris.code.ActivationCode;
 import ir.mohaymen.iris.code.ActivationCodeRepository;
-import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.user.User;
+import ir.mohaymen.iris.user.UserDto;
+import ir.mohaymen.iris.user.UserMapper;
 import ir.mohaymen.iris.user.UserRepository;
 import ir.mohaymen.iris.utility.CodeGenerator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.time.Instant;
 
@@ -38,9 +35,9 @@ public class AuthServiceImpl implements AuthService {
     private final ModelMapper mapper;
     private final SMSService smsService;
     private final ActivationCodeRepository activationCodeRepository;
-    private Logger logger= LoggerFactory.getLogger(AuthService.class);
+    private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    private AuthTokensDto register(String phoneNumber) {
+    private AuthDto register(String phoneNumber) {
         var user = User.builder()
                 .firstName("کاربر")
                 .phoneNumber(phoneNumber)
@@ -49,24 +46,33 @@ public class AuthServiceImpl implements AuthService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken();
         saveUserToken(savedUser, refreshToken);
-        logger.info(MessageFormat.format("user with id:{0} phone number:{1} registered refresh_token:{2} jwt_token:{3} ", savedUser.getUserId(), phoneNumber, refreshToken.getToken(), jwtToken));
-        return AuthTokensDto.builder()
+        logger.info(
+                MessageFormat.format("user with id:{0} phone number:{1} registered refresh_token:{2} jwt_token:{3} ",
+                        savedUser.getUserId(), phoneNumber, refreshToken.getToken(), jwtToken));
+        return AuthDto.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
+                .user(UserMapper.mapToUserDto(savedUser))
                 .build();
     }
 
-    public AuthTokensDto login(LoginDto loginDto) {
+    public AuthDto login(LoginDto loginDto) {
 
         if (!isActiveCodeValid(loginDto)) {
-            logger.warn(MessageFormat.format("user entered {0} as activation code which is for sb else phone number:{1}", loginDto.getActivationCode(), loginDto.getPhoneNumber()));
+            logger.warn(
+                    MessageFormat.format("user entered {0} as activation code which is for sb else phone number:{1}",
+                            loginDto.getActivationCode(), loginDto.getPhoneNumber()));
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        boolean isRegistered = false;
         String jwtToken, refreshToken;
+        UserDto userDto;
         if (!userRepository.existsByPhoneNumber(loginDto.getPhoneNumber())) {
             var result = register(loginDto.getPhoneNumber());
             jwtToken = result.getAccessToken();
             refreshToken = result.getRefreshToken();
+            isRegistered = true;
+            userDto=result.getUser();
         } else {
             var user = userRepository.findByPhoneNumber(loginDto.getPhoneNumber())
                     .orElseThrow();
@@ -74,21 +80,26 @@ public class AuthServiceImpl implements AuthService {
             var refreshTokenObj = jwtService.generateRefreshToken();
             refreshToken = refreshTokenObj.getToken();
             saveUserToken(user, refreshTokenObj);
+            userDto = UserMapper.mapToUserDto(user);
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getPhoneNumber(), "password"));
         deleteAllOldCodes(loginDto.getPhoneNumber());
-        logger.info(MessageFormat.format("user phone number:{0} registered refresh_token:{1} jwt_token:{2} logined", loginDto.getPhoneNumber(), refreshToken, jwtToken));
-        return AuthTokensDto.builder()
+        logger.info(MessageFormat.format("user phone number:{0} registered refresh_token:{1} jwt_token:{2} logined",
+                loginDto.getPhoneNumber(), refreshToken, jwtToken));
+        return AuthDto.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .isRegistered(isRegistered)
+                .user(userDto)
                 .build();
     }
 
     private boolean isActiveCodeValid(LoginDto loginDto) {
         var activeCodeObj = activationCodeRepository.findByCode(loginDto.getActivationCode()).orElseThrow(() -> {
-            logger.warn(MessageFormat.format("user phone number:{0} entered {1} as activation code incorrectly", loginDto.getPhoneNumber(), loginDto.getActivationCode()));
+            logger.warn(MessageFormat.format("user phone number:{0} entered {1} as activation code incorrectly",
+                    loginDto.getPhoneNumber(), loginDto.getActivationCode()));
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         });
         return activeCodeObj.getPhoneNumber().equals(loginDto.getPhoneNumber());
@@ -99,8 +110,8 @@ public class AuthServiceImpl implements AuthService {
         tokenRepository.save(token);
     }
 
-    public String refreshToken(AuthTokensDto authTokensDto) {
-        var refreshToken = authTokensDto.getRefreshToken();
+    public String refreshToken(AuthDto authDto) {
+        var refreshToken = authDto.getRefreshToken();
         var userPhoneNumber = jwtService.extractUsername(refreshToken);
         if (userPhoneNumber != null) {
             var user = this.userRepository.findByPhoneNumber(userPhoneNumber)
@@ -116,7 +127,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public String sendActivationCode(String phoneNumber) {
-        deleteAllOldCodes(phoneNumber);
+        if (activationCodeRepository.existsByPhoneNumber(phoneNumber))
+            return "retry later";
         String activationCode;
         do {
             activationCode = codeGenerator.generateActivationCode();
@@ -129,7 +141,8 @@ public class AuthServiceImpl implements AuthService {
         smsService.sendSms(phoneNumber, "کد فعالسازی شما:" + activationCode);
         return activationCode;
     }
-    private void deleteAllOldCodes(String phoneNumber){
+
+    private void deleteAllOldCodes(String phoneNumber) {
         var oldCodes = activationCodeRepository.findAllByPhoneNumber(phoneNumber);
         activationCodeRepository.deleteAll(oldCodes);
     }

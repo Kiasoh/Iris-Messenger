@@ -15,7 +15,8 @@ public interface ActivationCodeRepository extends RedisDocumentRepository<Activa
     Optional<ActivationCode> findByPhoneNumber(String phoneNumber);
     Iterable<ActivationCode> findAllByPhoneNumber(String phoneNumber);
 
-//    void deleteByPhoneNumber(String phoneNumber);
+    boolean existsByPhoneNumber(String phoneNumber);
+    //    void deleteByPhoneNumber(String phoneNumber);
 
 //    void deleteAllByPhoneNumber(String phoneNumber);
 }

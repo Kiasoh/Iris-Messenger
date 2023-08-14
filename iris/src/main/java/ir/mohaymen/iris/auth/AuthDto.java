@@ -1,6 +1,8 @@
 package ir.mohaymen.iris.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import ir.mohaymen.iris.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthTokensDto {
+public class AuthDto {
 
   @JsonProperty("access_token")
   private String accessToken;
   @JsonProperty("refresh_token")
   private String refreshToken;
+  private UserDto user;
+  private boolean isRegistered;
 }
