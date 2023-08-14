@@ -10,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -51,8 +50,10 @@ public class MessageSeeder implements Seeder {
         String text = generateRandomText(id);
 
         DateAndTime date = faker.date();
-        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
-        Instant editingTime = id % 6 == 0 ? date.future(200, TimeUnit.DAYS).toInstant() : null;
+        Date sendingTimeLowerBound = Date.from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeUpperBound = Date.from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
+        Instant sendingTime = date.between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
+        Instant editingTime = id % 6 == 0 ? date.past(100, TimeUnit.DAYS).toInstant() : null;
 
         Message message = new Message();
         message.setText(text);
