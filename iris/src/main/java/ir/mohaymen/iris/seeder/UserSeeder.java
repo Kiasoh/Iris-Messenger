@@ -22,7 +22,9 @@ public class UserSeeder implements Seeder {
         final int NUMBER_OF_INSTANCES = 100;
         final List<User> users = new ArrayList<>();
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
+        generateUser("ali", "hoseini", null, "0910", "something", users);
+        generateUser("sadegh", "poolaiii", "poolai_23", "0911", null, users);
+        for (int i = 0; i < NUMBER_OF_INSTANCES - 2; i++)
             generateRandomUser(users);
         userRepository.saveAll(users);
     }
@@ -36,6 +38,17 @@ public class UserSeeder implements Seeder {
         String phoneNumber = faker.phoneNumber().cellPhone().replaceAll("\\s", "");
         String bio = id % 3 == 0 ? name.title() + faker.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
 
+        User user = new User();
+        user.setUserName(userName);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPhoneNumber(phoneNumber);
+        user.setBio(bio);
+
+        userList.add(user);
+    }
+
+    private void generateUser(String firstName, String lastName, String userName, String phoneNumber, String bio, List<User> userList) {
         User user = new User();
         user.setUserName(userName);
         user.setFirstName(firstName);
