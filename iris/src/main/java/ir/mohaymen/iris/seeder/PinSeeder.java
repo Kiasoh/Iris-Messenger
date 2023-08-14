@@ -2,8 +2,11 @@ package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.message.Message;
+import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.pin.Pin;
 import ir.mohaymen.iris.pin.PinRepository;
+import ir.mohaymen.iris.subscription.Subscription;
+import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +18,7 @@ import java.util.List;
 public class PinSeeder implements Seeder {
 
     private final PinRepository pinRepository;
-
+    private final MessageRepository messageRepository;
     @Override
     public void load() {
         if (pinRepository.count() != 0) return;
@@ -36,15 +39,12 @@ public class PinSeeder implements Seeder {
         do {
             messageId = faker.random().nextInt(1, 2000);
         } while (messageIdList.contains(messageId));
-        Message message = new Message();
-        message.setMessageId(messageId);
-
-        Chat chat = message.getOriginChat();
+        Message message = messageRepository.findById(messageId).orElse(null);
+        User user=message.getSender();
 
         Pin pin = new Pin();
-        pin.setPinId(id);
         pin.setMessage(message);
-        pin.setChat(chat);
+        pin.setUser(user);
 
         messageIdList.add(messageId);
         pinList.add(pin);
