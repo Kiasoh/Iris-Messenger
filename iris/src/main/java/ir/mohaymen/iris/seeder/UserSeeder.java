@@ -15,17 +15,17 @@ public class UserSeeder implements Seeder {
 
     private final UserRepository userRepository;
 
+        static final int NUMBER_OF_INSTANCES = 100;
     @Override
     public void load() {
         if (userRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 100;
         final List<User> users = new ArrayList<>();
 
         generateUser("ali", "hoseini", null, "0910", "something", users);
-        generateUser("sadegh", "poolaiii", "poolai_23", "0911", null, users);
-        for (int i = 0; i < NUMBER_OF_INSTANCES - 2; i++)
+        for (int i = 0; i < NUMBER_OF_INSTANCES-1; i++)
             generateRandomUser(users);
+        generateUser("sadegh", "poolaiii", "poolai_23", "0911", null, users);
         userRepository.saveAll(users);
     }
 

@@ -11,6 +11,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserSeeder userSeeder;
     private final ContactSeeder contactSeeder;
     private final ChatSeeder chatSeeder;
+    private final PVSeeder pvSeeder;
     private final SubscriptionSeeder subscriptionSeeder;
     private final MediaSeeder mediaSeeder;
     private final MessageSeeder messageSeeder;
@@ -24,6 +25,7 @@ public class DataLoader implements CommandLineRunner {
         contactSeeder.load();
         chatSeeder.load();
         subscriptionSeeder.load();
+        pvSeeder.load();
         mediaSeeder.load();
         messageSeeder.load();
         pinSeeder.load();

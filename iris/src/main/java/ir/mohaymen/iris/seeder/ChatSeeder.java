@@ -16,11 +16,12 @@ public class ChatSeeder implements Seeder {
 
     private final ChatRepository chatRepository;
 
+    final static int NUMBER_OF_INSTANCES = 100;
+
     @Override
     public void load() {
         if (chatRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 100;
         final List<Chat> chats = new ArrayList<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
@@ -32,10 +33,9 @@ public class ChatSeeder implements Seeder {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         String title = faker.book().title();
         String link = id % 5 == 0 ? faker.regexify("\\w(\\w|\\d|_){2,10}") : null;
-        boolean isPublic = id % 2 == 0;
-        ChatType chatType = ChatType.values()[(int) id % ChatType.values().length];
+        ChatType chatType = ChatType.values()[faker.random().nextInt(1,ChatType.values().length-1)];
         String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |,|\\.){5,50}") : null;
-
+        boolean isPublic= id % 2 == 0;
         Chat chat = new Chat();
         chat.setTitle(title);
         chat.setLink(link);
