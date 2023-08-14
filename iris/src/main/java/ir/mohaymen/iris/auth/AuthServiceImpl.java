@@ -110,8 +110,8 @@ public class AuthServiceImpl implements AuthService {
         tokenRepository.save(token);
     }
 
-    public String refreshToken(AuthDto authDto) {
-        var refreshToken = authDto.getRefreshToken();
+    public String refreshToken(TokenDto tokenDto) {
+        var refreshToken = tokenDto.getRefreshToken();
         var userPhoneNumber = jwtService.extractUsername(refreshToken);
         if (userPhoneNumber != null) {
             var user = this.userRepository.findByPhoneNumber(userPhoneNumber)

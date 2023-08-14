@@ -19,8 +19,8 @@ public class AuthController {
   }
 
   @PostMapping("/refresh-token")
-  public ResponseEntity<String> refreshToken(@RequestBody AuthDto authDto) {
-    return ResponseEntity.ok(authService.refreshToken(authDto));
+  public ResponseEntity<String> refreshToken(@RequestBody TokenDto tokenDto) {
+    return ResponseEntity.ok(authService.refreshToken(tokenDto));
   }
 
   @GetMapping("/send-activation-code")
