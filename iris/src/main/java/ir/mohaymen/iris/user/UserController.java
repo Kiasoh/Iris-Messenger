@@ -1,20 +1,23 @@
 package ir.mohaymen.iris.user;
 
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
     @GetMapping("/users")
-    public ResponseEntity<Iterable<User>> getAllUsers(){
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<UserDto>> getAllUsers(){
+//        userService.getAll().forEach(UserMapper::mapToUserDto);
+        List<UserDto> result = userRepository.findAll().stream().map(UserMapper::mapToUserDto).toList();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/users/{id}")

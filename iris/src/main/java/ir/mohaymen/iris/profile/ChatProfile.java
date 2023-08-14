@@ -3,11 +3,8 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -15,6 +12,9 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "chat_profiles")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ChatProfile {
 
     @Id
