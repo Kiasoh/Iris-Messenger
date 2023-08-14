@@ -9,7 +9,6 @@ import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,8 +38,6 @@ public class MessageSeeder implements Seeder {
     private void generateRandomMessage(List<Message> messageList, Set<Long> mediaIdList) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        String text = generateRandomText(id);
-
         long userId = faker.random().nextInt(1, 100);
         User user = new User();
         user.setUserId(userId);
@@ -49,7 +46,9 @@ public class MessageSeeder implements Seeder {
         Chat chat = new Chat();
         chat.setChatId(chatId);
 
-        Media media = generateRandomMedia(id, text, mediaIdList);
+        Media media = generateRandomMedia(id, mediaIdList);
+
+        String text = generateRandomText(id);
 
         DateAndTime date = faker.date();
         Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
@@ -74,20 +73,18 @@ public class MessageSeeder implements Seeder {
             case 3 -> faker.hobbit().quote();
             case 4 -> faker.dune().quote();
             case 5 -> faker.rickAndMorty().quote();
-            default -> "";
+            default -> null;
         };
     }
 
-    private Media generateRandomMedia(Long seed, String messageText, Set<Long> mediaIdList) {
+    private Media generateRandomMedia(Long seed, Set<Long> mediaIdList) {
         Media media;
 
         media = new Media();
-        if (seed % 25 == 0 || messageText.isBlank()) {
+        if (seed % 7 == 2 || seed % 7 == 6) {
             long mediaId;
             do {
-                mediaId = faker.random().nextInt(1,1000);
-//                mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
-                System.out.println(MessageFormat.format("id:{0} seed:{1} count:{2}",mediaId,seed, mediaIdList.size()));
+                mediaId = faker.random().nextInt(1, 1000);
             } while (mediaIdList.contains(mediaId));
             media.setMediaId(mediaId);
             mediaIdList.add(mediaId);

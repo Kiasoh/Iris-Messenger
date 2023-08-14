@@ -39,7 +39,7 @@ public class ChatProfileSeeder implements Seeder {
 
         long mediaId;
         do {
-            mediaId = faker.random().nextInt(1, 200);
+            mediaId = faker.random().nextInt(1, 1000);
         } while (mediaIdList.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

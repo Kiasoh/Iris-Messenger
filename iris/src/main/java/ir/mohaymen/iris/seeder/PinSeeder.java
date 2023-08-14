@@ -34,7 +34,7 @@ public class PinSeeder implements Seeder {
 
         long messageId;
         do {
-            messageId = faker.random().nextInt(1, 1000);
+            messageId = faker.random().nextInt(1, 2000);
         } while (messageIdList.contains(messageId));
         Message message = new Message();
         message.setMessageId(messageId);
