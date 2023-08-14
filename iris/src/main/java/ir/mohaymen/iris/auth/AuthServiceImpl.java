@@ -127,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public String sendActivationCode(String phoneNumber) {
-        if (activationCodeRepository.existsByPhoneNumber(phoneNumber))
+        if (activationCodeRepository.findByPhoneNumber(phoneNumber).isPresent())
             return "retry later";
         String activationCode;
         do {
