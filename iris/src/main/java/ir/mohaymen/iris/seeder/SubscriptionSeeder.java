@@ -18,11 +18,12 @@ public class SubscriptionSeeder implements Seeder {
     private final SubscriptionRepository subscriptionRepository;
     private final ChatRepository chatRepository;
 
+    static final int NUMBER_OF_INSTANCES = 500;
+
     @Override
     public void load() {
         if (subscriptionRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 500;
         final List<Subscription> subscriptions = new ArrayList<>();
         final Map<Long, Set<Long>> userToChatMap = new HashMap<>();
 
@@ -32,7 +33,7 @@ public class SubscriptionSeeder implements Seeder {
     }
 
     private void generateRandomSubscription(List<Subscription> subscriptionList, Map<Long, Set<Long>> userToChatMap) {
-        long userId = faker.random().nextInt(1, 100);
+        long userId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User user = new User();
         user.setUserId(userId);
 
@@ -40,7 +41,7 @@ public class SubscriptionSeeder implements Seeder {
 
         long chatId;
         do {
-            chatId = faker.random().nextInt(1, 100);
+            chatId = faker.random().nextInt(1, ChatSeeder.NUMBER_OF_INSTANCES);
         } while (userToChatMap.get(userId).contains(chatId) || chatIsFull(chatId));
         Chat chat = new Chat();
         chat.setChatId(chatId);

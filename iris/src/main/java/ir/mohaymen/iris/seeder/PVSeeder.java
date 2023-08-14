@@ -17,20 +17,21 @@ public class PVSeeder implements Seeder {
 
     private final ChatRepository chatRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private final List<Subscription> subscriptionList = new ArrayList<>();;
+    private final List<Subscription> subscriptionList = new ArrayList<>();
+    ;
     private final List<Chat> pvs = new ArrayList<>();
     private List<Chat> savedChats;
 
-    final static int NUMBER_OF_INSTANCES = 30;
+    static final int NUMBER_OF_INSTANCES = 30;
 
     @Override
     public void load() {
-        if (chatRepository.count() >= ChatSeeder.NUMBER_OF_INSTANCES + this.NUMBER_OF_INSTANCES)
-            return;
+        if (chatRepository.count() >= ChatSeeder.NUMBER_OF_INSTANCES + NUMBER_OF_INSTANCES) return;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomChat();
-        savedChats=chatRepository.saveAll(pvs);
+        savedChats = chatRepository.saveAll(pvs);
+
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription(i);
         subscriptionRepository.saveAll(subscriptionList);
@@ -67,7 +68,7 @@ public class PVSeeder implements Seeder {
         user2.setUserId(userId2);
 
 
-        Chat chat =savedChats.get(i);
+        Chat chat = savedChats.get(i);
 
         Subscription subscription1 = new Subscription();
         subscription1.setUser(user1);

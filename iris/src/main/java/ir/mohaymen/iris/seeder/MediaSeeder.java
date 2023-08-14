@@ -15,17 +15,18 @@ public class MediaSeeder implements Seeder {
 
     private final MediaRepository mediaRepository;
 
+    static final int NUMBER_OF_INSTANCES = 1000;
+
     @Override
     public void load() {
         if (mediaRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 1000;
         final List<Media> medias = new ArrayList<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomMedia(medias);
         mediaRepository.saveAll(medias);
-    }
+     }
 
     private void generateRandomMedia(List<Media> mediaList) {
         File file = faker.file();

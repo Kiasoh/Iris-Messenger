@@ -4,6 +4,7 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.profile.ChatProfileRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,11 +21,12 @@ public class ChatProfileSeeder implements Seeder {
 
     private final ChatProfileRepository chatProfileRepository;
 
+    static final int NUMBER_OF_INSTANCES = 30;
+
     @Override
     public void load() {
         if (chatProfileRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 30;
         final List<ChatProfile> chatProfiles = new ArrayList<>();
         final Set<Long> mediaIds = new HashSet<>();
 
@@ -34,13 +36,13 @@ public class ChatProfileSeeder implements Seeder {
     }
 
     private void generateRandomChatProfile(List<ChatProfile> chatProfileList, Set<Long> mediaIdSet) {
-        long chatId = faker.random().nextInt(1, 100);
+        long chatId = faker.random().nextInt(1, ChatSeeder.NUMBER_OF_INSTANCES);
         Chat chat = new Chat();
         chat.setChatId(chatId);
 
         long mediaId;
         do {
-            mediaId = faker.random().nextInt(1, 1000);
+            mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
         } while (mediaIdSet.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

@@ -16,7 +16,7 @@ public class ChatSeeder implements Seeder {
 
     private final ChatRepository chatRepository;
 
-    final static int NUMBER_OF_INSTANCES = 100;
+    static final int NUMBER_OF_INSTANCES = 100;
 
     @Override
     public void load() {

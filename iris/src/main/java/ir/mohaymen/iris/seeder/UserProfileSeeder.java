@@ -20,11 +20,12 @@ public class UserProfileSeeder implements Seeder {
 
     private final UserProfileRepository userProfileRepository;
 
+    static final int NUMBER_OF_INSTANCES = 30;
+
     @Override
     public void load() {
         if (userProfileRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 30;
         final List<UserProfile> userProfiles = new ArrayList<>();
         final Set<Long> mediaIds = new HashSet<>();
 
@@ -34,13 +35,13 @@ public class UserProfileSeeder implements Seeder {
     }
 
     private void generateRandomUserProfile(List<UserProfile> userProfileList, Set<Long> mediaIdList) {
-        long userId = faker.random().nextInt(1, 100);
+        long userId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User user = new User();
         user.setUserId(userId);
 
         long mediaId;
         do {
-            mediaId = faker.random().nextInt(1, 1000);
+            mediaId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
         } while (mediaIdList.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

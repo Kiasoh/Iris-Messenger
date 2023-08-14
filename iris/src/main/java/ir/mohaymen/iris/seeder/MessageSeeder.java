@@ -21,11 +21,12 @@ public class MessageSeeder implements Seeder {
 
     private final MessageRepository messageRepository;
 
+    static final int NUMBER_OF_INSTANCES = 2000;
+
     @Override
     public void load() {
         if (messageRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 2000;
         final List<Message> messages = new ArrayList<>();
         final Set<Long> mediaIds = new HashSet<>();
 
@@ -37,11 +38,11 @@ public class MessageSeeder implements Seeder {
     private void generateRandomMessage(List<Message> messageList, Set<Long> mediaIdList) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        long userId = faker.random().nextInt(1, 100);
+        long userId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User user = new User();
         user.setUserId(userId);
 
-        long chatId = faker.random().nextInt(1, 100);
+        long chatId = faker.random().nextInt(1, ChatSeeder.NUMBER_OF_INSTANCES);
         Chat chat = new Chat();
         chat.setChatId(chatId);
 

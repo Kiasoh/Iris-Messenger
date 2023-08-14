@@ -24,11 +24,12 @@ public class PinSeeder implements Seeder {
     private final MessageRepository messageRepository;
     private final SubscriptionRepository subscriptionRepository;
 
+    static final int NUMBER_OF_INSTANCES = 40;
+
     @Override
     public void load() {
         if (pinRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 40;
         final List<Pin> pins = new ArrayList<>();
         final Set<Long> messageIds = new HashSet<>();
 
@@ -40,7 +41,7 @@ public class PinSeeder implements Seeder {
     private void generateRandomPin(List<Pin> pinList, Set<Long> messageIdList) {
         long messageId;
         do {
-            messageId = faker.random().nextInt(1, 2000);
+            messageId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
         } while (messageIdList.contains(messageId));
         Message message = messageRepository.findById(messageId).orElse(new Message());
 
@@ -48,7 +49,7 @@ public class PinSeeder implements Seeder {
 
         List<Subscription> subscriptions = new ArrayList<>();
         subscriptionRepository.findSubscriptionByChat(chat).iterator().forEachRemaining(subscriptions::add);
-        var max=subscriptions.size() - 1;
+        var max = subscriptions.size() - 1;
         int subscriptionId = faker.random().nextInt(0, max);
         User user = subscriptions.get(subscriptionId).getUser();
 

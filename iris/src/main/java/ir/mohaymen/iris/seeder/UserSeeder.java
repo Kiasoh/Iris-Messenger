@@ -15,7 +15,8 @@ public class UserSeeder implements Seeder {
 
     private final UserRepository userRepository;
 
-        static final int NUMBER_OF_INSTANCES = 100;
+    static final int NUMBER_OF_INSTANCES = 100;
+
     @Override
     public void load() {
         if (userRepository.count() != 0) return;
