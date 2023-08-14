@@ -17,12 +17,11 @@ public class PVSeeder implements Seeder {
 
     private final ChatRepository chatRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private final List<Subscription> subscriptionList = new ArrayList<>();
-    ;
-    private final List<Chat> pvs = new ArrayList<>();
-    private List<Chat> savedChats;
 
     static final int NUMBER_OF_INSTANCES = 30;
+    private final List<Subscription> subscriptionList = new ArrayList<>();
+    private final List<Chat> pvs = new ArrayList<>();
+    private List<Chat> savedChats;
 
     @Override
     public void load() {
@@ -44,13 +43,13 @@ public class PVSeeder implements Seeder {
         ChatType chatType = ChatType.PV;
         String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |,|\\.){5,50}") : null;
         boolean isPublic = false;
+
         Chat chat = new Chat();
         chat.setTitle(title);
         chat.setLink(link);
         chat.setPublic(isPublic);
         chat.setChatType(chatType);
         chat.setBio(bio);
-        chat.setSubs(new HashSet<>());
 
         pvs.add(chat);
     }

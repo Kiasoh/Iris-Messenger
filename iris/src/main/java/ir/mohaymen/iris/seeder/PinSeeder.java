@@ -25,24 +25,23 @@ public class PinSeeder implements Seeder {
     private final SubscriptionRepository subscriptionRepository;
 
     static final int NUMBER_OF_INSTANCES = 40;
+    private final List<Pin> pins = new ArrayList<>();
+    private final Set<Long> messageIds = new HashSet<>();
 
     @Override
     public void load() {
         if (pinRepository.count() != 0) return;
 
-        final List<Pin> pins = new ArrayList<>();
-        final Set<Long> messageIds = new HashSet<>();
-
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomPin(pins, messageIds);
+            generateRandomPin();
         pinRepository.saveAll(pins);
     }
 
-    private void generateRandomPin(List<Pin> pinList, Set<Long> messageIdList) {
+    private void generateRandomPin() {
         long messageId;
         do {
             messageId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
-        } while (messageIdList.contains(messageId));
+        } while (messageIds.contains(messageId));
         Message message = messageRepository.findById(messageId).orElse(new Message());
 
         Chat chat = message.getOriginChat();
@@ -58,7 +57,7 @@ public class PinSeeder implements Seeder {
         pin.setUser(user);
         pin.setChat(chat);
 
-        messageIdList.add(messageId);
-        pinList.add(pin);
+        messageIds.add(messageId);
+        pins.add(pin);
     }
 }

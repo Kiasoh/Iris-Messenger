@@ -16,21 +16,21 @@ public class UserSeeder implements Seeder {
     private final UserRepository userRepository;
 
     static final int NUMBER_OF_INSTANCES = 100;
+    private final List<User> users = new ArrayList<>();
 
     @Override
     public void load() {
         if (userRepository.count() != 0) return;
 
-        final List<User> users = new ArrayList<>();
 
         generateUser("ali", "hoseini", null, "0910", "something", users);
-        for (int i = 0; i < NUMBER_OF_INSTANCES-1; i++)
-            generateRandomUser(users);
+        for (int i = 0; i < NUMBER_OF_INSTANCES - 1; i++)
+            generateRandomUser();
         generateUser("sadegh", "poolaiii", "poolai_23", "0911", null, users);
         userRepository.saveAll(users);
     }
 
-    private void generateRandomUser(List<User> userList) {
+    private void generateRandomUser() {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         Name name = faker.name();
         String firstName = name.firstName();
@@ -46,7 +46,7 @@ public class UserSeeder implements Seeder {
         user.setPhoneNumber(phoneNumber);
         user.setBio(bio);
 
-        userList.add(user);
+        users.add(user);
     }
 
     private void generateUser(String firstName, String lastName, String userName, String phoneNumber, String bio, List<User> userList) {

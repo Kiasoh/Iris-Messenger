@@ -21,20 +21,19 @@ public class UserProfileSeeder implements Seeder {
     private final UserProfileRepository userProfileRepository;
 
     static final int NUMBER_OF_INSTANCES = 30;
+    private final List<UserProfile> userProfiles = new ArrayList<>();
+    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
         if (userProfileRepository.count() != 0) return;
 
-        final List<UserProfile> userProfiles = new ArrayList<>();
-        final Set<Long> mediaIds = new HashSet<>();
-
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomUserProfile(userProfiles, mediaIds);
+            generateRandomUserProfile();
         userProfileRepository.saveAll(userProfiles);
     }
 
-    private void generateRandomUserProfile(List<UserProfile> userProfileList, Set<Long> mediaIdList) {
+    private void generateRandomUserProfile() {
         long userId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User user = new User();
         user.setUserId(userId);
@@ -42,7 +41,7 @@ public class UserProfileSeeder implements Seeder {
         long mediaId;
         do {
             mediaId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
-        } while (mediaIdList.contains(mediaId));
+        } while (mediaIds.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);
 
@@ -53,7 +52,7 @@ public class UserProfileSeeder implements Seeder {
         userProfile.setMedia(media);
         userProfile.setSetAt(sendingTime);
 
-        mediaIdList.add(mediaId);
-        userProfileList.add(userProfile);
+        mediaIds.add(mediaId);
+        userProfiles.add(userProfile);
     }
 }
