@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -24,15 +26,14 @@ public class ChatProfileSeeder implements Seeder {
 
         final int NUMBER_OF_INSTANCES = 30;
         final List<ChatProfile> chatProfiles = new ArrayList<>();
-        final List<Long> mediaIds = new ArrayList<>();
+        final Set<Long> mediaIds = new HashSet<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomChatProfile(chatProfiles, mediaIds);
         chatProfileRepository.saveAll(chatProfiles);
     }
 
-    private void generateRandomChatProfile(List<ChatProfile> chatProfileList, List<Long> mediaIdList) {
-
+    private void generateRandomChatProfile(List<ChatProfile> chatProfileList, Set<Long> mediaIdSet) {
         long chatId = faker.random().nextInt(1, 100);
         Chat chat = new Chat();
         chat.setChatId(chatId);
@@ -40,7 +41,7 @@ public class ChatProfileSeeder implements Seeder {
         long mediaId;
         do {
             mediaId = faker.random().nextInt(1, 1000);
-        } while (mediaIdList.contains(mediaId));
+        } while (mediaIdSet.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);
 
@@ -51,7 +52,7 @@ public class ChatProfileSeeder implements Seeder {
         chatProfile.setMedia(media);
         chatProfile.setSetAt(sendingTime);
 
-        mediaIdList.add(mediaId);
+        mediaIdSet.add(mediaId);
         chatProfileList.add(chatProfile);
     }
 }

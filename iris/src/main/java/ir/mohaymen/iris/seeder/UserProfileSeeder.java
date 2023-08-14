@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -24,14 +26,14 @@ public class UserProfileSeeder implements Seeder {
 
         final int NUMBER_OF_INSTANCES = 30;
         final List<UserProfile> userProfiles = new ArrayList<>();
-        final List<Long> mediaIds = new ArrayList<>();
+        final Set<Long> mediaIds = new HashSet<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomUserProfile(userProfiles, mediaIds);
         userProfileRepository.saveAll(userProfiles);
     }
 
-    private void generateRandomUserProfile(List<UserProfile> userProfileList, List<Long> mediaIdList) {
+    private void generateRandomUserProfile(List<UserProfile> userProfileList, Set<Long> mediaIdList) {
         long userId = faker.random().nextInt(1, 100);
         User user = new User();
         user.setUserId(userId);

@@ -7,10 +7,7 @@ import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -24,21 +21,21 @@ public class ContactSeeder implements Seeder {
 
         final int NUMBER_OF_INSTANCES = 200;
         final List<Contact> contacts = new ArrayList<>();
-        final Map<Long, List<Long>> userIds = new HashMap<>();
+        final Map<Long, Set<Long>> userIds = new HashMap<>();
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomContact(contacts, userIds);
         contactRepository.saveAll(contacts);
     }
 
-    private void generateRandomContact(List<Contact> contactList, Map<Long, List<Long>> ids) {
+    private void generateRandomContact(List<Contact> contactList, Map<Long, Set<Long>> ids) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
         long firstUserId = faker.random().nextInt(1, 100);
         User firstUser = new User();
         firstUser.setUserId(firstUserId);
 
-        ids.computeIfAbsent(firstUserId, k -> new ArrayList<>());
+        ids.computeIfAbsent(firstUserId, k -> new HashSet<>());
 
         long secondUserId;
         do {
