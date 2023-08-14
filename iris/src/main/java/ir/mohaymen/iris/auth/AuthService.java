@@ -4,7 +4,7 @@ public interface AuthService {
 
     AuthDto login(LoginDto loginDto);
 
-    String refreshToken(AuthDto authDto);
+    String refreshToken(TokenDto tokenDto);
 
     String sendActivationCode(String phoneNumber);
 
