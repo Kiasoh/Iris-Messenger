@@ -47,7 +47,7 @@ public class PinSeeder implements Seeder {
         Chat chat = message.getOriginChat();
 
         List<Subscription> subscriptions = new ArrayList<>();
-        subscriptionRepository.findSubscriptionByChat(chat).iterator().forEachRemaining(subscriptions::add);
+        subscriptionRepository.findAllByChat(chat).iterator().forEachRemaining(subscriptions::add);
         var max = subscriptions.size() - 1;
         int subscriptionId = faker.random().nextInt(0, max);
         User user = subscriptions.get(subscriptionId).getUser();

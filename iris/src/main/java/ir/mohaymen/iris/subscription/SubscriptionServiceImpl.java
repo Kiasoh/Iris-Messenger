@@ -31,7 +31,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public Iterable<Subscription> getAllSubscriptionByChatId(Long chatId) {
         Chat chat = chatRepository.findById(chatId).orElse(null);
         if (chat == null) return null;
-        return subscriptionRepository.findSubscriptionByChat(chat);
+        return subscriptionRepository.findAllByChat(chat);
     }
 
     @Override
