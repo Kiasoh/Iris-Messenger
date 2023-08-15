@@ -16,7 +16,7 @@ import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contacts")
+@RequestMapping("/api/contacts")
 public class ContactController extends BaseController {
     private final UserService userService;
     private final ContactService contactService;

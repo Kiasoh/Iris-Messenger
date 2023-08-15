@@ -15,7 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pins")
+@RequestMapping("/api/pins")
 @RequiredArgsConstructor
 public class PinController extends BaseController {
     private final MessageService messageService;
