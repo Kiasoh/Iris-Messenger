@@ -3,6 +3,7 @@ package ir.mohaymen.iris.contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ContactController extends BaseController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/add-contact")
-    public ResponseEntity<PostContactDto> addContact(@RequestBody GetContactDto getContactDto) {
+    public ResponseEntity<PostContactDto> addContact(@RequestBody @Valid GetContactDto getContactDto) {
         if (contactService.isInContact(getUserByToken() , getContactDto.getContactId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         Contact contact = modelMapper.map(getContactDto, Contact.class);

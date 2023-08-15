@@ -15,5 +15,6 @@ public class MenuChatDto {
     private String title;
     private String lastMessage;
     private String userFirstName;
+    private ChatType chatType;
     private Media media;
 }

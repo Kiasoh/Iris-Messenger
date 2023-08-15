@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.user;
 
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class UserController extends BaseController {
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateUser(@RequestBody EditUserDto editUserDto){
+    public ResponseEntity<?> updateUser(@RequestBody @Valid EditUserDto editUserDto){
         User user = getUserByToken();
         user.setFirstName(editUserDto.getFirstName());
         user.setLastName(editUserDto.getLastName());

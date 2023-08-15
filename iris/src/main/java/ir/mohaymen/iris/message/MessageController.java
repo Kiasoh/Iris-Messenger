@@ -9,6 +9,7 @@ import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(getMessageDtoList , HttpStatus.OK);
     }
     @PostMapping("/send-message")
-    public ResponseEntity<GetMessageDto> sendMessage (@RequestBody MessageDto messageDto) {
+    public ResponseEntity<GetMessageDto> sendMessage (@RequestBody @Valid MessageDto messageDto) {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
         if (!chatService.isInChat(chat ,user ))
@@ -64,7 +65,7 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(modelMapper.map(messageService.createOrUpdate(message) , GetMessageDto.class), HttpStatus.OK);
     }
     @PatchMapping ("/edit-message")
-    public ResponseEntity<GetMessageDto> editMessage (@RequestBody EditMessageDto editMessageDto) {
+    public ResponseEntity<GetMessageDto> editMessage (@RequestBody @Valid EditMessageDto editMessageDto) {
         Message message = messageService.getById(editMessageDto.getMessageId());
         message.setText(editMessageDto.getText());
         message.setEditedAt(Instant.now());

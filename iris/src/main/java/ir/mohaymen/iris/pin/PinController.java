@@ -6,6 +6,7 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class PinController extends BaseController {
     private final PinService pinService;
 
     @PostMapping("/pin-message")
-    public ResponseEntity<GetPinDto> pinMessage (@RequestBody PinDto pinDto) {
+    public ResponseEntity<GetPinDto> pinMessage (@RequestBody @Valid PinDto pinDto) {
         Chat chat = chatService.getById(pinDto.getChatId());
         Message message = messageService.getById(pinDto.getMessageId());
         if(!chatService.isInChat(chat , getUserByToken()) || message.getOriginChat()!=chat)

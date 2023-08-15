@@ -6,6 +6,7 @@ import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.modelmapper.ModelMapper;
@@ -32,7 +33,7 @@ public class ChatController extends BaseController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/create-chat")
-    public ResponseEntity<GetChatDto> createChat(@RequestBody CreateChatDto createChatDto) {
+    public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
         chat.setSubs(new HashSet<>());
         chat = chatService.createOrUpdate(chat);

@@ -6,6 +6,7 @@ import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.chat.GetChatDto;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class SubscriptionController extends BaseController {
     // public SubscriptionController(SubscriptionService subscriptionService)
     // {this.subscriptionService = subscriptionService;}
     @PostMapping("/add-user-to-chat")
-    public ResponseEntity<GetChatDto> addToChat(@RequestBody AddSubDto addSubDto) {
+    public ResponseEntity<GetChatDto> addToChat(@RequestBody @Valid AddSubDto addSubDto) {
 
         Chat chat = chatService.getById(addSubDto.getChatId());
 
