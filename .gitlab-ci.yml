@@ -1,5 +1,7 @@
 build:
   stage: build
+  before_script:
+  - docker compose down
   script:
     - docker compose build
-    - docker compose restart -d
+    - docker compose up -d
