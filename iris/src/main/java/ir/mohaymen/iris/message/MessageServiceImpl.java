@@ -4,6 +4,8 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
@@ -21,7 +23,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message getById(Long id) {
-        return messageRepository.findById(id).orElse(null);
+        return messageRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -65,32 +67,32 @@ public class MessageServiceImpl implements MessageService {
     }
 
     public Iterable<Message> getByUser(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         return getByUser(user);
     }
 
     public Iterable<Message> getByUser(String userName) {
-        User user = userRepository.findByUserName(userName).orElse(null);
+        User user = userRepository.findByUserName(userName).orElseThrow(EntityNotFoundException::new);
         return getByUser(user);
     }
 
     public Iterable<Message> getByChat(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        Chat chat = chatRepository.findById(chatId).orElseThrow(EntityNotFoundException::new);
         return getByChat(chat);
     }
 
     public void deleteByUser(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         deleteByUser(user);
     }
 
     public void deleteByUser(String userName) {
-        User user = userRepository.findByUserName(userName).orElse(null);
+        User user = userRepository.findByUserName(userName).orElseThrow(EntityNotFoundException::new);
         deleteByUser(user);
     }
 
     public void deleteByChat(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        Chat chat = chatRepository.findById(chatId).orElseThrow(EntityNotFoundException::new);
         deleteByChat(chat);
     }
 

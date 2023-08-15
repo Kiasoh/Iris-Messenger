@@ -2,6 +2,8 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Chat getById(Long id) {
-        return chatRepository.findById(id).orElse(null);
+        return chatRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -40,7 +42,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     public Chat getByLink(String link) {
-        return chatRepository.findByLink(link).orElse(null);
+        return chatRepository.findByLink(link).orElseThrow(EntityNotFoundException::new);
     }
 
     public Iterable<Chat> getByTitle(String title) {

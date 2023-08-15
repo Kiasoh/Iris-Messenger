@@ -2,6 +2,8 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class ChatProfileServiceImpl implements ChatProfileService {
 
     @Override
     public ChatProfile getById(Long id) {
-        return chatProfileRepository.findById(id).orElse(null);
+        return chatProfileRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class ChatProfileServiceImpl implements ChatProfileService {
     }
 
     public Iterable<ChatProfile> getByChat(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElse(null);
+        Chat chat = chatRepository.findById(chatId).orElseThrow(EntityNotFoundException::new);
         return getByChat(chat);
     }
 }

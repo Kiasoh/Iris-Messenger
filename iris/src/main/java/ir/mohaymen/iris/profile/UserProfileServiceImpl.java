@@ -2,6 +2,8 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfile getById(Long id) {
-        return userProfileRepository.findById(id).orElse(null);
+        return userProfileRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     public Iterable<UserProfile> getByUser(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         return getByUser(user);
     }
 }

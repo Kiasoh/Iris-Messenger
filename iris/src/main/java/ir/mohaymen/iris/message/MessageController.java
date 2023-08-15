@@ -31,17 +31,17 @@ public class MessageController extends BaseController {
     private final UserService userService;
     private final ChatService chatService;
     private final MediaService mediaService;
-    @GetMapping("/get-messages/{chatId}/{floor}/{sill}")
-    public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId , @PathVariable("floor") Integer floor , @PathVariable("sill") Integer sill ) {
-        if (sill - floor > 50)
+    @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
+    public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId , @PathVariable("floor") Integer floor , @PathVariable("ceil") Integer ceil ) {
+        if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = (List<Message>) messageService.getByChat(chatService.getById(chatId));
-        if (messages.size() > sill)
-            sill = (messages.size());
+        if (messages.size() > ceil)
+            ceil = (messages.size());
         if(floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
-        for (Message message:messages.subList(floor, sill)) {
+        for (Message message:messages.subList(floor, ceil)) {
             getMessageDtoList.add(modelMapper.map(message , GetMessageDto.class));
         }
         return new ResponseEntity<>(getMessageDtoList , HttpStatus.OK);

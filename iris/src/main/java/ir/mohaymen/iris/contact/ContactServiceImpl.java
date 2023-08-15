@@ -2,6 +2,8 @@ package ir.mohaymen.iris.contact;
 
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Contact getById(Long id) {
-        return contactRepository.findById(id).orElse(null);
+        return contactRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     public Iterable<Contact> getContactByFirstUser(Long firstUserId) {
-        User user = userRepository.findById(firstUserId).orElse(null);
+        User user = userRepository.findById(firstUserId).orElseThrow(EntityNotFoundException::new);;
         return getContactByFirstUser(user);
     }
 
@@ -93,7 +95,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     public Iterable<Contact> getContactBySecondUser(Long secondUserId) {
-        User user = userRepository.findById(secondUserId).orElse(null);
+        User user = userRepository.findById(secondUserId).orElseThrow(EntityNotFoundException::new);
         return getContactByFirstUser(user);
     }
 
