@@ -28,7 +28,7 @@ public class DataLoader implements CommandLineRunner {
         pvSeeder.load();
         mediaSeeder.load();
         messageSeeder.load();
-        pinSeeder.load();
+//        pinSeeder.load();
         userProfileSeeder.load();
         chatProfileSeeder.load();
     }

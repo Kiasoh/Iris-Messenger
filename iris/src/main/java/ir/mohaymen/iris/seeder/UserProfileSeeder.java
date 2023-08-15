@@ -40,7 +40,7 @@ public class UserProfileSeeder implements Seeder {
 
         long mediaId;
         do {
-            mediaId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
+            mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
         } while (mediaIds.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);

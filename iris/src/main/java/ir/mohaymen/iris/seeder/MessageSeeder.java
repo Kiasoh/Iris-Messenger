@@ -30,7 +30,8 @@ public class MessageSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (messageRepository.count() != 0) return;
+        if (messageRepository.count() != 0)
+            return;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2; i++)
             generateRandomMessage();
@@ -50,7 +51,8 @@ public class MessageSeeder implements Seeder {
     private void generateMessageForPV(long pvId) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        Subscription subscription = subscriptionRepository.findById(pvId + NUMBER_OF_INSTANCES).orElse(new Subscription());
+        Subscription subscription = subscriptionRepository
+                .findById(pvId + NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2).orElse(new Subscription());
         generateMessage(subscription, id);
     }
 
@@ -63,8 +65,10 @@ public class MessageSeeder implements Seeder {
         String text = generateRandomText(id);
 
         DateAndTime date = faker.date();
-        Date sendingTimeLowerBound = Date.from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
-        Date sendingTimeUpperBound = Date.from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeLowerBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeUpperBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
         Instant sendingTime = date.between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
         Instant editingTime = id % 6 == 0 ? date.past(100, TimeUnit.DAYS).toInstant() : null;
 
