@@ -10,7 +10,6 @@ import java.util.ArrayList;
 @Setter
 @NoArgsConstructor
 public class AddSubDto {
-
     private Long chatId;
     private ArrayList<Long> userIds;
 }

@@ -8,11 +8,11 @@ import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/subs")
@@ -35,5 +35,21 @@ public class SubscriptionController extends BaseController {
             subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id), chat));
         }
         return new ResponseEntity<>(chatService.getById(addSubDto.getChatId()), HttpStatus.OK);
+    }
+    @GetMapping("/chat-subs/{id}")
+    public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
+        Chat chat = chatService.getById(id);
+        List<SubDto> subDtoList = new ArrayList<>();
+        for (Subscription sub:chat.getSubs()) {
+            SubDto subDto = new SubDto();
+            //contact
+            subDto.setFirstName(sub.getUser().getFirstName());
+            subDto.setLastName(sub.getUser().getUserName());
+            subDto.setUserId(sub.getUser().getUserId());
+            if (sub.getUser().getProfiles().size() != 0)
+                subDto.setProfile(sub.getUser().getProfiles().get(sub.getUser().getProfiles().size() - 1).getMedia());
+            subDtoList.add(subDto);
+        }
+        return new ResponseEntity<>(subDtoList , HttpStatus.OK);
     }
 }
