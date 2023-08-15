@@ -18,7 +18,9 @@ services:
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
     restart: unless-stopped
-
+    volumes:
+      - 'app_files:/app/files'
+      - 'app_logs:/app/logs'
   db:
     image: 'postgres:latest'
     environment:
@@ -41,3 +43,5 @@ services:
 volumes:
   redis_data:
   postgres_data:
+  app_files:
+  app_logs:
