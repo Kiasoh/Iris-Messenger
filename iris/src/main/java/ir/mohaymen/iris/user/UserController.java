@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.user;
 
+import ir.mohaymen.iris.utility.BaseController;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-public class UserController {
+public class UserController extends BaseController {
 
     private final UserServiceImpl userService;
     private final UserRepository userRepository;
@@ -26,9 +27,9 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody EditUserDto editUserDto, @PathVariable Long id){
-        User user = userService.getById(id);
+    @PutMapping("/users")
+    public ResponseEntity<?> updateUser(@RequestBody EditUserDto editUserDto){
+        User user = getUserByToken();
         user.setFirstName(editUserDto.getFirstName());
         user.setLastName(editUserDto.getLastName());
         user.setUserName(editUserDto.getUserName());

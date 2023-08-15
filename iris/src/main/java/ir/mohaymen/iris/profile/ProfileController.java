@@ -2,25 +2,36 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.media.Media;
+import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
+import ir.mohaymen.iris.utility.BaseController;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.Instant;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/profiles")
-public class ProfileController {
+public class ProfileController extends BaseController {
 
     private final ChatProfileService chatProfileService;
     private final UserProfileService userProfileService;
     private final UserService userService;
     private final ChatService chatService;
+    private final MediaService mediaService;
+    private final Logger logger= LoggerFactory.getLogger(ProfileController.class);
 
     @GetMapping("/users/{id}")
     public ResponseEntity<ProfileDto> getUserProfileById(@PathVariable Long id){
@@ -34,11 +45,13 @@ public class ProfileController {
         return new ResponseEntity<>(profileDto, HttpStatus.OK);
     }
 
-    @PostMapping("/users/{id}")
-    public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file, @PathVariable Long id){
-        User user = userService.getById(id);
-        Media media = Media.builder().fileMimeType(file.getContentType()).fileName(file.getOriginalFilename()).build();
-        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(media).build();
+    @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
+        User user = userService.getById(getUserByToken().getUserId());
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",user.getPhoneNumber(),file.getOriginalFilename()));
+        Media media = Media.builder().fileMimeType(file.getContentType()).fileName(file.getOriginalFilename()).filePath("file.getResource().getURI().toString()").build();
+        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(mediaService.createOrUpdate(media)).build();
+        userProfileService.createOrUpdate(userProfile);
         return ResponseEntity.ok("success");
     }
 
