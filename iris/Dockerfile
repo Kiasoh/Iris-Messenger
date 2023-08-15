@@ -10,6 +10,7 @@ RUN mvn package -DskipTests
 FROM openjdk:22-jdk-slim
 COPY --from=build /usr/app/target/iris-*.jar /app/runner.jar
 WORKDIR /app
+RUN mkdir -p logs files
 ENTRYPOINT ["java","-jar","./runner.jar"]
 
 # AS <NAME> to name this stage as maven
