@@ -29,13 +29,17 @@ public class ContactController extends BaseController {
         Contact contact = modelMapper.map(getContactDto, Contact.class);
         contact.setSecondUser(userService.getById(getContactDto.getContactId()));
         contactService.createOrUpdate(contact);
-        return new ResponseEntity<>(modelMapper.map(contact , PostContactDto.class) , HttpStatus.OK);
+        PostContactDto postContactDto = modelMapper.map(contact , PostContactDto.class);
+        postContactDto.setSecondUserId(contact.getSecondUser().getUserId());
+        return new ResponseEntity<>( postContactDto , HttpStatus.OK);
     }
     @GetMapping("/get-contacts")
     public ResponseEntity<List<PostContactDto>> getContacts() {
         List<PostContactDto> pcdtl = new ArrayList<>();
         for (Contact con: getUserByToken().getContacts() ) {
-            pcdtl.add(modelMapper.map(con , PostContactDto.class));
+            PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
+            postContactDto.setSecondUserId(con.getSecondUser().getUserId());
+            pcdtl.add(postContactDto);
         }
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
@@ -47,8 +51,11 @@ public class ContactController extends BaseController {
     }
     public PostContactDto getContactFromList(User user , Long userId) throws Exception {
         for (Contact con: user.getContacts())
-            if (con.getSecondUser().getUserId() == userId)
-                return modelMapper.map(con , PostContactDto.class);
+            if (con.getSecondUser().getUserId() == userId){
+                PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
+                postContactDto.setSecondUserId(con.getSecondUser().getUserId());
+                return postContactDto;
+            }
         throw new Exception();
     }
 }

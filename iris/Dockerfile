@@ -1,4 +1,4 @@
-FROM maven:3.9.3-amazoncorretto-20 as build
+FROM maven:3.9.3-eclipse-temurin-20-alpine as build
 ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
@@ -6,7 +6,7 @@ ADD iris/pom.xml $HOME
 RUN mvn verify --fail-never
 ADD ./iris $HOME
 RUN mvn package -DskipTests
-FROM openjdk:22-jdk-slim
+FROM amazoncorretto:17.0.7-alpine
 COPY --from=build /usr/app/target/iris-0.0.1-SNAPSHOT.jar /app/runner.jar
 ENTRYPOINT ["java","-jar","/app/runner.jar"]
 

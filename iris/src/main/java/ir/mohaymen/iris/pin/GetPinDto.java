@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PinDto {
+public class GetPinDto {
     private Long messageId;
-    private Long chatId;
 }

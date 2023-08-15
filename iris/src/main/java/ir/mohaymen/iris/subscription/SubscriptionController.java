@@ -3,9 +3,11 @@ package ir.mohaymen.iris.subscription;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.chat.GetChatDto;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +23,12 @@ public class SubscriptionController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ChatService chatService;
+    private final ModelMapper modelMapper;
 
     // public SubscriptionController(SubscriptionService subscriptionService)
     // {this.subscriptionService = subscriptionService;}
     @PostMapping("/add-user-to-chat")
-    public ResponseEntity<Chat> addToChat(@RequestBody AddSubDto addSubDto) {
+    public ResponseEntity<GetChatDto> addToChat(@RequestBody AddSubDto addSubDto) {
 
         Chat chat = chatService.getById(addSubDto.getChatId());
 
@@ -34,7 +37,10 @@ public class SubscriptionController extends BaseController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id), chat));
         }
-        return new ResponseEntity<>(chatService.getById(addSubDto.getChatId()), HttpStatus.OK);
+        chat = chatService.getById(addSubDto.getChatId());
+        GetChatDto getChatDto = modelMapper.map( chat , GetChatDto.class);
+        getChatDto.setSubCount(chat.getSubs().size());
+        return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
     @GetMapping("/chat-subs/{id}")
     public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
