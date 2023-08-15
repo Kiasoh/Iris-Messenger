@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/messages")
+@RequestMapping("/api/messages")
 public class MessageController extends BaseController {
     private final MessageService messageService;
     private final ModelMapper modelMapper;

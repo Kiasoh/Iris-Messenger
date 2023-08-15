@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pins")
+@RequestMapping("/api/pins")
 @RequiredArgsConstructor
 public class PinController extends BaseController {
     private final MessageService messageService;

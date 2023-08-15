@@ -9,25 +9,25 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api/users")
 public class UserController extends BaseController {
 
     private final UserServiceImpl userService;
     private final UserRepository userRepository;
 
-    @GetMapping("/users")
+    @GetMapping("")
     public ResponseEntity<List<UserDto>> getAllUsers(){
-//        userService.getAll().forEach(UserMapper::mapToUserDto);
         List<UserDto> result = userRepository.findAll().stream().map(UserMapper::mapToUserDto).toList();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id){
         UserDto userDto = UserMapper.mapToUserDto(userService.getById(id));
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @PutMapping("/users")
+    @PutMapping("")
     public ResponseEntity<?> updateUser(@RequestBody EditUserDto editUserDto){
         User user = getUserByToken();
         user.setFirstName(editUserDto.getFirstName());

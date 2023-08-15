@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/subs")
+@RequestMapping("/api/subs")
 @RequiredArgsConstructor
 public class SubscriptionController extends BaseController {
     private final SubscriptionService subscriptionService;

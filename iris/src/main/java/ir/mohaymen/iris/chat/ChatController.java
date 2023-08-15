@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chats")
+@RequestMapping("/api/chats")
 @RequiredArgsConstructor
 public class ChatController extends BaseController {
     private final ChatService chatService;
