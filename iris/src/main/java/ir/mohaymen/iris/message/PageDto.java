@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class PageDto {
-    Long chatId;
-    int floor;
-    int seal;
+    private Long chatId;
+    private Integer floor;
+    private Integer sill;
 }
