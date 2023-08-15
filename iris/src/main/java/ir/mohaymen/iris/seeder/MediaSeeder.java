@@ -15,19 +15,19 @@ public class MediaSeeder implements Seeder {
 
     private final MediaRepository mediaRepository;
 
+    static final int NUMBER_OF_INSTANCES = 1000;
+    private final List<Media> medias = new ArrayList<>();
+
     @Override
     public void load() {
         if (mediaRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 1000;
-        final List<Media> medias = new ArrayList<>();
-
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomMedia(medias);
+            generateRandomMedia();
         mediaRepository.saveAll(medias);
-    }
+     }
 
-    private void generateRandomMedia(List<Media> mediaList) {
+    private void generateRandomMedia() {
         File file = faker.file();
         String name = file.fileName();
         String mimeType = file.mimeType();
@@ -38,6 +38,6 @@ public class MediaSeeder implements Seeder {
         media.setFileMimeType(mimeType);
         media.setFilePath(path);
 
-        mediaList.add(media);
+        medias.add(media);
     }
 }

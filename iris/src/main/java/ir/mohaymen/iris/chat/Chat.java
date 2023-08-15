@@ -24,7 +24,6 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatId;
 
-    @NotBlank
     private String title;
 
     private String bio;

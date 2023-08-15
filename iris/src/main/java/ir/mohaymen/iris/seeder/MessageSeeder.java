@@ -5,16 +5,16 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
+import ir.mohaymen.iris.subscription.Subscription;
+import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -22,38 +22,55 @@ import java.util.concurrent.TimeUnit;
 public class MessageSeeder implements Seeder {
 
     private final MessageRepository messageRepository;
+    private final SubscriptionRepository subscriptionRepository;
+
+    static final int NUMBER_OF_INSTANCES = 2000 + PVSeeder.NUMBER_OF_INSTANCES * 2;
+    private final List<Message> messages = new ArrayList<>();
+    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
-        if (messageRepository.count() != 0) return;
+        if (messageRepository.count() != 0)
+            return;
 
-        final int NUMBER_OF_INSTANCES = 2000;
-        final List<Message> messages = new ArrayList<>();
-        final Set<Long> mediaIds = new HashSet<>();
-
-        for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomMessage(messages, mediaIds);
+        for (int i = 0; i < NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2; i++)
+            generateRandomMessage();
+        for (int i = 0; i < PVSeeder.NUMBER_OF_INSTANCES * 2; i++)
+            generateMessageForPV(i + 1);
         messageRepository.saveAll(messages);
     }
 
-    private void generateRandomMessage(List<Message> messageList, Set<Long> mediaIdList) {
+    private void generateRandomMessage() {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+
+        long subscriptionId = faker.random().nextInt(1, SubscriptionSeeder.NUMBER_OF_INSTANCES);
+        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElse(new Subscription());
+        generateMessage(subscription, id);
+    }
+
+    private void generateMessageForPV(long pvId) {
+        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+
+        Subscription subscription = subscriptionRepository
+                .findById(pvId + NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2).orElse(new Subscription());
+        generateMessage(subscription, id);
+    }
+
+    private void generateMessage(Subscription subscription, long id) {
+        User user = subscription.getUser();
+        Chat chat = subscription.getChat();
+
+        Media media = generateRandomMedia(id);
 
         String text = generateRandomText(id);
 
-        long userId = faker.random().nextInt(1, 100);
-        User user = new User();
-        user.setUserId(userId);
-
-        long chatId = faker.random().nextInt(1, 100);
-        Chat chat = new Chat();
-        chat.setChatId(chatId);
-
-        Media media = generateRandomMedia(id, text, mediaIdList);
-
         DateAndTime date = faker.date();
-        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
-        Instant editingTime = id % 6 == 0 ? date.future(200, TimeUnit.DAYS).toInstant() : null;
+        Date sendingTimeLowerBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeUpperBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
+        Instant sendingTime = date.between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
+        Instant editingTime = id % 6 == 0 ? date.past(100, TimeUnit.DAYS).toInstant() : null;
 
         Message message = new Message();
         message.setText(text);
@@ -63,7 +80,7 @@ public class MessageSeeder implements Seeder {
         message.setSendAt(sendingTime);
         message.setEditedAt(editingTime);
 
-        messageList.add(message);
+        messages.add(message);
     }
 
     private String generateRandomText(Long seed) {
@@ -74,23 +91,21 @@ public class MessageSeeder implements Seeder {
             case 3 -> faker.hobbit().quote();
             case 4 -> faker.dune().quote();
             case 5 -> faker.rickAndMorty().quote();
-            default -> "";
+            default -> null;
         };
     }
 
-    private Media generateRandomMedia(Long seed, String messageText, Set<Long> mediaIdList) {
+    private Media generateRandomMedia(Long seed) {
         Media media;
 
         media = new Media();
-        if (seed % 25 == 0 || messageText.isBlank()) {
+        if (seed % 7 == 2 || seed % 7 == 6) {
             long mediaId;
             do {
-                mediaId = faker.random().nextInt(1,1000);
-//                mediaId = Long.parseLong(fakeValuesService.regexify("[1-9][0-9]?|1[0-9][0-9]|200"));
-                System.out.println(MessageFormat.format("id:{0} seed:{1} count:{2}",mediaId,seed, mediaIdList.size()));
-            } while (mediaIdList.contains(mediaId));
+                mediaId = faker.random().nextInt(1, 1000);
+            } while (mediaIds.contains(mediaId));
             media.setMediaId(mediaId);
-            mediaIdList.add(mediaId);
+            mediaIds.add(mediaId);
         } else
             media = null;
 

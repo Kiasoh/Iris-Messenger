@@ -3,8 +3,7 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -12,6 +11,9 @@ import java.time.Instant;
 @Table(name = "user_profiles")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserProfile {
 
     @Id

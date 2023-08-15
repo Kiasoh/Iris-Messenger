@@ -1,7 +1,5 @@
 package ir.mohaymen.iris.auth;
 
-import ir.mohaymen.iris.code.ActivationCode;
-import ir.mohaymen.iris.code.ActivationCodeRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -15,14 +13,14 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/login")
-  public ResponseEntity<AuthTokensDto> login(
+  public ResponseEntity<AuthDto> login(
       @RequestBody LoginDto request) {
     return ResponseEntity.ok(authService.login(request));
   }
 
   @PostMapping("/refresh-token")
-  public ResponseEntity<String> refreshToken(@RequestBody AuthTokensDto authTokensDto) {
-    return ResponseEntity.ok(authService.refreshToken(authTokensDto));
+  public ResponseEntity<String> refreshToken(@RequestBody TokenDto tokenDto) {
+    return ResponseEntity.ok(authService.refreshToken(tokenDto));
   }
 
   @GetMapping("/send-activation-code")

@@ -7,10 +7,7 @@ import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -18,32 +15,32 @@ public class ContactSeeder implements Seeder {
 
     private final ContactRepository contactRepository;
 
+    static final int NUMBER_OF_INSTANCES = 200;
+    private final List<Contact> contacts = new ArrayList<>();
+    private final Map<Long, Set<Long>> userIds = new HashMap<>();
+
     @Override
     public void load() {
         if (contactRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 200;
-        final List<Contact> contacts = new ArrayList<>();
-        final Map<Long, List<Long>> userIds = new HashMap<>();
-
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomContact(contacts, userIds);
+            generateRandomContact();
         contactRepository.saveAll(contacts);
     }
 
-    private void generateRandomContact(List<Contact> contactList, Map<Long, List<Long>> ids) {
+    private void generateRandomContact() {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        long firstUserId = faker.random().nextInt(1, 100);
+        long firstUserId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User firstUser = new User();
         firstUser.setUserId(firstUserId);
 
-        ids.computeIfAbsent(firstUserId, k -> new ArrayList<>());
+        userIds.computeIfAbsent(firstUserId, k -> new HashSet<>());
 
         long secondUserId;
         do {
-            secondUserId = faker.random().nextInt(1, 100);
-        } while (secondUserId == firstUserId || ids.get(firstUserId).contains(secondUserId));
+            secondUserId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
+        } while (secondUserId == firstUserId || userIds.get(firstUserId).contains(secondUserId));
         User secondUser = new User();
         secondUser.setUserId(secondUserId);
 
@@ -57,7 +54,7 @@ public class ContactSeeder implements Seeder {
         contact.setFirstName(firstName);
         contact.setLastName(lastName);
 
-        contactList.add(contact);
-        ids.get(firstUserId).add(secondUserId);
+        contacts.add(contact);
+        userIds.get(firstUserId).add(secondUserId);
     }
 }

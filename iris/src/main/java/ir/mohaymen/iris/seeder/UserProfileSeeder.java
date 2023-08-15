@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -18,28 +20,28 @@ public class UserProfileSeeder implements Seeder {
 
     private final UserProfileRepository userProfileRepository;
 
+    static final int NUMBER_OF_INSTANCES = 30;
+    private final List<UserProfile> userProfiles = new ArrayList<>();
+    private final Set<Long> mediaIds = new HashSet<>();
+
     @Override
     public void load() {
         if (userProfileRepository.count() != 0) return;
 
-        final int NUMBER_OF_INSTANCES = 30;
-        final List<UserProfile> userProfiles = new ArrayList<>();
-        final List<Long> mediaIds = new ArrayList<>();
-
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomUserProfile(userProfiles, mediaIds);
+            generateRandomUserProfile();
         userProfileRepository.saveAll(userProfiles);
     }
 
-    private void generateRandomUserProfile(List<UserProfile> userProfileList, List<Long> mediaIdList) {
-        long userId = faker.random().nextInt(1, 100);
+    private void generateRandomUserProfile() {
+        long userId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User user = new User();
         user.setUserId(userId);
 
         long mediaId;
         do {
-            mediaId = faker.random().nextInt(1, 200);
-        } while (mediaIdList.contains(mediaId));
+            mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
+        } while (mediaIds.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);
 
@@ -50,7 +52,7 @@ public class UserProfileSeeder implements Seeder {
         userProfile.setMedia(media);
         userProfile.setSetAt(sendingTime);
 
-        mediaIdList.add(mediaId);
-        userProfileList.add(userProfile);
+        mediaIds.add(mediaId);
+        userProfiles.add(userProfile);
     }
 }

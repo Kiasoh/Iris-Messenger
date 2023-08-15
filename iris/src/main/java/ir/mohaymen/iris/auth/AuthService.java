@@ -2,9 +2,9 @@ package ir.mohaymen.iris.auth;
 
 public interface AuthService {
 
-    AuthTokensDto login(LoginDto loginDto);
+    AuthDto login(LoginDto loginDto);
 
-    String refreshToken(AuthTokensDto authTokensDto);
+    String refreshToken(TokenDto tokenDto);
 
     String sendActivationCode(String phoneNumber);
 
