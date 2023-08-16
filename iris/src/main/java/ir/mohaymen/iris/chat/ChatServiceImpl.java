@@ -5,8 +5,11 @@ import ir.mohaymen.iris.user.User;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -48,5 +51,15 @@ public class ChatServiceImpl implements ChatService {
 
     public Iterable<Chat> getByTitle(String title) {
         return chatRepository.findByTitle(title);
+    }
+    public Long helloFromTheOtherSide (Chat chat ,Long userId) {
+        if (chat.getSubs() == null)
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        if (chat.getChatType() != ChatType.PV || chat.getSubs().size() != 2)
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        List<Subscription> bothSide = (List<Subscription>) chat.getSubs();
+        if (bothSide.get(0).getUser().getUserId() == userId)
+            return bothSide.get(1).getUser().getUserId();
+        return bothSide.get(0).getUser().getUserId();
     }
 }
