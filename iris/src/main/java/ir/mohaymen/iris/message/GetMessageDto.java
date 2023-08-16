@@ -1,14 +1,12 @@
 package ir.mohaymen.iris.message;
 
-import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor

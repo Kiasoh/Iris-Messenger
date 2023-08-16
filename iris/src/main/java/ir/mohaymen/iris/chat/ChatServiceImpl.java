@@ -2,7 +2,6 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

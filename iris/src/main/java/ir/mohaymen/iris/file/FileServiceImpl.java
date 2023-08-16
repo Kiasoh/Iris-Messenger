@@ -63,6 +63,18 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource getFileAsResource(Long id) throws IOException {
+        Path foundFile = getPathById(id);
+
+        if (foundFile != null) return new UrlResource(foundFile.toUri());
+        else return null;
+    }
+    public void deleteFile(Long id) throws IOException {
+        Path foundFile = getPathById(id);
+        if (foundFile == null)
+            Files.delete(foundFile);
+    }
+
+    private Path getPathById(Long id) throws IOException {
         String fileCode = generateFileCodeByMediaId(id);
         Path dirPath = Paths.get(path);
 
@@ -70,8 +82,6 @@ public class FileServiceImpl implements FileService {
                 filter(file -> file.getFileName().startsWith(fileCode))
                 .findFirst()
                 .orElse(null);
-
-        if (foundFile != null) return new UrlResource(foundFile.toUri());
-        else return null;
+        return foundFile;
     }
 }

@@ -7,7 +7,8 @@ import ir.mohaymen.iris.utility.Nameable;
 public interface SubscriptionService {
 
     Subscription getSubscriptionBySubscriptionId(Long subscriptionId);
-    Nameable setName(Iterable<Contact> contacts , User user);
+
+    Nameable setName(Iterable<Contact> contacts, User user);
 
     Iterable<Subscription> getAllSubscriptionByUserId(Long userId);
 

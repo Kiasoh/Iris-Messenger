@@ -4,7 +4,6 @@ import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

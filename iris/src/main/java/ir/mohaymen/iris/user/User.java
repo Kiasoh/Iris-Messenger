@@ -7,7 +7,6 @@ import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,15 +23,19 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+
 public class User implements UserDetails, Nameable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @NotBlank
     private String firstName;
 
     private String lastName;
 
+    @NotBlank
     @Column(unique = true)
     private String phoneNumber;
 
@@ -69,7 +72,7 @@ public class User implements UserDetails, Nameable {
         return phoneNumber;
     }
 
-    public String getUserName(){
+    public String getUserName() {
         return userName;
     }
 

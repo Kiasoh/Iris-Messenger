@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.chat;
 
+
 import ir.mohaymen.iris.auth.AuthService;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.message.Message;
@@ -14,32 +15,33 @@ import ir.mohaymen.iris.utility.BaseController;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/chats")
 @RequiredArgsConstructor
 public class ChatController extends BaseController {
+
     private final ChatService chatService;
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final MessageService messageService;
-    private final ContactService contactService;
 
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
@@ -65,6 +67,7 @@ public class ChatController extends BaseController {
             }
         }
         return getGetChatDtoResponseEntity(chat);
+
     }
 
     @GetMapping("/get-chat/{id}")

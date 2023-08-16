@@ -1,6 +1,5 @@
 package ir.mohaymen.iris.user;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Iterable<User> getAll() {
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
