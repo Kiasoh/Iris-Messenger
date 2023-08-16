@@ -6,9 +6,7 @@ import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -31,13 +29,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public long countUnSeenMessages(Long lastSeenMessageId , Long chatId) {
-        return messageRepository.countUnSeenMessages(lastSeenMessageId , chatId);
+    public long countUnSeenMessages(Long lastSeenMessageId, Long chatId) {
+        return messageRepository.countUnSeenMessages(lastSeenMessageId, chatId);
     }
 
     @Override
     public List<Subscription> usersSeen(Long messageId, Long chatId) {
-        return messageRepository.usersSeen(messageId , chatId);
+        return messageRepository.usersSeen(messageId, chatId);
     }
 
     @Override

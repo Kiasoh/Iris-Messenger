@@ -3,7 +3,6 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.media.Media;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

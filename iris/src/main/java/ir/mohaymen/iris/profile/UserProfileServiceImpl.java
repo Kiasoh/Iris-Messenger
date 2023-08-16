@@ -3,7 +3,6 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -11,10 +11,9 @@ public interface MessageService {
 
     Message getById(Long id);
 
-    long countUnSeenMessages(Long lastSeenMessageId , Long chatId);
+    long countUnSeenMessages(Long lastSeenMessageId, Long chatId);
 
-    List<Subscription> usersSeen(Long messageId , Long chatId);
-
+    List<Subscription> usersSeen(Long messageId, Long chatId);
 
     Iterable<Message> getAll();
 
