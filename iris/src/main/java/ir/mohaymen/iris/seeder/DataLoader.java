@@ -11,8 +11,8 @@ public class DataLoader implements CommandLineRunner {
     private final UserSeeder userSeeder;
     private final ContactSeeder contactSeeder;
     private final ChatSeeder chatSeeder;
-    private final PVSeeder pvSeeder;
     private final SubscriptionSeeder subscriptionSeeder;
+    private final PVSeeder pvSeeder;
     private final MediaSeeder mediaSeeder;
     private final MessageSeeder messageSeeder;
     private final PinSeeder pinSeeder;
