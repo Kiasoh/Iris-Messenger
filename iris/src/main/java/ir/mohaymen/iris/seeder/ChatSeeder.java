@@ -31,7 +31,7 @@ public class ChatSeeder implements Seeder {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         String title = faker.book().title();
         ChatType chatType = ChatType.values()[faker.random().nextInt(1, ChatType.values().length - 1)];
-        String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |,|\\.){5,50}") : null;
+        String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |_|,|\\.){5,50}") : null;
         boolean isPublic = id % 2 == 0;
         String link = (isPublic || id % 5 == 0) ? faker.regexify("\\w(\\w|\\d|_){2,10}") : null;
 
