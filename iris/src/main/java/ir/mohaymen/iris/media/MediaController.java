@@ -1,7 +1,11 @@
 package ir.mohaymen.iris.media;
 
 import ir.mohaymen.iris.file.FileService;
+import ir.mohaymen.iris.security.SecurityService;
+import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,15 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/media")
-public class MediaController {
+public class MediaController extends BaseController {
     private final FileService fileService;
     private final MediaService mediaService;
+    private final SecurityService securityService;
+    private final Logger logger= LoggerFactory.getLogger(MediaController.class);
+
     @GetMapping("/download/{mediaId}")
     public ResponseEntity<?> downloadFile(@PathVariable Long mediaId) {
+        logger.info("test");
+        var user=getUserByToken();
+        if (!securityService.hasAccessToMedia(user.getUserId(), mediaId)){
+            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to access media id:{1}. not permitted!",user.getPhoneNumber(),mediaId));
+            return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
+        }
+        logger.info("test2");
         Resource resource = null;
         try {
             resource = fileService.getFileAsResource(mediaId);
@@ -34,8 +49,8 @@ public class MediaController {
         }
 
         String contentType = "application/octet-stream";
-        String fileName=mediaService.getById(mediaId).getFileName();
-        String headerValue = "attachment; filename=\"" + fileName + "\"";
+        String fileName = mediaService.getById(mediaId).getFileName();
+        String headerValue = "inline; filename=\"" + fileName + "\"";
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
