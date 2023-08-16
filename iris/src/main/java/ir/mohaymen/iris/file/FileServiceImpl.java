@@ -3,6 +3,7 @@ package ir.mohaymen.iris.file;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ import java.nio.file.StandardCopyOption;
 public class FileServiceImpl implements FileService{
     private final MediaService mediaService;
 
-//    @Value("${application.files.path}")
-    private final String path="files";
+    @Value("${application.files.path}")
+    private String path="files";
     @Override
     public Long saveFile(String inputFileName, MultipartFile multipartFile)
             throws IOException {
