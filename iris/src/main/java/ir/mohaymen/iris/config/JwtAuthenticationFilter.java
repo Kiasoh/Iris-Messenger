@@ -3,6 +3,7 @@ package ir.mohaymen.iris.config;
 import ir.mohaymen.iris.auth.JwtService;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.user.UserRepository;
+import ir.mohaymen.iris.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
   private final TokenRepository tokenRepository;
-  private final UserRepository userRepository;
+  private final UserService userService;
 
   @Override
   protected void doFilterInternal(
@@ -57,9 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }
-      var user=userRepository.findByPhoneNumber(userPhoneNumber).orElseThrow();
-      user.setLastSeen(Instant.now());
-      userRepository.save(user);
+      userService.setOnline(userPhoneNumber);
 
     }
     filterChain.doFilter(request, response);

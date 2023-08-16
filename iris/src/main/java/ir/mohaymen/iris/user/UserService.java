@@ -23,4 +23,6 @@ public interface UserService {
     void deleteByUserName(String userName);
 
     void deleteByPhoneNumber(String phoneNumber);
+    void setOnline(Long userId);
+    void setOnline(String phoneNumber);
 }
