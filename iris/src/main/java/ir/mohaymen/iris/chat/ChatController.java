@@ -1,11 +1,13 @@
 package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.auth.AuthService;
+import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
@@ -13,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.NullValueInNestedPathException;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +34,6 @@ public class ChatController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ModelMapper modelMapper;
-
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
@@ -66,12 +68,25 @@ public class ChatController extends BaseController {
     public ResponseEntity<List<MenuChatDto>> getAllChats () {
         List<MenuChatDto> menuChatDtos = new ArrayList<>();
         for (Subscription sub :getUserByToken().getSubs()) {
-            MenuChatDto menuChatDto = modelMapper.map(sub.getChat() , MenuChatDto.class);
-            if (sub.getChat().getChatProfiles().size() != 0)
-                menuChatDto.setMedia(sub.getChat().getChatProfiles().get(sub.getChat().getChatProfiles().size() - 1) .getMedia());
-            if (sub.getChat().getMessages().size() != 0) {
-                menuChatDto.setLastMessage(sub.getChat().getMessages().get(sub.getChat().getMessages().size() - 1).getText());
-                menuChatDto.setUserFirstName(sub.getChat().getMessages().get(sub.getChat().getMessages().size() - 1).getSender().getFirstName());
+            Chat chat = sub.getChat();
+            MenuChatDto menuChatDto = modelMapper.map(chat , MenuChatDto.class);
+            if (chat.getChatProfiles().size() != 0)
+                menuChatDto.setMedia(chat.getChatProfiles().get(chat.getChatProfiles().size() - 1) .getMedia());
+            if (chat.getMessages().size() != 0) {
+                List<Message> messages = chat.getMessages();
+                int count = 0;
+                for (int i = messages.size() -1 ; i > -1;  i-- ) {
+                    if (messages.get(i).getMessageId() > sub.getLastMessageSeenId())
+                        count ++;
+                    else
+                        break;
+                }
+                menuChatDto.setUnSeenMessages(count);
+                menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
+                menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
+                User user = messages.get(messages.size() - 1).getSender();
+                Nameable nameable = subscriptionService.setName(user.getContacts() , user);
+                menuChatDto.setUserFirstName(nameable.getFirstName());
             }
             menuChatDtos.add(menuChatDto);
         }

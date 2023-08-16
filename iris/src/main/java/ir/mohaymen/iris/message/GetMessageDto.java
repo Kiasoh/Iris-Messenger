@@ -14,6 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class GetMessageDto {
     private Long messageId;
+    private Long userId;
     private String text;
     private Media media;
     private Instant sendAt;

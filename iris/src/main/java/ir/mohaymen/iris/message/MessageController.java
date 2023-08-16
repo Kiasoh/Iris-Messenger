@@ -29,7 +29,6 @@ import java.util.List;
 public class MessageController extends BaseController {
     private final MessageService messageService;
     private final ModelMapper modelMapper;
-    private final UserService userService;
     private final ChatService chatService;
     private final MediaService mediaService;
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
@@ -43,7 +42,7 @@ public class MessageController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
         for (Message message:messages.subList(floor, ceil)) {
-            getMessageDtoList.add(modelMapper.map(message , GetMessageDto.class));
+            getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         return new ResponseEntity<>(getMessageDtoList , HttpStatus.OK);
     }
@@ -62,13 +61,18 @@ public class MessageController extends BaseController {
         message.setMedia(media);
         message.setSendAt(Instant.now());
 //        GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message);
-        return new ResponseEntity<>(modelMapper.map(messageService.createOrUpdate(message) , GetMessageDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
     @PatchMapping ("/edit-message")
     public ResponseEntity<GetMessageDto> editMessage (@RequestBody @Valid EditMessageDto editMessageDto) {
         Message message = messageService.getById(editMessageDto.getMessageId());
         message.setText(editMessageDto.getText());
         message.setEditedAt(Instant.now());
-        return new ResponseEntity<>(modelMapper.map(messageService.createOrUpdate(message) , GetMessageDto.class) , HttpStatus.OK);
+        return new ResponseEntity<>( mapMessageToGetMessageDto(message), HttpStatus.OK);
+    }
+    private GetMessageDto mapMessageToGetMessageDto(Message message) {
+        GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message) , GetMessageDto.class);
+        getMessageDto.setUserId(message.getSender().getUserId());
+        return getMessageDto;
     }
 }
