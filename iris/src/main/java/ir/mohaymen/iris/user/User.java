@@ -11,6 +11,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,8 @@ public class User implements UserDetails, Nameable {
     private String userName;
 
     private String bio;
+
+    private Instant lastSeen;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
