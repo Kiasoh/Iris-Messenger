@@ -1,5 +1,7 @@
 package ir.mohaymen.iris.profile;
 
+import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
@@ -28,6 +30,7 @@ public class ProfileController extends BaseController {
     private final ChatProfileService chatProfileService;
     private final UserProfileService userProfileService;
     private final UserService userService;
+    private final ChatService chatService;
     private final FileService fileService;
     private final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
@@ -50,6 +53,18 @@ public class ProfileController extends BaseController {
         Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
         UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
         userProfileService.createOrUpdate(userProfile);
+
+        return ResponseEntity.ok("success");
+    }
+    @RequestMapping(path = "/chats/{chatId}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file,@PathVariable("chatId") Long chatId) throws IOException {
+        User user = getUserByToken();
+        //TODO: check if user has permission
+        Chat chat=chatService.getById(chatId);
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1} for chat", user.getPhoneNumber(), file.getOriginalFilename()));
+        Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
+        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
+        chatProfileService.createOrUpdate(chatProfile);
 
         return ResponseEntity.ok("success");
     }
