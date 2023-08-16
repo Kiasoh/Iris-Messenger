@@ -2,6 +2,7 @@ package ir.mohaymen.iris.message;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
 import jakarta.persistence.EntityExistsException;
@@ -39,6 +40,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Iterable<Message> getByChat(Chat chat) {
         return messageRepository.findByOriginChat(chat);
+    }
+
+    @Override
+    public Iterable<Message> getByMedia(Media media) {
+        return messageRepository.findAllByMedia(media);
     }
 
     @Override
