@@ -2,6 +2,8 @@ package ir.mohaymen.iris.user;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class UserDto {
     private String phoneNumber;
     private String userName;
     private String bio;
+    private Instant lastSeen;
 }
