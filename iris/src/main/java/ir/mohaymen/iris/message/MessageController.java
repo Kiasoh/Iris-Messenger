@@ -16,16 +16,18 @@ import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.net.http.HttpResponse;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,6 +40,7 @@ public class MessageController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final ContactService contactService;
 
+    private final Logger logger= LoggerFactory.getLogger(MessageController.class);
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId , @PathVariable("floor") Integer floor , @PathVariable("ceil") Integer ceil ) {
         if (ceil - floor > 50)
@@ -99,8 +102,13 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
     @PatchMapping ("/edit-message")
-    public ResponseEntity<GetMessageDto> editMessage (@RequestBody @Valid EditMessageDto editMessageDto) {
+    public ResponseEntity<?> editMessage (@RequestBody @Valid EditMessageDto editMessageDto) {
+        var user=getUserByToken();
         Message message = messageService.getById(editMessageDto.getMessageId());
+        if (!Objects.equals(message.getSender().getUserId(), user.getUserId())){
+            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to edit message with id:{1}!",user.getPhoneNumber(),message.getMessageId()));
+            return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
+        }
         message.setText(editMessageDto.getText());
         message.setEditedAt(Instant.now());
         return new ResponseEntity<>( mapMessageToGetMessageDto(message), HttpStatus.OK);
