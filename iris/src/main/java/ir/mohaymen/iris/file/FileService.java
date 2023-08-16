@@ -10,4 +10,6 @@ public interface FileService {
     Long saveFile(String fileName, MultipartFile multipartFile) throws IOException;
 
     Resource getFileAsResource(Long id) throws IOException;
+    void deleteFile(Long id) throws IOException;
+
 }
