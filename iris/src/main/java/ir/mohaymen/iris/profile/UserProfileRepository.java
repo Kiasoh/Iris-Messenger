@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
     Iterable<UserProfile> findByUser(User user);
+
     boolean existsByMedia(Media media);
 }
