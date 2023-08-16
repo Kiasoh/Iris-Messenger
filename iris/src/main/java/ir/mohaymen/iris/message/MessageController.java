@@ -2,10 +2,17 @@ package ir.mohaymen.iris.message;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
+import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.contact.Contact;
+import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
+import ir.mohaymen.iris.subscription.SubDto;
+import ir.mohaymen.iris.subscription.Subscription;
+import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +35,9 @@ public class MessageController extends BaseController {
     private final ModelMapper modelMapper;
     private final ChatService chatService;
     private final MediaService mediaService;
+    private final SubscriptionService subscriptionService;
+    private final ContactService contactService;
+
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId , @PathVariable("floor") Integer floor , @PathVariable("ceil") Integer ceil ) {
         if (ceil - floor > 50)
@@ -41,6 +52,26 @@ public class MessageController extends BaseController {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         return new ResponseEntity<>(getMessageDtoList , HttpStatus.OK);
+    }
+    @GetMapping("/seen-users/{chatId}/{messageId}")
+    public ResponseEntity<List<SubDto>> usersSeen (@PathVariable Long chatId , @PathVariable Long messageId) {
+        Iterable<Contact> contacts = contactService.getContactByFirstUser(getUserByToken());
+        if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
+            return new ResponseEntity<>(null , HttpStatus.FORBIDDEN);
+        List<SubDto> users = new ArrayList<>();
+        messageService.usersSeen(messageId , chatId).forEach( s -> {
+            SubDto subDto = new SubDto();
+            Nameable nameable = subscriptionService.setName( contacts , s.getUser());
+            subDto.setFirstName(nameable.getFirstName());
+            subDto.setLastName(nameable.getLastName());
+            subDto.setUserId(s.getUser().getUserId());
+            users.add(subDto);
+        });
+        return new ResponseEntity<>(users , HttpStatus.OK);
+    }
+    @GetMapping("/seen-user-count/{chatId}/{messageId}")
+    public ResponseEntity<Integer> userSeenCount (@PathVariable Long chatId , @PathVariable Long messageId) {
+        return new ResponseEntity<>(messageService.usersSeen(messageId , chatId).size() , HttpStatus.OK);
     }
     @PostMapping("/send-message")
     public ResponseEntity<GetMessageDto> sendMessage (@RequestBody @Valid MessageDto messageDto) {
