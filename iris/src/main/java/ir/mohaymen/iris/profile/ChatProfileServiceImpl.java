@@ -2,6 +2,7 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.media.Media;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,11 @@ public class ChatProfileServiceImpl implements ChatProfileService {
     @Override
     public Iterable<ChatProfile> getByChat(Chat chat) {
         return chatProfileRepository.findByChat(chat);
+    }
+
+    @Override
+    public Iterable<ChatProfile> getByMedia(Media media) {
+        return chatProfileRepository.findAllByMedia(media);
     }
 
     @Override

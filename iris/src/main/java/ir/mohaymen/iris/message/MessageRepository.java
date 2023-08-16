@@ -16,6 +16,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Iterable<Message> findByOriginChat(Chat chat);
 
+    Iterable<Message> findAllByMedia(Media media);
+
     void deleteBySender(User user);
 
     void deleteByOriginChat(Chat chat);
