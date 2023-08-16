@@ -6,7 +6,6 @@ import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,14 +23,17 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @NotBlank
     private String firstName;
 
     private String lastName;
 
+    @NotBlank
     @Column(unique = true)
     private String phoneNumber;
 

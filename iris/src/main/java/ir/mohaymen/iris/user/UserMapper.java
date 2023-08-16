@@ -2,8 +2,8 @@ package ir.mohaymen.iris.user;
 
 public class UserMapper {
 
-    public static UserDto mapToUserDto(User user){
-        UserDto userDto = new UserDto(
+    public static UserDto mapToUserDto(User user) {
+        return new UserDto(
                 user.getUserId(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -11,6 +11,5 @@ public class UserMapper {
                 user.getUserName(),
                 user.getBio()
         );
-        return userDto;
     }
 }
