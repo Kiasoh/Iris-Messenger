@@ -40,7 +40,7 @@ public class ChatServiceImpl implements ChatService {
     public void deleteById(Long id) {
         chatRepository.deleteById(id);
     }
-
+    @Override
     public Chat getByLink(String link) {
         return chatRepository.findByLink(link).orElseThrow(EntityNotFoundException::new);
     }

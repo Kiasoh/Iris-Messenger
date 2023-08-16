@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -60,12 +61,24 @@ public class ChatController extends BaseController {
     @GetMapping("/get-chat/{id}")
     public ResponseEntity<GetChatDto> getChat(@PathVariable Long id) {
         Chat chat = chatService.getById(id);
-        if (!chatService.isInChat(chat , getUserByToken()))
+        return getGetChatDtoResponseEntity(chat);
+    }
+    @GetMapping("/{link}")
+    public ResponseEntity<GetChatDto> getChatByLink(@PathVariable String link) {
+        if (link == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        Chat chat = chatService.getByLink(link);
+        return getGetChatDtoResponseEntity(chat);
+    }
+
+    private ResponseEntity<GetChatDto> getGetChatDtoResponseEntity(Chat chat) {
+        if (!chatService.isInChat(chat , getUserByToken()) && !chat.isPublic())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         GetChatDto getChatDto = modelMapper.map(chat , GetChatDto.class);
         getChatDto.setSubCount(chat.getSubs().size());
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
+
     @GetMapping("/get-all-chats")
     public ResponseEntity<List<MenuChatDto>> getAllChats () {
         List<MenuChatDto> menuChatDtos = new ArrayList<>();
@@ -76,13 +89,6 @@ public class ChatController extends BaseController {
                 menuChatDto.setMedia(chat.getChatProfiles().get(chat.getChatProfiles().size() - 1) .getMedia());
             if (chat.getMessages().size() != 0) {
                 List<Message> messages = chat.getMessages();
-//                long count = 0;
-//                for (int i = messages.size() -1 ; i > -1;  i-- ) {
-//                    if (messages.get(i).getMessageId() > sub.getLastMessageSeenId())
-//                        count ++;
-//                    else
-//                        break;
-//                }
                 menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId() , chat.getChatId()));
                 menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
                 menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());

@@ -6,6 +6,8 @@ public interface ChatService {
     boolean isInChat(Chat chat, User user);
     Chat getById(Long id);
 
+    Chat getByLink(String link);
+
     Iterable<Chat> getAll();
 
     Chat createOrUpdate(Chat chat);
