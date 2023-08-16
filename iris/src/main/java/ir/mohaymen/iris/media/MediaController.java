@@ -2,6 +2,7 @@ package ir.mohaymen.iris.media;
 
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.security.SecurityService;
+import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,29 +24,27 @@ import java.text.MessageFormat;
 @RequiredArgsConstructor
 @RequestMapping("/api/media")
 public class MediaController extends BaseController {
+
     private final FileService fileService;
     private final MediaService mediaService;
     private final SecurityService securityService;
-    private final Logger logger= LoggerFactory.getLogger(MediaController.class);
+    private final Logger logger = LoggerFactory.getLogger(MediaController.class);
 
     @GetMapping("/download/{mediaId}")
     public ResponseEntity<?> downloadFile(@PathVariable Long mediaId) {
-        logger.info("test");
-        var user=getUserByToken();
-        if (!securityService.hasAccessToMedia(user.getUserId(), mediaId)){
-            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to access media id:{1}. not permitted!",user.getPhoneNumber(),mediaId));
+
+        User user = getUserByToken();
+        if (!securityService.hasAccessToMedia(user.getUserId(), mediaId)) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to access media id:{1}. not permitted!", user.getPhoneNumber(), mediaId));
             return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
         }
-        logger.info("test2");
-        Resource resource = null;
+
+        Resource resource;
         try {
             resource = fileService.getFileAsResource(mediaId);
+            if (resource == null) return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
-        }
-
-        if (resource == null) {
-            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
         }
 
         String contentType = "application/octet-stream";
@@ -56,6 +55,4 @@ public class MediaController extends BaseController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(resource);
     }
-
-
 }
