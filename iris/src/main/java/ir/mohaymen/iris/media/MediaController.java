@@ -21,11 +21,10 @@ public class MediaController {
     private final FileService fileService;
     private final MediaService mediaService;
     @GetMapping("/download/{mediaId}")
-    public ResponseEntity<?> downloadFile(@PathVariable("mediaId") Long mediaId) {
-        String fileCode=mediaId.toString();
+    public ResponseEntity<?> downloadFile(@PathVariable Long mediaId) {
         Resource resource = null;
         try {
-            resource = fileService.getFileAsResource(fileCode);
+            resource = fileService.getFileAsResource(mediaId);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }

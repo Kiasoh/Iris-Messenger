@@ -2,7 +2,6 @@ package ir.mohaymen.iris.file;
 
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
-import ir.mohaymen.iris.utility.CodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,16 +19,21 @@ import java.nio.file.StandardCopyOption;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService{
     private final MediaService mediaService;
-    public String saveFile(String inputFileName, MultipartFile multipartFile)
+
+//    @Value("${application.files.path}")
+    private final String path="files";
+    @Override
+    public Long saveFile(String inputFileName, MultipartFile multipartFile)
             throws IOException {
         var fileName=StringUtils.cleanPath(inputFileName);
-        Path uploadPath = Paths.get("files");
+        Path uploadPath = Paths.get(path);
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         String fileCode;
+        Long id;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             var savedMedia=mediaService.createOrUpdate(Media.builder()
@@ -39,7 +43,8 @@ public class FileServiceImpl implements FileService{
                     .build());
             savedMedia.setFilePath("/api/media/download/"+savedMedia.getMediaId());
             savedMedia=mediaService.createOrUpdate(savedMedia);
-            fileCode=savedMedia.getMediaId().toString();
+            id=savedMedia.getMediaId();
+            fileCode=generateFileCodeByMediaId(savedMedia.getMediaId());
             String savedFileName=fileCode + "-" + fileName;
             Path filePath = uploadPath.resolve(savedFileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -47,12 +52,16 @@ public class FileServiceImpl implements FileService{
             throw new IOException("Could not save file: " + fileName, ioe);
         }
 
-        return fileCode;
+        return id;
+    }
+    private String generateFileCodeByMediaId(Long id){
+        return Long.toString(1000_000L+id);
     }
     private Path foundFile;
-
-    public Resource getFileAsResource(String fileCode) throws IOException {
-        Path dirPath = Paths.get("files");
+    @Override
+    public Resource getFileAsResource(Long id) throws IOException {
+        String fileCode=generateFileCodeByMediaId(id);
+        Path dirPath = Paths.get(path);
 
         Files.list(dirPath).forEach(file -> {
             if (file.getFileName().toString().startsWith(fileCode)) {

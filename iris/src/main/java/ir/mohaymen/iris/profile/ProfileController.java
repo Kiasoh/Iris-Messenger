@@ -51,7 +51,7 @@ public class ProfileController extends BaseController {
     public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
         logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",user.getPhoneNumber(),file.getOriginalFilename()));
-        Long mediaId=Long.parseLong(fileService.saveFile(file.getOriginalFilename(),file));
+        Long mediaId=fileService.saveFile(file.getOriginalFilename(),file);
         UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
         userProfileService.createOrUpdate(userProfile);
 
