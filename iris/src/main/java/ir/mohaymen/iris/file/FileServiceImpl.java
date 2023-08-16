@@ -74,4 +74,14 @@ public class FileServiceImpl implements FileService {
         if (foundFile != null) return new UrlResource(foundFile.toUri());
         else return null;
     }
+    public void deleteFile(Long id) throws IOException {
+        String fileCode = generateFileCodeByMediaId(id);
+        Path dirPath = Paths.get(path);
+
+        Path foundFile = Files.list(dirPath).
+                filter(file -> file.getFileName().startsWith(fileCode))
+                .findFirst()
+                .orElse(null);
+        if (foundFile == null) Files.delete(foundFile);
+    }
 }
