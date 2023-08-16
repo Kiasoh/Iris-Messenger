@@ -2,8 +2,10 @@ package ir.mohaymen.iris.subscription;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
+import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         if (user == null) return null;
         return subscriptionRepository.findSubscriptionByUser(user);
+    }
+    @Override
+    public Nameable setName(Iterable<Contact> contacts,User user) {
+        for (Contact contact: contacts) {
+            if (contact.getSecondUser() == user) {
+                return contact;
+            }
+        }
+        return user;
     }
 
     @Override

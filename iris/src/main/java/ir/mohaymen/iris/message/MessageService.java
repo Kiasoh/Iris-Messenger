@@ -2,11 +2,19 @@ package ir.mohaymen.iris.message;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
+import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
+
+import java.util.List;
 
 public interface MessageService {
 
     Message getById(Long id);
+
+    long countUnSeenMessages(Long lastSeenMessageId , Long chatId);
+
+    List<Subscription> usersSeen(Long messageId , Long chatId);
+
 
     Iterable<Message> getAll();
 
