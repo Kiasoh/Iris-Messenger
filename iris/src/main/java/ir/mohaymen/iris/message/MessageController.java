@@ -7,6 +7,8 @@ import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.SubDto;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -40,6 +42,7 @@ public class MessageController extends BaseController {
     private final MediaService mediaService;
     private final SubscriptionService subscriptionService;
     private final ContactService contactService;
+    private final PermissionService permissionService;
 
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -85,8 +88,10 @@ public class MessageController extends BaseController {
     public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto) {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
-        if (!chatService.isInChat(chat, user))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        if (!chatService.isInChat(chat, user)
+                || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
         Media media;
         if (messageDto.getFileContentType() == null && messageDto.getFileName() == null && messageDto.getFilePath() == null) {
             if (messageDto.getText() == null)

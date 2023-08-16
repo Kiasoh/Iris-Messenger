@@ -2,6 +2,8 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -19,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -30,6 +33,7 @@ public class ChatController extends BaseController {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final MessageService messageService;
+    private final PermissionService permissionService;
 
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
@@ -39,6 +43,8 @@ public class ChatController extends BaseController {
         Subscription sub = new Subscription();
         sub.setChat(chat);
         sub.setUser(getUserByToken());
+        Set<Permission> ownerPermissions = chat.getChatType() == ChatType.PV ? Permission.getDefaultPermissions(chat.getChatType()) : Permission.getOwnerPermissions();
+        sub.setPermissions(ownerPermissions);
         subscriptionService.createOrUpdate(sub);
         for (Long id : createChatDto.getUserIds()) {
             chat = chatService.getById(chat.getChatId());
@@ -49,6 +55,7 @@ public class ChatController extends BaseController {
                 sub = new Subscription();
                 sub.setChat(chat);
                 sub.setUser(user);
+                sub.setPermissions(Permission.getDefaultPermissions(chat.getChatType()));
                 subscriptionService.createOrUpdate(sub);
             } catch (Exception ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -105,8 +112,9 @@ public class ChatController extends BaseController {
 
     @DeleteMapping("delete-chat/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable Long id) throws Exception {
-        if (!chatService.isInChat(chatService.getById(id), getUserByToken()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!chatService.isInChat(chatService.getById(id), getUserByToken())
+                || !permissionService.hasAccess(getUserByToken().getUserId(), id, Permission.OWNER))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         chatService.deleteById(id);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }

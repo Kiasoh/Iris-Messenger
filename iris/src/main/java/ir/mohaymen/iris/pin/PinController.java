@@ -4,6 +4,8 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import jakarta.validation.Valid;
@@ -24,9 +26,12 @@ public class PinController extends BaseController {
     private final ChatService chatService;
     private final UserService userService;
     private final PinService pinService;
-
+    private final PermissionService permissionService;
     @PostMapping("/pin-message")
     public ResponseEntity<GetPinDto> pinMessage (@RequestBody @Valid PinDto pinDto) {
+        if (!permissionService.hasAccess(getUserByToken().getUserId(),pinDto.getChatId(), Permission.PIN_MESSAGE))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
         Chat chat = chatService.getById(pinDto.getChatId());
         Message message = messageService.getById(pinDto.getMessageId());
         if(!chatService.isInChat(chat , getUserByToken()) || message.getOriginChat()!=chat)
