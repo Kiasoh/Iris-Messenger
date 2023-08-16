@@ -3,6 +3,7 @@ package ir.mohaymen.iris.file;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -15,37 +16,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
 @Service
 @RequiredArgsConstructor
-public class FileServiceImpl implements FileService{
+public class FileServiceImpl implements FileService {
+
     private final MediaService mediaService;
 
-//    @Value("${application.files.path}")
-    private final String path="files";
+    @Value("${application.files.path}")
+    private String path = "files";
+
     @Override
-    public Long saveFile(String inputFileName, MultipartFile multipartFile)
-            throws IOException {
-        var fileName=StringUtils.cleanPath(inputFileName);
+    public Long saveFile(String inputFileName, MultipartFile multipartFile) throws IOException {
+        String fileName = StringUtils.cleanPath(inputFileName);
         Path uploadPath = Paths.get(path);
 
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
+        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
 
-        String fileCode;
         Long id;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            var savedMedia=mediaService.createOrUpdate(Media.builder()
-                            .fileMimeType(multipartFile.getContentType())
-                            .fileName(fileName)
-                            .filePath("/api/media/download/")
+            Media savedMedia = mediaService.createOrUpdate(Media.builder()
+                    .fileMimeType(multipartFile.getContentType())
+                    .fileName(fileName)
+                    .filePath("/api/media/download/")
                     .build());
-            savedMedia.setFilePath("/api/media/download/"+savedMedia.getMediaId());
-            savedMedia=mediaService.createOrUpdate(savedMedia);
-            id=savedMedia.getMediaId();
-            fileCode=generateFileCodeByMediaId(savedMedia.getMediaId());
-            String savedFileName=fileCode + "-" + fileName;
+
+            savedMedia.setFilePath("/api/media/download/" + savedMedia.getMediaId());
+            savedMedia = mediaService.createOrUpdate(savedMedia);
+            id = savedMedia.getMediaId();
+            String fileCode = generateFileCodeByMediaId(savedMedia.getMediaId());
+            String savedFileName = fileCode + "-" + fileName;
             Path filePath = uploadPath.resolve(savedFileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
@@ -54,26 +55,23 @@ public class FileServiceImpl implements FileService{
 
         return id;
     }
-    private String generateFileCodeByMediaId(Long id){
-        return Long.toString(1000_000L+id);
+
+    private String generateFileCodeByMediaId(Long id) {
+        return Long.toString(1000_000L + id);
     }
-    private Path foundFile;
+
+
     @Override
     public Resource getFileAsResource(Long id) throws IOException {
-        String fileCode=generateFileCodeByMediaId(id);
+        String fileCode = generateFileCodeByMediaId(id);
         Path dirPath = Paths.get(path);
 
-        Files.list(dirPath).forEach(file -> {
-            if (file.getFileName().toString().startsWith(fileCode)) {
-                foundFile = file;
-                return;
-            }
-        });
+        Path foundFile = Files.list(dirPath).
+                filter(file -> file.getFileName().startsWith(fileCode))
+                .findFirst()
+                .orElse(null);
 
-        if (foundFile != null) {
-            return new UrlResource(foundFile.toUri());
-        }
-
-        return null;
+        if (foundFile != null) return new UrlResource(foundFile.toUri());
+        else return null;
     }
 }
