@@ -28,4 +28,6 @@ public class Subscription {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "chatId")
     private Chat chat;
+
+    private Long lastMessageSeenId = 0L;
 }

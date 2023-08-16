@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.github.javafaker.Code;
+
 import java.text.MessageFormat;
 import java.time.Instant;
 
@@ -31,7 +33,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final CodeGenerator codeGenerator;
     private final ModelMapper mapper;
     private final SMSService smsService;
     private final ActivationCodeRepository activationCodeRepository;
@@ -72,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
             jwtToken = result.getAccessToken();
             refreshToken = result.getRefreshToken();
             isRegistered = true;
-            userDto=result.getUser();
+            userDto = result.getUser();
         } else {
             var user = userRepository.findByPhoneNumber(loginDto.getPhoneNumber())
                     .orElseThrow();
@@ -127,12 +128,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public String sendActivationCode(String phoneNumber) {
-        var oldCode=activationCodeRepository.findByPhoneNumber(phoneNumber);
+        var oldCode = activationCodeRepository.findByPhoneNumber(phoneNumber);
         if (oldCode.isPresent())
             return oldCode.get().getCode();
         String activationCode;
         do {
-            activationCode = codeGenerator.generateActivationCode();
+            activationCode = CodeGenerator.generateActivationCode();
         } while (activationCodeRepository.findByCode(activationCode).isPresent());
         ActivationCode codeObj = ActivationCode.builder()
                 .phoneNumber(phoneNumber)

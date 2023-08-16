@@ -4,6 +4,7 @@ import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.profile.UserProfile;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.token.Token;
+import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -22,7 +23,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User implements UserDetails {
+
+public class User implements UserDetails, Nameable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,7 +72,7 @@ public class User implements UserDetails {
         return phoneNumber;
     }
 
-    public String getUserName(){
+    public String getUserName() {
         return userName;
     }
 

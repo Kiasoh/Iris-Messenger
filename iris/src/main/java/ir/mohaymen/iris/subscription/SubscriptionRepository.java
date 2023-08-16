@@ -11,4 +11,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     Iterable<Subscription> findSubscriptionByUser(User user);
 
     Iterable<Subscription> findAllByChat(Chat chat);
+
 }

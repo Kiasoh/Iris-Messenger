@@ -3,7 +3,10 @@ package ir.mohaymen.iris.chat;
 import ir.mohaymen.iris.user.User;
 
 public interface ChatService {
+
     Chat getById(Long id);
+
+    Chat getByLink(String link);
 
     Iterable<Chat> getAll();
 

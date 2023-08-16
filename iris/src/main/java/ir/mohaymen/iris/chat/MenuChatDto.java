@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @AllArgsConstructor
 @Setter
@@ -13,7 +15,9 @@ import lombok.Setter;
 public class MenuChatDto {
     private Long chatId;
     private String title;
+    private Long unSeenMessages;
     private String lastMessage;
+    private Instant sentAt;
     private String userFirstName;
     private ChatType chatType;
     private Media media;
