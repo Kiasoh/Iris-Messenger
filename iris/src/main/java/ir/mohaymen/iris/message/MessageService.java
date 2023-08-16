@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.message;
 
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
 
@@ -20,6 +21,8 @@ public interface MessageService {
     Iterable<Message> getByUser(User user);
 
     Iterable<Message> getByChat(Chat chat);
+
+    Iterable<Message> getByMedia(Media media);
 
     Message createOrUpdate(Message message);
 

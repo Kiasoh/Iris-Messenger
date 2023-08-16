@@ -1,8 +1,7 @@
 package ir.mohaymen.iris.profile;
 
-import ir.mohaymen.iris.chat.ChatService;
+import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
-import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
@@ -29,29 +28,29 @@ public class ProfileController extends BaseController {
     private final ChatProfileService chatProfileService;
     private final UserProfileService userProfileService;
     private final UserService userService;
-    private final ChatService chatService;
-    private final MediaService mediaService;
-    private final Logger logger= LoggerFactory.getLogger(ProfileController.class);
+    private final FileService fileService;
+    private final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<ProfileDto> getUserProfileById(@PathVariable Long id){
+    public ResponseEntity<ProfileDto> getUserProfileById(@PathVariable Long id) {
         ProfileDto profileDto = ProfileMapper.mapToProfileDto(userProfileService.getById(id));
         return new ResponseEntity<>(profileDto, HttpStatus.OK);
     }
 
     @GetMapping("/chats/{id}")
-    public ResponseEntity<ProfileDto> getChatProfileById(@PathVariable Long id){
+    public ResponseEntity<ProfileDto> getChatProfileById(@PathVariable Long id) {
         ProfileDto profileDto = ProfileMapper.mapToProfileDto(chatProfileService.getById(id));
         return new ResponseEntity<>(profileDto, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(path = "/users", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",user.getPhoneNumber(),file.getOriginalFilename()));
-        Media media = Media.builder().fileMimeType(file.getContentType()).fileName(file.getOriginalFilename()).filePath("file.getResource().getURI().toString()").build();
-        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(mediaService.createOrUpdate(media)).build();
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}", user.getPhoneNumber(), file.getOriginalFilename()));
+        Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
+        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
         userProfileService.createOrUpdate(userProfile);
+
         return ResponseEntity.ok("success");
     }
 
