@@ -1,23 +1,19 @@
 package ir.mohaymen.iris.message;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
-import ir.mohaymen.iris.auth.AuthService;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,10 +46,18 @@ public class MessageController extends BaseController {
     public ResponseEntity<GetMessageDto> sendMessage (@RequestBody @Valid MessageDto messageDto) {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
-        if (!chatService.isInChat(chat ,user ))
+        if (!chatService.isInChat(chat ,user ) )
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        Media media = modelMapper.map(messageDto , Media.class);
-        mediaService.createOrUpdate(media);
+        Media media;
+        if (messageDto.getFileContentType() == null && messageDto.getFileName() == null && messageDto.getFilePath() == null) {
+            if (messageDto.getText() == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            media = null;
+        }
+        else {
+            media = modelMapper.map(messageDto , Media.class);
+            mediaService.createOrUpdate(media);
+        }
         Message message = new Message();
         message.setText(messageDto.getText());
         message.setOriginChat(chat);

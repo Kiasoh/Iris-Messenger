@@ -51,7 +51,7 @@ public class SubscriptionController extends BaseController {
         Chat chat = chatService.getById(chatId);
         Subscription subscription = null;
         for (Subscription sub:chat.getSubs()) {
-            if (sub.getUser() == getUserByToken()){
+            if (sub.getUser().getUserId() == getUserByToken().getUserId()){
                 subscription = sub;
                 break;
             }

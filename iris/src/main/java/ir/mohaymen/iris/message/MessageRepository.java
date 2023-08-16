@@ -4,6 +4,7 @@ import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
@@ -16,4 +17,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     void deleteBySender(User user);
 
     void deleteByOriginChat(Chat chat);
+
+    @Query(value = """
+    select count(m)
+    From Message m
+    where m.messageId > ?1 and m.originChat.chatId = ?2
+""")
+    long countUnSeenMessages(Long lastSeenMessageId , Long chatId);
 }

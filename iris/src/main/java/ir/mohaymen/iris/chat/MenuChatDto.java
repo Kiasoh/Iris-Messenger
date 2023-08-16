@@ -15,7 +15,7 @@ import java.time.Instant;
 public class MenuChatDto {
     private Long chatId;
     private String title;
-    private int unSeenMessages;
+    private Long unSeenMessages;
     private String lastMessage;
     private Instant sentAt;
     private String userFirstName;

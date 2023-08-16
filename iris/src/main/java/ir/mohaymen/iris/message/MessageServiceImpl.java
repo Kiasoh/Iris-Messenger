@@ -27,6 +27,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public long countUnSeenMessages(Long lastSeenMessageId , Long chatId) {
+        return messageRepository.countUnSeenMessages(lastSeenMessageId , chatId);
+    }
+
+    @Override
     public Iterable<Message> getAll() {
         return messageRepository.findAll();
     }

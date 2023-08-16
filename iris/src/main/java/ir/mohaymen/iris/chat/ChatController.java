@@ -2,6 +2,7 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.auth.AuthService;
 import ir.mohaymen.iris.message.Message;
+import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -34,6 +35,7 @@ public class ChatController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final MessageService messageService;
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
@@ -74,14 +76,14 @@ public class ChatController extends BaseController {
                 menuChatDto.setMedia(chat.getChatProfiles().get(chat.getChatProfiles().size() - 1) .getMedia());
             if (chat.getMessages().size() != 0) {
                 List<Message> messages = chat.getMessages();
-                int count = 0;
-                for (int i = messages.size() -1 ; i > -1;  i-- ) {
-                    if (messages.get(i).getMessageId() > sub.getLastMessageSeenId())
-                        count ++;
-                    else
-                        break;
-                }
-                menuChatDto.setUnSeenMessages(count);
+//                long count = 0;
+//                for (int i = messages.size() -1 ; i > -1;  i-- ) {
+//                    if (messages.get(i).getMessageId() > sub.getLastMessageSeenId())
+//                        count ++;
+//                    else
+//                        break;
+//                }
+                menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId() , chat.getChatId()));
                 menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
                 menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
                 User user = messages.get(messages.size() - 1).getSender();

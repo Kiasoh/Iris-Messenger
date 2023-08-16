@@ -7,6 +7,8 @@ public interface MessageService {
 
     Message getById(Long id);
 
+    long countUnSeenMessages(Long lastSeenMessageId , Long chatId);
+
     Iterable<Message> getAll();
 
     Iterable<Message> getByUser(User user);
