@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.search;
 
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -9,11 +10,11 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Getter
 @Setter
-@Document(indexName = "message2")
+@Document(indexName = "message")
 public class SearchMessageDto {
 
 
-    @Field( type = FieldType.Long, name = "id")
+    @Id
     private Long id;
 
     @Field( type = FieldType.Text, name = "text")
