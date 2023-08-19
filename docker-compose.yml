@@ -7,14 +7,12 @@ services:
       - "8080:8080"
     depends_on:
       - db
-      - redis
       - elastic
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iris
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=toor
       - SPRING_JWT_SECRET_KEY=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      - REDIS_HOST=redis
       - RAYGAN_SMS_SENDER_NUMBER=null
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
@@ -33,14 +31,6 @@ services:
     restart: unless-stopped
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
-  redis:
-    image: 'redis/redis-stack:latest'
-    ports:
-      - "6379:6379"
-      - "8001:8001"
-    restart: unless-stopped
-    volumes:
-      - "redis_data:/data"
   elastic:
     image: elasticsearch:7.17.9
     environment:
@@ -53,7 +43,6 @@ services:
       - "elastic_data:/usr/share/elasticsearch/data"
     
 volumes:
-  redis_data:
   postgres_data:
   app_files:
   app_logs:
