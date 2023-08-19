@@ -45,7 +45,18 @@ public class GlobalExceptionHandler {
 
     private void log(String msg, Exception e) {
         logger.error(msg + " exception message:" + e.getMessage());
-        var stackTrace = Arrays.stream(e.getStackTrace()).limit(5).map(StackTraceElement::toString)
+        var stackTraces = e.getStackTrace();
+        int i;
+        for (i = 0; i < stackTraces.length; i++) {
+            if (stackTraces[i].getClassName().contains("Controller")) {
+                i += 2;
+                break;
+            }
+        }
+
+        var stackTrace = Arrays.stream(e.getStackTrace())
+                .limit(i)
+                .map(StackTraceElement::toString)
                 .toArray(String[]::new);
         logger.error(String.join("\n", stackTrace));
     }
