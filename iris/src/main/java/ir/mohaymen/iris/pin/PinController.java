@@ -29,7 +29,7 @@ public class PinController extends BaseController {
     public ResponseEntity<GetPinDto> pinMessage (@RequestBody @Valid PinDto pinDto) {
         Chat chat = chatService.getById(pinDto.getChatId());
         Message message = messageService.getById(pinDto.getMessageId());
-        if(!chatService.isInChat(chat , getUserByToken()) || message.getOriginChat()!=chat)
+        if(!chatService.isInChat(chat , getUserByToken()) || message.getChat()!=chat)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         Pin pin = new Pin();
         pin.setUser(getUserByToken());

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,7 @@ public class Chat {
     public Set<Subscription> subs;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
     public List<ChatProfile> chatProfiles;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "originChat")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
     public List<Message> messages;
     private Instant createdAt;
 }

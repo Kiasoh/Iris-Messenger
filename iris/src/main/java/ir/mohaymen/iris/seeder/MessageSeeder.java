@@ -78,7 +78,7 @@ public class MessageSeeder implements Seeder {
 
         Message message = new Message();
         message.setText(text);
-        message.setOriginChat(chat);
+        message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(sendingTime);
