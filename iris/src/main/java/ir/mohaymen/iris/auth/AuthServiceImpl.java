@@ -4,10 +4,7 @@ import ir.mohaymen.iris.code.ActivationCode;
 import ir.mohaymen.iris.code.ActivationCodeRepository;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
-import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserDto;
-import ir.mohaymen.iris.user.UserMapper;
-import ir.mohaymen.iris.user.UserRepository;
+import ir.mohaymen.iris.user.*;
 import ir.mohaymen.iris.utility.CodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -36,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final ModelMapper mapper;
     private final SMSService smsService;
     private final ActivationCodeRepository activationCodeRepository;
+    private final UserService userService;
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private AuthDto register(String phoneNumber) {
@@ -87,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getPhoneNumber(), "password"));
         deleteAllOldCodes(loginDto.getPhoneNumber());
+        userService.setOnline(userDto.getUserId());
         logger.info(MessageFormat.format("user phone number:{0} registered refresh_token:{1} jwt_token:{2} logined",
                 loginDto.getPhoneNumber(), refreshToken, jwtToken));
         return AuthDto.builder()

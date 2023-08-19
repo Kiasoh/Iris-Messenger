@@ -9,7 +9,8 @@ public class UserMapper {
                 user.getLastName(),
                 user.getPhoneNumber(),
                 user.getUserName(),
-                user.getBio()
+                user.getBio(),
+                user.getLastSeen()
         );
     }
 }

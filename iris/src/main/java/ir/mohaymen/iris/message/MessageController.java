@@ -48,12 +48,12 @@ public class MessageController extends BaseController {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = (List<Message>) messageService.getByChat(chatService.getById(chatId));
-        if (messages.size() > ceil)
+        if (messages.size() < ceil)
             ceil = (messages.size());
         if (floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
-        for (Message message : messages.subList(floor, ceil)) {
+        for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);

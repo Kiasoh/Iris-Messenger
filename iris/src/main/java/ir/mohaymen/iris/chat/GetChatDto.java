@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.profile.ChatProfile;
+import ir.mohaymen.iris.profile.ProfileDto;
 import ir.mohaymen.iris.subscription.Subscription;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,5 +24,5 @@ public class GetChatDto {
     private ChatType chatType;
     public int subCount;
 //    private Set<Subscription> subs;
-    public List<ChatProfile> chatProfiles;
+    public List<ProfileDto> profileDtoList;
 }
