@@ -13,8 +13,5 @@ public class MessageDto {
     private String text;
     @NotNull
     private Long chatId;
-    private String fileName;
-    private String fileContentType;
-    private String filePath;
 }
 
