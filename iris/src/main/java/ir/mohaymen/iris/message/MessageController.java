@@ -85,24 +85,26 @@ public class MessageController extends BaseController {
     public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto) {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
+        Message repliedMessage = messageService.getById(messageDto.getRepliedMessageId());
+
         if (!chatService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
         Media media;
         if (messageDto.getFileContentType() == null && messageDto.getFileName() == null && messageDto.getFilePath() == null) {
-            if (messageDto.getText() == null)
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            media = null;
+            if (messageDto.getText() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            else media = null;
         } else {
             media = modelMapper.map(messageDto, Media.class);
             mediaService.createOrUpdate(media);
         }
         Message message = new Message();
+        message.setRepliedMessageId(repliedMessage);
         message.setText(messageDto.getText());
         message.setOriginChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
-//        GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message);
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 
@@ -122,6 +124,7 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setRepliedMessageId(message.getRepliedMessageId().getMessageId());
         return getMessageDto;
     }
 }

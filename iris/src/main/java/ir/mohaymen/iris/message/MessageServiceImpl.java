@@ -59,6 +59,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public Iterable<Message> getByReplyMessage(Message message) {
+        return messageRepository.findByRepliedMessageId(message);
+    }
+
+    @Override
     public Message createOrUpdate(Message message) {
         return messageRepository.save(message);
     }

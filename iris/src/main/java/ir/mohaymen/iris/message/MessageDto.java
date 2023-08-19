@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MessageDto {
+    private Long repliedMessageId;
     private String text;
     @NotNull
     private Long chatId;
