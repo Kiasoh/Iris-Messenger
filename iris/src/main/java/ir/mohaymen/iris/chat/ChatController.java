@@ -125,7 +125,7 @@ public class ChatController extends BaseController {
                 menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
                 menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
                 User user = messages.get(messages.size() - 1).getSender();
-                Nameable nameable = subscriptionService.setName(user.getContacts(), user);
+                Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
                 if (user.getProfiles().size() != 0) {
                     menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
                     menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
