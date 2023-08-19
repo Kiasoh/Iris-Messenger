@@ -14,17 +14,16 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController extends BaseController {
 
-    private final UserServiceImpl userService;
-
-    @GetMapping("")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> result = userService.getAll().stream().map(UserMapper::mapToUserDto).toList();
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+    private final UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto userDto = UserMapper.mapToUserDto(userService.getById(id));
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+    @GetMapping("/get-current-user")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        UserDto userDto = UserMapper.mapToUserDto(getUserByToken());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -38,4 +37,5 @@ public class UserController extends BaseController {
         userService.createOrUpdate(user);
         return ResponseEntity.ok("success");
     }
+
 }
