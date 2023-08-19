@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @NoArgsConstructor
 public class MessageDto {
+    private Long repliedMessageId;
     private String text;
     @NotNull
     private Long chatId;

@@ -22,6 +22,11 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
 
+    @JoinColumn(name = "reply_id")
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Message repliedMessageId;
+
     @Column(columnDefinition = "TEXT")
     private String text;
 

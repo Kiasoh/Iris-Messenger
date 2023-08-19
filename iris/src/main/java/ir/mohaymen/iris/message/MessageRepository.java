@@ -17,20 +17,23 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Iterable<Message> findAllByMedia(Media media);
 
+    Iterable<Message> findByRepliedMessageId(Message message);
+
     void deleteBySender(User user);
 
     void deleteByOriginChat(Chat chat);
 
     @Query(value = """
-    select count(m)
-    From Message m
-    where m.messageId > ?1 and m.originChat.chatId = ?2
-""")
-    long countUnSeenMessages(Long lastSeenMessageId , Long chatId);
+                select count(m)
+                From Message m
+                where m.messageId > ?1 and m.originChat.chatId = ?2
+            """)
+    long countUnSeenMessages(Long lastSeenMessageId, Long chatId);
+
     @Query(value = """
-    select s
-    From Subscription s
-    where s.lastMessageSeenId > ?1 and s.chat = ?2
-""")
-    List<Subscription> usersSeen(Long messageId , Long chatId);
+                select s
+                From Subscription s
+                where s.lastMessageSeenId > ?1 and s.chat = ?2
+            """)
+    List<Subscription> usersSeen(Long messageId, Long chatId);
 }

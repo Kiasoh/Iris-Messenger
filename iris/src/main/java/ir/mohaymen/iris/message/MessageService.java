@@ -23,6 +23,8 @@ public interface MessageService {
 
     Iterable<Message> getByMedia(Media media);
 
+    Iterable<Message> getByReplyMessage(Message message);
+
     Message createOrUpdate(Message message);
 
     void deleteById(Long id);
