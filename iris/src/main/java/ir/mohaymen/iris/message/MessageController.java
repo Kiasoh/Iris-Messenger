@@ -140,6 +140,18 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(mapMessageToForwardMessageDto(message), HttpStatus.OK);
     }
 
+    @PostMapping("/forward-message/{chatId}")
+    public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId, @RequestBody @Valid List<Long> messageIds) {
+        List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
+        for (Long messageId : messageIds) {
+            ResponseEntity<ForwardMessageDto> forwardMessageDtoResponseEntity = forwardMessage(chatId, messageId);
+            ForwardMessageDto forwardMessageDto = forwardMessageDtoResponseEntity.getBody();
+            forwardMessageDtos.add(forwardMessageDto);
+        }
+
+        return new ResponseEntity<>(forwardMessageDtos, HttpStatus.OK);
+    }
+
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
