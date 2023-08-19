@@ -16,6 +16,7 @@ services:
       - RAYGAN_SMS_SENDER_NUMBER=null
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
+      - ELASTIC_HOST=elastic
     restart: unless-stopped
     volumes:
       - 'app_files:/app/files'
