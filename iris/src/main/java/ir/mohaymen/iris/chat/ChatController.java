@@ -1,9 +1,5 @@
 package ir.mohaymen.iris.chat;
 
-
-import ir.mohaymen.iris.auth.AuthService;
-import ir.mohaymen.iris.contact.ContactService;
-import ir.mohaymen.iris.message.GetMessageDto;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.profile.ProfileDto;
@@ -19,10 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.NullValueInNestedPathException;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.Query;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,10 +50,12 @@ public class ChatController extends BaseController {
         sub.setUser(getUserByToken());
         subscriptionService.createOrUpdate(sub);
         addedSubs.add(sub);
+        if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         for (Long id : createChatDto.getUserIds()) {
             chat = chatService.getById(chat.getChatId());
             User user = userService.getById(id);
-            if ((chat.getSubs().size() > 1 && chat.getChatType() == ChatType.PV) || chatService.isInChat(chat, user))
+            if (chatService.isInChat(chat, user))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             try {
                 sub = new Subscription();
@@ -168,5 +162,9 @@ public class ChatController extends BaseController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         chatService.deleteById(id);
         return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    private Subscription createInternalSub(Chat chat , User user) {
+        return new Subscription();
     }
 }

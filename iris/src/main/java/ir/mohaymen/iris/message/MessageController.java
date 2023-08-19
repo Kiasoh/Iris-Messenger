@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -96,11 +97,12 @@ public class MessageController extends BaseController {
     }
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto,@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
         if (!chatService.isInChat(chat, user))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        var file=messageDto.getFile();
         Media media;
         if (file==null || file.isEmpty()){
             media=null;
