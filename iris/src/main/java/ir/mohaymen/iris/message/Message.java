@@ -25,7 +25,7 @@ public class Message {
     @JoinColumn(name = "reply_id")
     @ManyToOne
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private Message repliedMessageId;
+    private Message repliedMessage;
 
     @Column(columnDefinition = "TEXT")
     private String text;
@@ -38,7 +38,7 @@ public class Message {
     @JoinColumn(name = "origin_chat_id")
     @ManyToOne
 //    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Chat originChat;
+    private Message originMessage;
 
     @JoinColumn(name = "userId")
     @ManyToOne

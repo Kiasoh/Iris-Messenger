@@ -53,7 +53,7 @@ public class MessageController extends BaseController {
         if (floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
-        for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
+        for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);
@@ -99,7 +99,7 @@ public class MessageController extends BaseController {
             mediaService.createOrUpdate(media);
         }
         Message message = new Message();
-        message.setRepliedMessageId(repliedMessage);
+        message.setRepliedMessage(repliedMessage);
         message.setText(messageDto.getText());
         message.setChat(chat);
         message.setSender(user);
@@ -121,10 +121,37 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 
+    @PostMapping("/forward-message/{chatId}/{messageId}")
+    public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
+        User user = getUserByToken();
+        Message message = messageService.getById(messageId);
+
+        Message newMessage = new Message();
+        newMessage.setChat(chatService.getById(chatId));
+        newMessage.setOriginMessage(message);
+        newMessage.setSender(user);
+        message.setText(message.getText());
+
+        Media newMedia = modelMapper.map(message.getMedia(), Media.class);
+        newMedia.setMediaId(null);
+        mediaService.createOrUpdate(newMedia);
+        message.setMedia(newMedia);
+
+        return new ResponseEntity<>(mapMessageToForwardMessageDto(message), HttpStatus.OK);
+    }
+
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
-        getMessageDto.setRepliedMessageId(message.getRepliedMessageId().getMessageId());
+        getMessageDto.setRepliedMessageId(message.getRepliedMessage().getMessageId());
         return getMessageDto;
+    }
+
+    private ForwardMessageDto mapMessageToForwardMessageDto(Message message) {
+        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message), ForwardMessageDto.class);
+        forwardMessageDto.setUserId(message.getSender().getUserId());
+        forwardMessageDto.setMessageId(message.getOriginMessage().getMessageId());
+        forwardMessageDto.setChatId(message.getChat().getChatId());
+        return forwardMessageDto;
     }
 }
