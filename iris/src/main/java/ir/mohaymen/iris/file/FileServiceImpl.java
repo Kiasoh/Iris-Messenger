@@ -27,14 +27,14 @@ public class FileServiceImpl implements FileService {
     private String path = "files";
 
     @Override
-    public Media saveFile(String inputFileName, MultipartFile multipartFile) throws IOException {
+    public Long saveFile(String inputFileName, MultipartFile multipartFile) throws IOException {
         String fileName = StringUtils.cleanPath(inputFileName);
         Path uploadPath = Paths.get(path);
 
         if (!Files.exists(uploadPath))
             Files.createDirectories(uploadPath);
 
-        Media media;
+        Long id;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Media savedMedia = mediaService.createOrUpdate(Media.builder()
@@ -45,7 +45,7 @@ public class FileServiceImpl implements FileService {
 
             savedMedia.setFilePath("/api/media/download/" + savedMedia.getMediaId());
             savedMedia = mediaService.createOrUpdate(savedMedia);
-            media = savedMedia;
+            id = savedMedia.getMediaId();
             String fileCode = generateFileCodeByMediaId(savedMedia.getMediaId());
             String savedFileName = fileCode + "-" + fileName;
             Path filePath = uploadPath.resolve(savedFileName);
@@ -54,7 +54,7 @@ public class FileServiceImpl implements FileService {
             throw new IOException("Could not save file: " + fileName, ioe);
         }
 
-        return media;
+        return id;
     }
 
     private String generateFileCodeByMediaId(Long id) {

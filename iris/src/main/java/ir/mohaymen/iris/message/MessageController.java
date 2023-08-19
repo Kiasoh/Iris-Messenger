@@ -111,7 +111,8 @@ public class MessageController extends BaseController {
             }
         }
         else {
-            media=fileService.saveFile(file.getOriginalFilename(),file);
+            var mediaId=fileService.saveFile(file.getOriginalFilename(),file);
+            media=Media.builder().mediaId(mediaId).build();
         }
         Message message = new Message();
         message.setText(messageDto.getText());
