@@ -1,6 +1,9 @@
 package ir.mohaymen.iris.user;
 
+import ir.mohaymen.iris.contact.ContactService;
+import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,8 +17,8 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController extends BaseController {
 
-    private final UserServiceImpl userService;
-
+    private final UserService userService;
+    private final SubscriptionService subscriptionService;
     @GetMapping("")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> result = userService.getAll().stream().map(UserMapper::mapToUserDto).toList();
@@ -24,7 +27,11 @@ public class UserController extends BaseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        UserDto userDto = UserMapper.mapToUserDto(userService.getById(id));
+        User user = userService.getById(id);
+        UserDto userDto = UserMapper.mapToUserDto(user);
+        Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
+        userDto.setFirstName(nameable.getFirstName());
+        userDto.setLastName(nameable.getFirstName());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 

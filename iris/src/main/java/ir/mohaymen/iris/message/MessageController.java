@@ -3,6 +3,7 @@ package ir.mohaymen.iris.message;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.chat.MenuChatDto;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.media.Media;
@@ -26,8 +27,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +50,8 @@ public class MessageController extends BaseController {
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId, @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Message> messages = (List<Message>) messageService.getByChat(chatService.getById(chatId));
+        List<Message> messages = new ArrayList<>();
+        messageService.getByChat(chatService.getById(chatId)).forEach(m -> messages.add(m));
         if (messages.size() < ceil)
             ceil = (messages.size());
         if (floor < 0)
@@ -56,6 +60,9 @@ public class MessageController extends BaseController {
         for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
+        List<GetMessageDto> sorted = getMessageDtoList.stream()
+                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);
     }
 
@@ -122,6 +129,7 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setSendAt(message.getSendAt());
         return getMessageDto;
     }
 }
