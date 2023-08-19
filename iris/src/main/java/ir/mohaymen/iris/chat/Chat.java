@@ -4,11 +4,9 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.subscription.Subscription;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +39,6 @@ public class Chat {
     public Set<Subscription> subs;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
     public List<ChatProfile> chatProfiles;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "originChat")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
     public List<Message> messages;
 }

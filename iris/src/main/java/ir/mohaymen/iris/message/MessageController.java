@@ -101,7 +101,7 @@ public class MessageController extends BaseController {
         Message message = new Message();
         message.setRepliedMessageId(repliedMessage);
         message.setText(messageDto.getText());
-        message.setOriginChat(chat);
+        message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
