@@ -8,6 +8,7 @@ services:
     depends_on:
       - db
       - redis
+      - elastic
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iris
       - SPRING_DATASOURCE_USERNAME=root
@@ -40,8 +41,20 @@ services:
     restart: unless-stopped
     volumes:
       - "redis_data:/data"
+  elastic:
+    image: elasticsearch:7.17.9
+    environment:
+      - 'discovery.type=single-node'
+      - 'xpack.security.enabled=false'
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+    volumes:
+      - "elastic_data:/usr/share/elasticsearch/data"
+    
 volumes:
   redis_data:
   postgres_data:
   app_files:
   app_logs:
+  elastic_data:
