@@ -31,7 +31,8 @@ public class FileServiceImpl implements FileService {
         String fileName = StringUtils.cleanPath(inputFileName);
         Path uploadPath = Paths.get(path);
 
-        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+        if (!Files.exists(uploadPath))
+            Files.createDirectories(uploadPath);
 
         Long id;
 
@@ -60,14 +61,16 @@ public class FileServiceImpl implements FileService {
         return Long.toString(1000_000L + id);
     }
 
-
     @Override
     public Resource getFileAsResource(Long id) throws IOException {
         Path foundFile = getPathById(id);
 
-        if (foundFile != null) return new UrlResource(foundFile.toUri());
-        else return null;
+        if (foundFile != null)
+            return new UrlResource(foundFile.toUri());
+        else
+            return null;
     }
+
     public void deleteFile(Long id) throws IOException {
         Path foundFile = getPathById(id);
         if (foundFile == null)
@@ -78,8 +81,7 @@ public class FileServiceImpl implements FileService {
         String fileCode = generateFileCodeByMediaId(id);
         Path dirPath = Paths.get(path);
 
-        Path foundFile = Files.list(dirPath).
-                filter(file -> file.getFileName().startsWith(fileCode))
+        Path foundFile = Files.list(dirPath).filter(file -> file.getFileName().toString().startsWith(fileCode))
                 .findFirst()
                 .orElse(null);
         return foundFile;

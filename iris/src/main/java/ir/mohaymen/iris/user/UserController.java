@@ -19,11 +19,7 @@ public class UserController extends BaseController {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-    @GetMapping("")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> result = userService.getAll().stream().map(UserMapper::mapToUserDto).toList();
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
@@ -32,6 +28,11 @@ public class UserController extends BaseController {
         Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
         userDto.setFirstName(nameable.getFirstName());
         userDto.setLastName(nameable.getFirstName());
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+    @GetMapping("/get-current-user")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        UserDto userDto = UserMapper.mapToUserDto(getUserByToken());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -45,4 +46,5 @@ public class UserController extends BaseController {
         userService.createOrUpdate(user);
         return ResponseEntity.ok("success");
     }
+
 }

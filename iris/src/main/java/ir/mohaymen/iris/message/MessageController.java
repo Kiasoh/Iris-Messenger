@@ -6,6 +6,7 @@ import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.chat.MenuChatDto;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
+import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.subscription.SubDto;
@@ -19,11 +20,14 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,6 +35,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +49,7 @@ public class MessageController extends BaseController {
     private final MediaService mediaService;
     private final SubscriptionService subscriptionService;
     private final ContactService contactService;
+    private final FileService fileService;
 
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -88,20 +95,22 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
     }
 
-    @PostMapping("/send-message")
-    public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto) {
+    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto,@RequestPart("file") MultipartFile file) throws IOException {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
         if (!chatService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         Media media;
-        if (messageDto.getFileContentType() == null && messageDto.getFileName() == null && messageDto.getFilePath() == null) {
-            if (messageDto.getText() == null)
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            media = null;
-        } else {
-            media = modelMapper.map(messageDto, Media.class);
-            mediaService.createOrUpdate(media);
+        if (file==null || file.isEmpty()){
+            media=null;
+            if (messageDto.getText().isBlank()){
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            }
+        }
+        else {
+            var mediaId=fileService.saveFile(file.getOriginalFilename(),file);
+            media=Media.builder().mediaId(mediaId).build();
         }
         Message message = new Message();
         message.setText(messageDto.getText());

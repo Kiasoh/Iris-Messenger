@@ -39,6 +39,7 @@ public class MessageSeeder implements Seeder {
             generateRandomMessageForChat();
         for (int i = 0; i < NUMBER_OF_PV_MESSAGES; i++)
             generateMessageForPV(i + 1);
+        messages.sort(Comparator.comparing(Message::getSendAt));
         messageRepository.saveAll(messages);
     }
 
