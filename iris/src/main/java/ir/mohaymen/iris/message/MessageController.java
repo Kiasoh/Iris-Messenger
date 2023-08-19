@@ -3,6 +3,7 @@ package ir.mohaymen.iris.message;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.chat.MenuChatDto;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.file.FileService;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +32,10 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -54,7 +58,8 @@ public class MessageController extends BaseController {
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId, @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Message> messages = (List<Message>) messageService.getByChat(chatService.getById(chatId));
+        List<Message> messages = new ArrayList<>();
+        messageService.getByChat(chatService.getById(chatId)).forEach(m -> messages.add(m));
         if (messages.size() < ceil)
             ceil = (messages.size());
         if (floor < 0)
@@ -63,6 +68,9 @@ public class MessageController extends BaseController {
         for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
+        List<GetMessageDto> sorted = getMessageDtoList.stream()
+                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);
     }
 
@@ -89,11 +97,12 @@ public class MessageController extends BaseController {
     }
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<GetMessageDto> sendMessage(@RequestBody @Valid MessageDto messageDto,@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
         if (!chatService.isInChat(chat, user))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        var file=messageDto.getFile();
         Media media;
         if (file==null || file.isEmpty()){
             media=null;
@@ -102,8 +111,7 @@ public class MessageController extends BaseController {
             }
         }
         else {
-            var mediaId=fileService.saveFile(file.getOriginalFilename(),file);
-            media=Media.builder().mediaId(mediaId).build();
+            media=fileService.saveFile(file.getOriginalFilename(),file);
         }
         Message message = new Message();
         message.setText(messageDto.getText());
@@ -130,6 +138,7 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setSendAt(message.getSendAt());
         return getMessageDto;
     }
 }

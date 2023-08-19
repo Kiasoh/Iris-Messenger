@@ -54,9 +54,9 @@ public class ChatServiceImpl implements ChatService {
     public Long helloFromTheOtherSide (Chat chat ,Long userId) {
         if (chat.getSubs() == null)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        if (chat.getChatType() != ChatType.PV || chat.getSubs().size() != 2)
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Subscription> bothSide = (List<Subscription>) chat.getSubs();
+//        if (chat.getChatType() != ChatType.PV || chat.getSubs().size() != 2)
+//            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        List<Subscription> bothSide = chat.getSubs().stream().toList();
         if (bothSide.get(0).getUser().getUserId() == userId)
             return bothSide.get(1).getUser().getUserId();
         return bothSide.get(0).getUser().getUserId();

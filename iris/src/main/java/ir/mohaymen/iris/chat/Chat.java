@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -41,4 +42,5 @@ public class Chat {
     public List<ChatProfile> chatProfiles;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chat")
     public List<Message> messages;
+    private Instant createdAt;
 }
