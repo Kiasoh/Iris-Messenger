@@ -65,33 +65,17 @@ public class ProfileController extends BaseController {
         UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
         userProfileService.createOrUpdate(userProfile);
         return ResponseEntity.ok("User profile added");
-
-        return ResponseEntity.ok("success");
     }
-    @RequestMapping(path = "/chats/{chatId}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file,@PathVariable("chatId") Long chatId) throws IOException {
+    @RequestMapping(path = "/chats/{id}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file,@PathVariable Long id) throws IOException {
         User user = getUserByToken();
         //TODO: check if user has permission
-        Chat chat=chatService.getById(chatId);
+        Chat chat=chatService.getById(id);
         logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1} for chat", user.getPhoneNumber(), file.getOriginalFilename()));
         Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
         ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
         chatProfileService.createOrUpdate(chatProfile);
 
-        return ResponseEntity.ok("success");
-    }
-
-    @RequestMapping(path = "/chats/{id}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file, @PathVariable Long id){
-        Chat chat = chatService.getById(id);
-        Media media = Media.builder().fileName(file.getOriginalFilename()).filePath("not set yet").fileMimeType(file.getContentType()).build();
-        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(mediaService.createOrUpdate(media)).build();
-        chatProfileService.createOrUpdate(chatProfile);
         return ResponseEntity.ok("Chat profile added");
     }
-
-//    @GetMapping("/profile/chats/{id}")
-//    public ResponseEntity<ProfileDto> getChatProfileById(@PathVariable Long id){
-//        ProfileDto profileDto = ProfileDto.mapToProfileDto()
-//    }
 }
