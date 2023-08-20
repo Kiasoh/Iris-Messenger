@@ -44,7 +44,7 @@ public class ContactController extends BaseController {
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
     @GetMapping("/get-contact")
-    public ResponseEntity<PostContactDto> getContact(@RequestBody Long userId) {
+    public ResponseEntity<PostContactDto> getContact(@RequestParam Long userId) {
         if(!contactService.isInContact(getUserByToken() , userId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(makePostContact(contactService.getContact(getUserByToken().getUserId(), userId)) , HttpStatus.OK);

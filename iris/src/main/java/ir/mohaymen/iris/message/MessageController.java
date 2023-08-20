@@ -100,7 +100,7 @@ public class MessageController extends BaseController {
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
-        if (!chatService.isInChat(chat, user))
+        if (!subscriptionService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         var file=messageDto.getFile();
         Media media;
