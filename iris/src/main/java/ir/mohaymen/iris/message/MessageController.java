@@ -55,7 +55,7 @@ public class MessageController extends BaseController {
 
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId,
-            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
+                                                           @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = new ArrayList<>();
@@ -95,7 +95,7 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/send-message", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
@@ -147,11 +147,20 @@ public class MessageController extends BaseController {
     @PostMapping("/forward-message/{chatId}/{messageId}")
     public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
         User user = getUserByToken();
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward message:{1} to chat:{2}",
+                user.getPhoneNumber(), messageId, chatId));
         Message message = messageService.getById(messageId);
         Chat newChat = chatService.getById(chatId);
 
-        if (!chatService.isInChat(newChat, user)) throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        if (!chatService.isInChat(message.getChat(), user)) throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        if (!chatService.isInChat(newChat, user)) {
+            logger.info(MessageFormat.format("user with phone number:{0} is not in chat:{1} to forward message",
+                    user.getPhoneNumber(), chatId));
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        } else if (!chatService.isInChat(message.getChat(), user)) {
+            logger.info(MessageFormat.format("user with phone number:{0} does not have access to message:{1}",
+                    user.getPhoneNumber(), messageId));
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
 
         // TODO: 8/20/2023 check if user has permission to send message (channels, restricted permissions, ...)
 
@@ -178,6 +187,8 @@ public class MessageController extends BaseController {
 
     @PostMapping("/forward-message/{chatId}")
     public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId, @RequestBody @Valid List<Long> messageIds) {
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward {} message(s) to chat:{2}",
+                getUserByToken().getPhoneNumber(), messageIds.size(), chatId));
         List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
         for (Long messageId : messageIds) {
             ResponseEntity<ForwardMessageDto> forwardMessageDtoResponseEntity = forwardMessage(chatId, messageId);
