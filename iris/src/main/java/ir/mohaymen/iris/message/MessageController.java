@@ -97,19 +97,24 @@ public class MessageController extends BaseController {
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
-        Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
+        Chat chat = chatService.getById(messageDto.getChatId());
+        logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to send message in chat:{1}!",
+                user.getPhoneNumber(), chat.getChatId()));
 
-        Message repliedMessage = (messageDto.getRepliedMessageId() != null)
-                ? messageService.getById(messageDto.getRepliedMessageId())
-                : null;
+        Message repliedMessage = (messageDto.getRepliedMessageId() != null) ? messageService.getById(messageDto.getRepliedMessageId()) : null;
 
-        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId()))
+        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId())) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to reply a message which is in another chat!",
+                    user.getPhoneNumber()));
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-
-        if (!chatService.isInChat(chat, user)
-                || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE))
+        } else if (!chatService.isInChat(chat, user)
+                || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE)) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to send message in this chat!",
+                    user.getPhoneNumber()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        }
+
         var file = messageDto.getFile();
         Media media;
         if (file == null || file.isEmpty()) {
@@ -147,17 +152,17 @@ public class MessageController extends BaseController {
     @PostMapping("/forward-message/{chatId}/{messageId}")
     public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
         User user = getUserByToken();
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward message:{1} to chat:{2}",
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward message:{1} to chat:{2}!",
                 user.getPhoneNumber(), messageId, chatId));
         Message message = messageService.getById(messageId);
         Chat newChat = chatService.getById(chatId);
 
         if (!chatService.isInChat(newChat, user)) {
-            logger.info(MessageFormat.format("user with phone number:{0} is not in chat:{1} to forward message",
+            logger.info(MessageFormat.format("user with phone number:{0} is not in chat:{1} to forward message!",
                     user.getPhoneNumber(), chatId));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         } else if (!chatService.isInChat(message.getChat(), user)) {
-            logger.info(MessageFormat.format("user with phone number:{0} does not have access to message:{1}",
+            logger.info(MessageFormat.format("user with phone number:{0} does not have access to message:{1} to forward it!",
                     user.getPhoneNumber(), messageId));
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
