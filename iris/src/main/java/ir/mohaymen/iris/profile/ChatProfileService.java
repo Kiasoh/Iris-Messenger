@@ -3,11 +3,13 @@ package ir.mohaymen.iris.profile;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.media.Media;
 
+import java.util.List;
+
 public interface ChatProfileService {
 
     ChatProfile getById(Long id);
 
-    Iterable<ChatProfile> getByChat(Chat chat);
+    List<ChatProfile> getByChat(Chat chat);
 
     Iterable<ChatProfile> getByMedia(Media media);
 

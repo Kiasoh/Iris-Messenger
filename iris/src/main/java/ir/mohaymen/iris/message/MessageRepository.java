@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Iterable<Message> findBySender(User user);
+    List<Message> findBySender(User user);
 
-    Iterable<Message> findByChat(Chat chat);
+    List<Message> findByChat(Chat chat);
 
-    Iterable<Message> findAllByMedia(Media media);
+    List<Message> findAllByMedia(Media media);
 
     Iterable<Message> findByRepliedMessageId(Message message);
 
