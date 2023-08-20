@@ -138,11 +138,53 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 
+    @PostMapping("/forward-message/{chatId}/{messageId}")
+    public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
+        User user = getUserByToken();
+        Message message = messageService.getById(messageId);
+
+        if (!chatService.isInChat(message.getChat(), user))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        // TODO: 8/20/2023 check if user has permission to send message (channels, restricted permissions, ...)
+
+        Message newMessage = new Message();
+        newMessage.setChat(chatService.getById(chatId));
+        newMessage.setOriginMessage(message);
+        newMessage.setSender(user);
+        newMessage.setText(message.getText());
+
+//        Media newMedia = modelMapper.map(message.getMedia(), Media.class);
+//        newMedia.setMediaId(null);
+//        mediaService.createOrUpdate(newMedia);
+//        message.setMedia(newMedia);
+
+        return new ResponseEntity<>(mapMessageToForwardMessageDto(newMessage), HttpStatus.OK);
+    }
+
+    @PostMapping("/forward-message/{chatId}")
+    public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId, @RequestBody @Valid List<Long> messageIds) {
+        List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
+        for (Long messageId : messageIds) {
+            ResponseEntity<ForwardMessageDto> forwardMessageDtoResponseEntity = forwardMessage(chatId, messageId);
+            ForwardMessageDto forwardMessageDto = forwardMessageDtoResponseEntity.getBody();
+            forwardMessageDtos.add(forwardMessageDto);
+        }
+
+        return new ResponseEntity<>(forwardMessageDtos, HttpStatus.OK);
+    }
+
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
         if (message.getRepliedMessage() != null)
             getMessageDto.setRepliedMessageId(message.getRepliedMessage().getMessageId());
         return getMessageDto;
+    }
+
+    private ForwardMessageDto mapMessageToForwardMessageDto(Message message) {
+        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message), ForwardMessageDto.class);
+        forwardMessageDto.setUserId(message.getSender().getUserId());
+        return forwardMessageDto;
     }
 }

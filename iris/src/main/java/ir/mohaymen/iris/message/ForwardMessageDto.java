@@ -6,22 +6,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.Instant;
 
 @NoArgsConstructor
 @Setter
 @Getter
 public class ForwardMessageDto {
+
     @NotNull
     private Long messageId;
+
     @NotNull
     private Long chatId;
+
+    @NotNull
     private Long userId;
+
     @NotNull
     private Long originMessageId;
+
     private String text;
+
     private Media media;
+
     @CreationTimestamp
     private Instant sendAt;
 }
