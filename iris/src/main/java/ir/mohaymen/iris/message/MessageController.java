@@ -141,14 +141,15 @@ public class MessageController extends BaseController {
     public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
         User user = getUserByToken();
         Message message = messageService.getById(messageId);
+        Chat newChat = chatService.getById(chatId);
 
-        if (!chatService.isInChat(message.getChat(), user))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        if (!chatService.isInChat(newChat, user)) throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        if (!chatService.isInChat(message.getChat(), user)) throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
         // TODO: 8/20/2023 check if user has permission to send message (channels, restricted permissions, ...)
 
         Message newMessage = new Message();
-        newMessage.setChat(chatService.getById(chatId));
+        newMessage.setChat(newChat);
         newMessage.setOriginMessage(message);
         newMessage.setSender(user);
         newMessage.setText(message.getText());
