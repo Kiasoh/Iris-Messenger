@@ -46,6 +46,8 @@ public class ChatController extends BaseController {
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
         chat.setCreatedAt(Instant.now());
+        if (chat.getChatType() == ChatType.PV)
+            chat.setPublic(false);
         createInternalSub(chat , getUserByToken());
         chat = chatService.createOrUpdate(chat);
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))

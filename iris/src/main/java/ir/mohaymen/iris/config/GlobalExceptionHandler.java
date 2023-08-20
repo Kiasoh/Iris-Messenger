@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     private void log(String msg, Exception e) {
         logger.error(msg + " exception message:" + e.getMessage());
-        var stackTrace = Arrays.stream(e.getStackTrace()).limit(5).map(StackTraceElement::toString)
+        var stackTrace = Arrays.stream(e.getStackTrace()).limit(50).map(StackTraceElement::toString)
                 .toArray(String[]::new);
         logger.error(String.join("\n", stackTrace));
     }

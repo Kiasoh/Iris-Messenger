@@ -18,6 +18,7 @@ public interface ContactService {
     Iterable<Contact> getContactBySecondUser(User secondUser);
 
     Iterable<User> getUserBySecondUser(User secondUser);
+    Contact getContact(Long firstUserId , Long secondUserId);
 
     Contact createOrUpdate(Contact contact);
 

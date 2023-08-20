@@ -40,5 +40,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         where m.originChat.chatId = ?1
         order by m.messageId desc 
 """)
-    Message getLastMessageByChatId(Long chatID);
+    List<Message> getLastMessageByChatId(Long chatId);
+    Message findFirstByOriginChatOrderByMessageIdDesc(Chat chat);
 }
