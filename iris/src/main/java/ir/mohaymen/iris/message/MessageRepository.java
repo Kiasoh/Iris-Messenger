@@ -33,4 +33,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     where s.lastMessageSeenId > ?1 and s.chat = ?2
 """)
     List<Subscription> usersSeen(Long messageId , Long chatId);
+
+    @Query(value = """
+        select m
+        from Message m
+        where m.originChat.chatId = ?1
+        order by m.messageId desc 
+""")
+    Message getLastMessageByChatId(Long chatID);
 }

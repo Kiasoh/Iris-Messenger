@@ -46,6 +46,7 @@ public class ChatController extends BaseController {
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
         chat.setCreatedAt(Instant.now());
+        createInternalSub(chat , getUserByToken());
         chat = chatService.createOrUpdate(chat);
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -91,11 +92,11 @@ public class ChatController extends BaseController {
             User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
             if (userProfileList != null)
-                user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+               userProfileList.forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
         }
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
-        getChatDto.setSubCount(subscriptionService.getAllSubscriptionByChatId(chat.getChatId()).size());
+        getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
@@ -117,11 +118,11 @@ public class ChatController extends BaseController {
             menuChatDto.setUserFirstName(nameable.getFirstName());
         }
         if (chat.getMessages().size() != 0) {
-            List<Message> messages = messageService.getByChat(chat);
+            Message message = messageService.getLastMessageByChatId(chat.getChatId());
             menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
-            menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
-            menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
-            User user = messages.get(messages.size() - 1).getSender();
+            menuChatDto.setLastMessage(message.getText());
+            menuChatDto.setSentAt(message.getSendAt());
+            User user = message.getSender();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
             if (user.getProfiles().size() != 0) {
                 menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());

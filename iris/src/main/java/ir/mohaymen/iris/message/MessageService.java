@@ -24,6 +24,7 @@ public interface MessageService {
     Iterable<Message> getByMedia(Media media);
 
     Message createOrUpdate(Message message);
+    Message getLastMessageByChatId(Long chatId);
 
     void deleteById(Long id);
 
