@@ -98,4 +98,12 @@ public class User implements UserDetails, Nameable {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String fullName() {
+        String name = firstName;
+        if(lastName!=null)
+            name =name + " " + lastName;
+        return name;
+    }
 }

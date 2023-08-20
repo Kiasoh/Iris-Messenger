@@ -12,4 +12,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     List<UserProfile> findByUser(User user);
 
     boolean existsByMedia(Media media);
+
+    UserProfile findFirstByUserOrderByIdDesc(User user);
 }

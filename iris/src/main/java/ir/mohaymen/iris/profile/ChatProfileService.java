@@ -17,5 +17,7 @@ public interface ChatProfileService {
 
     ChatProfile createOrUpdate(ChatProfile chatProfile);
 
+    ChatProfile getLastChatProfile(Chat chat);
+
     void deleteById(Long id);
 }

@@ -12,6 +12,8 @@ public interface UserProfileService {
 
     List<UserProfile> getByUser(User user);
 
+    UserProfile getLastUserProfile(User user);
+
     Iterable<UserProfile> getAll();
 
     boolean isProfilePicture(Media media);
