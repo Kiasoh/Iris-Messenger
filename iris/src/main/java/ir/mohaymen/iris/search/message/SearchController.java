@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.search;
+package ir.mohaymen.iris.search.message;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
