@@ -2,12 +2,15 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
+import jdk.dynalink.linker.LinkerServices;
+
+import java.util.List;
 
 public interface UserProfileService {
 
     UserProfile getById(Long id);
 
-    Iterable<UserProfile> getByUser(User user);
+    List<UserProfile> getByUser(User user);
 
     Iterable<UserProfile> getAll();
 

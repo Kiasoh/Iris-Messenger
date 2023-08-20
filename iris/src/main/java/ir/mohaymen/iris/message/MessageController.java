@@ -8,6 +8,8 @@ import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.SubDto;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -47,11 +49,13 @@ public class MessageController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final ContactService contactService;
     private final FileService fileService;
+    private final PermissionService permissionService;
 
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
-    public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId, @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
+    public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId,
+            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = new ArrayList<>();
@@ -72,13 +76,12 @@ public class MessageController extends BaseController {
 
     @GetMapping("/seen-users/{chatId}/{messageId}")
     public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        Iterable<Contact> contacts = contactService.getContactByFirstUser(getUserByToken());
         if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         List<SubDto> users = new ArrayList<>();
         messageService.usersSeen(messageId, chatId).forEach(s -> {
             SubDto subDto = new SubDto();
-            Nameable nameable = subscriptionService.setName(contacts, s.getUser());
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), s.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(s.getUser().getUserId());
@@ -92,18 +95,20 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/send-message", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
-        System.out.println(1);
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
 
-        Message repliedMessage = (messageDto.getRepliedMessageId() != null) ? messageService.getById(messageDto.getRepliedMessageId()) : null;
+        Message repliedMessage = (messageDto.getRepliedMessageId() != null)
+                ? messageService.getById(messageDto.getRepliedMessageId())
+                : null;
 
         if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId()))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
-        if (!chatService.isInChat(chat, user))
+        if (!chatService.isInChat(chat, user)
+                || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         var file = messageDto.getFile();
         Media media;
@@ -130,7 +135,8 @@ public class MessageController extends BaseController {
         var user = getUserByToken();
         Message message = messageService.getById(editMessageDto.getMessageId());
         if (!Objects.equals(message.getSender().getUserId(), user.getUserId())) {
-            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to edit message with id:{1}!", user.getPhoneNumber(), message.getMessageId()));
+            logger.info(MessageFormat.format("user with phoneNumber:{0} wants to edit message with id:{1}!",
+                    user.getPhoneNumber(), message.getMessageId()));
             return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
         }
         message.setText(editMessageDto.getText());

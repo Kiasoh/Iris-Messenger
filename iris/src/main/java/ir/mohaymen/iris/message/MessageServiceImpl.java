@@ -49,7 +49,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Iterable<Message> getByChat(Chat chat) {
+    public List<Message> getByChat(Chat chat) {
         return messageRepository.findByChat(chat);
     }
 
@@ -119,12 +119,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     public Page<Message> getMessagesByPage(Long chatId, int pageNum, int pageSize) {
-//        Iterable<Message> messages = getByChat(chatId);
+        // Iterable<Message> messages = getByChat(chatId);
         var chat = new Chat();
         chat.setChatId(chatId);
         var message = new Message();
         message.setChat(chat);
         return messageRepository.findAll(Example.of(message), Pageable.ofSize(pageSize).withPage(pageNum));
-//         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
+        // messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
     }
 }
