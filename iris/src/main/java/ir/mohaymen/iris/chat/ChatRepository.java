@@ -14,6 +14,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     Optional<Chat> findByLink(String Link);
 
     Iterable<Chat> findByTitle(String title);
+
 //    @Query(value = """
 //    select new ir.mohaymen.iris.chat.MenuChatDto(
 //    c.chatId,
