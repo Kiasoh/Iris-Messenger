@@ -154,10 +154,17 @@ public class MessageController extends BaseController {
         newMessage.setSender(user);
         newMessage.setText(message.getText());
 
-//        Media newMedia = modelMapper.map(message.getMedia(), Media.class);
-//        newMedia.setMediaId(null);
-//        mediaService.createOrUpdate(newMedia);
-//        message.setMedia(newMedia);
+        if (message.getMedia() != null) {
+            Media media = message.getMedia();
+
+            Media newMedia = new Media();
+            newMedia.setFileName(media.getFileName());
+            newMedia.setFilePath(media.getFilePath());
+            newMedia.setFileMimeType(media.getFileMimeType());
+
+            newMedia = mediaService.createOrUpdate(newMedia);
+            newMessage.setMedia(newMedia);
+        }
 
         return new ResponseEntity<>(mapMessageToForwardMessageDto(newMessage), HttpStatus.OK);
     }
