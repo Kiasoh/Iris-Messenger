@@ -3,7 +3,6 @@ package ir.mohaymen.iris.message;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
-import ir.mohaymen.iris.chat.MenuChatDto;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.file.FileService;
@@ -19,14 +18,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -65,7 +61,7 @@ public class MessageController extends BaseController {
         if (floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
-        for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
+        for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         List<GetMessageDto> sorted = getMessageDtoList.stream()
@@ -98,23 +94,30 @@ public class MessageController extends BaseController {
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
+        System.out.println(1);
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
+
+        Message repliedMessage = (messageDto.getRepliedMessageId() != null) ? messageService.getById(messageDto.getRepliedMessageId()) : null;
+
+        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId()))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
         if (!chatService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        var file=messageDto.getFile();
+        var file = messageDto.getFile();
         Media media;
-        if (file==null || file.isEmpty()){
-            media=null;
-            if (messageDto.getText().isBlank()){
+        if (file == null || file.isEmpty()) {
+            media = null;
+            if (messageDto.getText().isBlank()) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
             }
-        }
-        else {
-            media=fileService.saveFile(file.getOriginalFilename(),file);
+        } else {
+            media = fileService.saveFile(file.getOriginalFilename(), file);
         }
         Message message = new Message();
         message.setText(messageDto.getText());
+        message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
@@ -138,7 +141,8 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
-        getMessageDto.setSendAt(message.getSendAt());
+        if (message.getRepliedMessage() != null)
+            getMessageDto.setRepliedMessageId(message.getRepliedMessage().getMessageId());
         return getMessageDto;
     }
 }

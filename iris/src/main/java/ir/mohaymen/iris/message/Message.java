@@ -37,7 +37,6 @@ public class Message {
 
     @JoinColumn(name = "origin_message_id")
     @ManyToOne
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Message originMessage;
 
     @JoinColumn(name = "userId")
