@@ -15,5 +15,5 @@ public interface ChatService {
     Chat createOrUpdate(Chat chat);
 
     void deleteById(Long id) throws Exception;
-    Long helloFromTheOtherSide (Chat chat ,Long userId);
+    Long getOtherPVUser(Chat chat , Long userId);
 }

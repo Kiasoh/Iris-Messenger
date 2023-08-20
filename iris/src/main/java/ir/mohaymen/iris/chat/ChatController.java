@@ -20,9 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,23 +37,31 @@ public class ChatController extends BaseController {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final MessageService messageService;
+    private final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
-        Set<Subscription> addedSubs = new HashSet<>();
-        chat.setSubs(addedSubs);
+        logger.info(MessageFormat.format("user with phone number:{0} wants to create chat ", getUserByToken().getPhoneNumber()));
+        if (!chat.getChatType().equals(ChatType.PV) && chat.getTitle().isBlank()) {
+            logger.error("non-PV chat must have title");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         chat.setCreatedAt(Instant.now());
-        chat = chatService.createOrUpdate(chat);
-        Subscription sub = new Subscription();
-        sub.setChat(chat);
-        sub.setUser(getUserByToken());
+        Chat savedChat = chatService.createOrUpdate(chat);
+        Subscription sub = new Subscription() {{
+            setChat(savedChat);
+            setUser(getUserByToken());
+        }};
+        //TODO:Permission set to owner
         subscriptionService.createOrUpdate(sub);
+        Set<Subscription> addedSubs = new HashSet<>();
         addedSubs.add(sub);
-        if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
+        if ((createChatDto.getUserIds().size() != 1 && savedChat.getChatType() == ChatType.PV))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         for (Long id : createChatDto.getUserIds()) {
-            chat = chatService.getById(chat.getChatId());
+            chat = chatService.getById(savedChat.getChatId());
             User user = userService.getById(id);
             if (chatService.isInChat(chat, user))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -91,20 +99,19 @@ public class ChatController extends BaseController {
 
     private ResponseEntity<GetChatDto> getGetChatDtoResponseEntity(Chat chat) {
         GetChatDto getChatDto = new GetChatDto();
-        if ( chat.getChatType() != ChatType.PV){
+        if (chat.getChatType() != ChatType.PV) {
             getChatDto = modelMapper.map(chat, GetChatDto.class);
             List<ProfileDto> profileDtoList = new ArrayList<>();
             if (chat.getChatProfiles() != null)
-                chat.getChatProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+                chat.getChatProfiles().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
             getChatDto.setProfileDtoList(profileDtoList);
             getChatDto.setSubCount(chat.getSubs().size());
-        }
-        else {
-            User user = userService.getById(chatService.helloFromTheOtherSide(chat , getUserByToken().getUserId()));
+        } else {
+            User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
             getChatDto.setChatId(chat.getChatId());
             getChatDto.setSubCount(2);
             List<ProfileDto> profileDtoList = new ArrayList<>();
-            user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+            user.getProfiles().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
             getChatDto.setProfileDtoList(profileDtoList);
             getChatDto.setBio(user.getBio());
             getChatDto.setLink(chat.getLink());
@@ -135,10 +142,9 @@ public class ChatController extends BaseController {
                     menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
                 }
                 menuChatDto.setUserFirstName(nameable.getFirstName());
-            }
-            else {
+            } else {
                 menuChatDto.setSentAt(chat.getCreatedAt());
-                User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
+                User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
                 Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
                 if (user.getProfiles().size() != 0) {
                     menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
@@ -148,7 +154,7 @@ public class ChatController extends BaseController {
             }
             menuChatDtos.add(menuChatDto);
         }
-        Collections.sort(menuChatDtos, (o1, o2) -> {
+        menuChatDtos.sort((o1, o2) -> {
             if (o1.getSentAt().isBefore(o2.getSentAt()))
                 return 1;
             return -1;
@@ -164,7 +170,4 @@ public class ChatController extends BaseController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    private Subscription createInternalSub(Chat chat , User user) {
-        return new Subscription();
-    }
 }
