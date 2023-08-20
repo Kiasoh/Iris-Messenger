@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.search;
+package ir.mohaymen.iris.search.message;
 
 import jakarta.persistence.Id;
 import lombok.Getter;

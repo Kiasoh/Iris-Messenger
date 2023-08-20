@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.search;
+package ir.mohaymen.iris.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +11,10 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "com.baeldung.spring.data.es.repository")
-@ComponentScan(basePackages = { "com.baeldung.spring.data.es.service" })
-public class Config extends AbstractElasticsearchConfiguration {
+@EnableElasticsearchRepositories(basePackages = "ir.mohaymen.iris.search.message.SearchMessageRepository")
+@ComponentScan(basePackages = { "ir.mohaymen.iris.search.message.SearchMessageService" })
+public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
+
     @Value("${application.elasticsearch.host}")
     private String host="localhost";
     @Bean
