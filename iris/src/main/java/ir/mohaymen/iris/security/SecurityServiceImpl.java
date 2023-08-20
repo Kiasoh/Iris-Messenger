@@ -53,7 +53,7 @@ public class SecurityServiceImpl implements SecurityService {
         Iterable<Message> messages = messageService.getByMedia(media);
 
         for (Message message : messages)
-            if (chatService.isInChat(message.getOriginChat(), user)) return true;
+            if (chatService.isInChat(message.getChat(), user)) return true;
 
         return false;
     }

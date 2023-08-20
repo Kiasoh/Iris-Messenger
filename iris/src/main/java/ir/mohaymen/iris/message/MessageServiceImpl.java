@@ -123,7 +123,7 @@ public class MessageServiceImpl implements MessageService {
         var chat = new Chat();
         chat.setChatId(chatId);
         var message = new Message();
-        message.setOriginChat(chat);
+        message.setChat(chat);
         return messageRepository.findAll(Example.of(message), Pageable.ofSize(pageSize).withPage(pageNum));
 //         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
     }

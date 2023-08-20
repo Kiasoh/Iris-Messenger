@@ -3,7 +3,6 @@ package ir.mohaymen.iris.message;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
-import ir.mohaymen.iris.chat.MenuChatDto;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.file.FileService;
@@ -19,14 +18,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -98,9 +94,13 @@ public class MessageController extends BaseController {
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
+        System.out.println(1);
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
         Message repliedMessage = messageService.getById(messageDto.getRepliedMessageId());
+
+        if (!repliedMessage.getChat().getChatId().equals(chat.getChatId()))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
         if (!chatService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
@@ -118,7 +118,7 @@ public class MessageController extends BaseController {
         Message message = new Message();
         message.setRepliedMessageId(repliedMessage);
         message.setText(messageDto.getText());
-        message.setOriginChat(chat);
+        message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
