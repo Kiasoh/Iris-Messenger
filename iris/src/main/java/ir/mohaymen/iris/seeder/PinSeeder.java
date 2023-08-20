@@ -44,7 +44,7 @@ public class PinSeeder implements Seeder {
         } while (messageIds.contains(messageId));
         Message message = messageRepository.findById(messageId).orElse(new Message());
 
-        Chat chat = message.getOriginChat();
+        Chat chat = message.getChat();
 
         List<Subscription> subscriptions = new ArrayList<>();
         subscriptionRepository.findAllByChat(chat).iterator().forEachRemaining(subscriptions::add);

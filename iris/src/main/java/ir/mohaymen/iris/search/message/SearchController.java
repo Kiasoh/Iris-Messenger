@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.search;
+package ir.mohaymen.iris.search.message;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/search")
+@RequestMapping("/api/search/message")
 public class SearchController {
 
     private final SearchMessageService searchMessageService;

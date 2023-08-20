@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 @RestControllerAdvice
@@ -35,6 +37,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> badData(Exception e) {
         log("bad data", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler({ SQLException.class, SQLDataException.class })
+    public ResponseEntity<?> dataBase(Exception e) {
+        log("SQL ERROR", e);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

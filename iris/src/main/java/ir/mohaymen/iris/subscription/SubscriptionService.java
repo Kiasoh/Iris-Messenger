@@ -1,20 +1,31 @@
 package ir.mohaymen.iris.subscription;
 
+import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.Nameable;
+
+import java.util.List;
 
 public interface SubscriptionService {
 
     Subscription getSubscriptionBySubscriptionId(Long subscriptionId);
 
-    Nameable setName(Iterable<Contact> contacts, User user);
+    Nameable setName(List<Contact> contacts, User user);
 
-    Iterable<Subscription> getAllSubscriptionByUserId(Long userId);
+    List<Subscription> getAllSubscriptionByUserId(Long userId);
 
-    Iterable<Subscription> getAllSubscriptionByChatId(Long chatId);
+    boolean isInChat(Chat chat , User user);
 
-    Iterable<Subscription> getAll();
+    Subscription getSubscriptionByChatAndUser(Chat chat , User user);
+
+    void updateLastSeenMessage(Long chatId , Long userId , Long messageId);
+
+    Integer subscriptionCount(Long chatId);
+
+    List<Subscription> getAllSubscriptionByChatId(Long chatId);
+
+    List<Subscription> getAll();
 
     Subscription createOrUpdate(Subscription subscription);
 

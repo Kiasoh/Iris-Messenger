@@ -2,9 +2,12 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
+import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
@@ -12,10 +15,13 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.Instant;
@@ -34,9 +40,10 @@ public class ProfileController extends BaseController {
     private final FileService fileService;
     private final Logger logger = LoggerFactory.getLogger(ProfileController.class);
     private final MediaService mediaService;
+    private final PermissionService permissionService;
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<List<ProfileDto>> getUserProfileById(@PathVariable Long id){
+    public ResponseEntity<List<ProfileDto>> getUserProfileById(@PathVariable Long id) {
         User user = userService.getById(id);
 
         List<ProfileDto> profiles = user.getProfiles().stream()
@@ -47,7 +54,7 @@ public class ProfileController extends BaseController {
     }
 
     @GetMapping("/chats/{id}")
-    public ResponseEntity<List<ProfileDto>> getChatProfileById(@PathVariable Long id){
+    public ResponseEntity<List<ProfileDto>> getChatProfileById(@PathVariable Long id) {
         Chat chat = chatService.getById(id);
 
         List<ProfileDto> profiles = chat.getChatProfiles().stream()
@@ -57,23 +64,29 @@ public class ProfileController extends BaseController {
         return new ResponseEntity<>(profiles, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/users", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}", user.getPhoneNumber(), file.getOriginalFilename()));
-        Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
-        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",
+                user.getPhoneNumber(), file.getOriginalFilename()));
+        Media media = fileService.saveFile(file.getOriginalFilename(), file);
+        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(media).build();
         userProfileService.createOrUpdate(userProfile);
         return ResponseEntity.ok("User profile added");
     }
-    @RequestMapping(path = "/chats/{id}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file,@PathVariable Long id) throws IOException {
+
+    @RequestMapping(path = "/chats/{id}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file, @PathVariable Long id)
+            throws IOException {
         User user = getUserByToken();
-        //TODO: check if user has permission
-        Chat chat=chatService.getById(id);
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1} for chat", user.getPhoneNumber(), file.getOriginalFilename()));
-        Long mediaId = fileService.saveFile(file.getOriginalFilename(), file);
-        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(Media.builder().mediaId(mediaId).build()).build();
+        if (!permissionService.hasAccess(user.getUserId(), id, Permission.CHANGE_CHAT_INFO)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        Chat chat = chatService.getById(id);
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1} for chat",
+                user.getPhoneNumber(), file.getOriginalFilename()));
+        Media media = fileService.saveFile(file.getOriginalFilename(), file);
+        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(media).build();
         chatProfileService.createOrUpdate(chatProfile);
 
         return ResponseEntity.ok("Chat profile added");

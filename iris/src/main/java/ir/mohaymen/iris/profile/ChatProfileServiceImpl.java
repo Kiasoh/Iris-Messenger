@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ChatProfileServiceImpl implements ChatProfileService {
@@ -25,7 +27,7 @@ public class ChatProfileServiceImpl implements ChatProfileService {
     }
 
     @Override
-    public Iterable<ChatProfile> getByChat(Chat chat) {
+    public List<ChatProfile> getByChat(Chat chat) {
         return chatProfileRepository.findByChat(chat);
     }
 
@@ -37,6 +39,12 @@ public class ChatProfileServiceImpl implements ChatProfileService {
     @Override
     public ChatProfile createOrUpdate(ChatProfile chatProfile) {
         return chatProfileRepository.save(chatProfile);
+    }
+
+    @Override
+    public ChatProfile getLastChatProfile(Chat chat) {
+//        return null;
+        return chatProfileRepository.findFirstByChatOrderByIdDesc(chat);
     }
 
     @Override

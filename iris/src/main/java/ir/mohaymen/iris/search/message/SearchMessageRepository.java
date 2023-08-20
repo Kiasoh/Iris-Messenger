@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.search;
+package ir.mohaymen.iris.search.message;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

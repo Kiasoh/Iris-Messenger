@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +28,12 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Iterable<Contact> getContactByFirstUser(User firstUser) {
+    public List<Contact> getContactByFirstUser(User firstUser) {
         return contactRepository.findByFirstUser(firstUser);
     }
     @Override
     public boolean isInContact (User firstUser , Long secondUserId) {
-        return firstUser.getContacts().stream().anyMatch(c -> c.getSecondUser().getUserId() == secondUserId);
+        return contactRepository.userInContact(firstUser.getUserId() , secondUserId);
     }
 
     @Override
@@ -56,6 +57,11 @@ public class ContactServiceImpl implements ContactService {
         for (Contact contact : contacts)
             users.add(contact.getSecondUser());
         return users;
+    }
+
+    @Override
+    public Contact getContact(Long firstUserId, Long secondUserId) {
+        return contactRepository.getContact(firstUserId , secondUserId);
     }
 
     @Override

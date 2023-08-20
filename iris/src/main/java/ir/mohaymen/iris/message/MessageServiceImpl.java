@@ -34,6 +34,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<Subscription> getSubSeen(Long messageId, Long chatId) {
+        return messageRepository.getSubSeen(messageId , chatId);
+    }
+
+    @Override
     public List<Subscription> usersSeen(Long messageId, Long chatId) {
         return messageRepository.usersSeen(messageId, chatId);
     }
@@ -49,13 +54,18 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Iterable<Message> getByChat(Chat chat) {
-        return messageRepository.findByOriginChat(chat);
+    public List<Message> getByChat(Chat chat) {
+        return messageRepository.findByChat(chat);
     }
 
     @Override
     public Iterable<Message> getByMedia(Media media) {
         return messageRepository.findAllByMedia(media);
+    }
+
+    @Override
+    public Iterable<Message> getByReplyMessage(Message message) {
+        return messageRepository.findByRepliedMessage(message);
     }
 
     @Override
@@ -80,7 +90,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void deleteByChat(Chat chat) {
-        messageRepository.deleteByOriginChat(chat);
+        messageRepository.deleteByChat(chat);
     }
 
     public Iterable<Message> getByUser(Long userId) {
@@ -114,12 +124,19 @@ public class MessageServiceImpl implements MessageService {
     }
 
     public Page<Message> getMessagesByPage(Long chatId, int pageNum, int pageSize) {
-//        Iterable<Message> messages = getByChat(chatId);
+        // Iterable<Message> messages = getByChat(chatId);
         var chat = new Chat();
         chat.setChatId(chatId);
         var message = new Message();
-        message.setOriginChat(chat);
+        message.setChat(chat);
         return messageRepository.findAll(Example.of(message), Pageable.ofSize(pageSize).withPage(pageNum));
-//         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
+        // messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
+    }
+    @Override
+    public Message getLastMessageByChatId(Long chatId){
+        return messageRepository.getLastMessageByChatId(chatId).get(0);
+    }
+    public Message getLastMessageByChatId(Chat chat) {
+        return messageRepository.findFirstByChatOrderByMessageIdDesc(chat);
     }
 }
