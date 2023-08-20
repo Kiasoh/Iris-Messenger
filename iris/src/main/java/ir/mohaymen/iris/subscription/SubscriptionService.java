@@ -14,6 +14,7 @@ public interface SubscriptionService {
 
     List<Subscription> getAllSubscriptionByUserId(Long userId);
 
+    Integer subscriptionCount(Long chatId);
 
     List<Subscription> getAllSubscriptionByChatId(Long chatId);
 

@@ -42,6 +42,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.findSubscriptionByUser(user);
     }
 
+    @Override
+    public Integer subscriptionCount(Long chatId) {
+        return subscriptionRepository.subscriptionCount(chatId);
+    }
+
 
     @Override
     public List<Subscription> getAllSubscriptionByChatId(Long chatId) {

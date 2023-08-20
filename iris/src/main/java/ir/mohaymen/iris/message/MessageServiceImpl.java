@@ -127,4 +127,8 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.findAll(Example.of(message), Pageable.ofSize(pageSize).withPage(pageNum));
 //         messageRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNum));
     }
+    @Override
+    public Message getLastMessageByChatId(Long chatId){
+        return messageRepository.getLastMessageByChatId(chatId);
+    }
 }

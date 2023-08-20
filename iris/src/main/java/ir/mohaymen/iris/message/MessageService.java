@@ -26,6 +26,7 @@ public interface MessageService {
     Iterable<Message> getByReplyMessage(Message message);
 
     Message createOrUpdate(Message message);
+    Message getLastMessageByChatId(Long chatId);
 
     void deleteById(Long id);
 
