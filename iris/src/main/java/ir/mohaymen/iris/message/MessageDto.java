@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -13,8 +14,6 @@ public class MessageDto {
     private String text;
     @NotNull
     private Long chatId;
-    private String fileName;
-    private String fileContentType;
-    private String filePath;
+    private MultipartFile file;
 }
 

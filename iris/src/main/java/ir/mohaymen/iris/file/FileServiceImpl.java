@@ -27,13 +27,14 @@ public class FileServiceImpl implements FileService {
     private String path = "files";
 
     @Override
-    public Long saveFile(String inputFileName, MultipartFile multipartFile) throws IOException {
+    public Media saveFile(String inputFileName, MultipartFile multipartFile) throws IOException {
         String fileName = StringUtils.cleanPath(inputFileName);
         Path uploadPath = Paths.get(path);
 
-        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+        if (!Files.exists(uploadPath))
+            Files.createDirectories(uploadPath);
 
-        Long id;
+        Media media;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Media savedMedia = mediaService.createOrUpdate(Media.builder()
@@ -44,7 +45,7 @@ public class FileServiceImpl implements FileService {
 
             savedMedia.setFilePath("/api/media/download/" + savedMedia.getMediaId());
             savedMedia = mediaService.createOrUpdate(savedMedia);
-            id = savedMedia.getMediaId();
+            media = savedMedia;
             String fileCode = generateFileCodeByMediaId(savedMedia.getMediaId());
             String savedFileName = fileCode + "-" + fileName;
             Path filePath = uploadPath.resolve(savedFileName);
@@ -53,21 +54,23 @@ public class FileServiceImpl implements FileService {
             throw new IOException("Could not save file: " + fileName, ioe);
         }
 
-        return id;
+        return media;
     }
 
     private String generateFileCodeByMediaId(Long id) {
         return Long.toString(1000_000L + id);
     }
 
-
     @Override
     public Resource getFileAsResource(Long id) throws IOException {
         Path foundFile = getPathById(id);
 
-        if (foundFile != null) return new UrlResource(foundFile.toUri());
-        else return null;
+        if (foundFile != null)
+            return new UrlResource(foundFile.toUri());
+        else
+            return null;
     }
+
     public void deleteFile(Long id) throws IOException {
         Path foundFile = getPathById(id);
         if (foundFile == null)
@@ -78,8 +81,7 @@ public class FileServiceImpl implements FileService {
         String fileCode = generateFileCodeByMediaId(id);
         Path dirPath = Paths.get(path);
 
-        Path foundFile = Files.list(dirPath).
-                filter(file -> file.getFileName().startsWith(fileCode))
+        Path foundFile = Files.list(dirPath).filter(file -> file.getFileName().toString().startsWith(fileCode))
                 .findFirst()
                 .orElse(null);
         return foundFile;
