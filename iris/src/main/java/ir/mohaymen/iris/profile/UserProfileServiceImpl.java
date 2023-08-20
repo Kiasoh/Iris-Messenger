@@ -1,8 +1,8 @@
 package ir.mohaymen.iris.profile;
 
+import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public Iterable<UserProfile> getAll() {
         return userProfileRepository.findAll();
+    }
+
+    @Override
+    public boolean isProfilePicture(Media media) {
+        return userProfileRepository.existsByMedia(media);
     }
 
     @Override

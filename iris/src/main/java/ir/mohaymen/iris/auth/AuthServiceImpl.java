@@ -1,18 +1,15 @@
 package ir.mohaymen.iris.auth;
 
 import ir.mohaymen.iris.code.ActivationCode;
-import ir.mohaymen.iris.code.ActivationCodeRepository;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
-import ir.mohaymen.iris.user.User;
-import ir.mohaymen.iris.user.UserDto;
-import ir.mohaymen.iris.user.UserMapper;
-import ir.mohaymen.iris.user.UserRepository;
+import ir.mohaymen.iris.user.*;
 import ir.mohaymen.iris.utility.CodeGenerator;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,18 +21,29 @@ import java.text.MessageFormat;
 import java.time.Instant;
 
 @Service
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final CodeGenerator codeGenerator;
     private final ModelMapper mapper;
     private final SMSService smsService;
-    private final ActivationCodeRepository activationCodeRepository;
+    private final UserService userService;
+    private final Cache cache;
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
+
+    public AuthServiceImpl(UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, ModelMapper mapper, SMSService smsService, UserService userService, CacheManager cacheManager) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.mapper = mapper;
+        this.smsService = smsService;
+        this.userService = userService;
+        this.cache= cacheManager.getCache("activationCodes");
+    }
 
     private AuthDto register(String phoneNumber) {
         var user = User.builder()
@@ -72,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
             jwtToken = result.getAccessToken();
             refreshToken = result.getRefreshToken();
             isRegistered = true;
-            userDto=result.getUser();
+            userDto = result.getUser();
         } else {
             var user = userRepository.findByPhoneNumber(loginDto.getPhoneNumber())
                     .orElseThrow();
@@ -85,7 +93,8 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getPhoneNumber(), "password"));
-        deleteAllOldCodes(loginDto.getPhoneNumber());
+        cache.evictIfPresent(loginDto.getPhoneNumber());
+        userService.setOnline(userDto.getUserId());
         logger.info(MessageFormat.format("user phone number:{0} registered refresh_token:{1} jwt_token:{2} logined",
                 loginDto.getPhoneNumber(), refreshToken, jwtToken));
         return AuthDto.builder()
@@ -97,12 +106,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private boolean isActiveCodeValid(LoginDto loginDto) {
-        var activeCodeObj = activationCodeRepository.findByCode(loginDto.getActivationCode()).orElseThrow(() -> {
-            logger.warn(MessageFormat.format("user phone number:{0} entered {1} as activation code incorrectly",
-                    loginDto.getPhoneNumber(), loginDto.getActivationCode()));
+        ActivationCode activeCodeObj = cache.get(loginDto.getPhoneNumber(), ActivationCode.class);
+        if (activeCodeObj == null) {
+            logger.warn(MessageFormat.format("user phone number:{0} entered {1} as activation code while has no activation code", loginDto.getPhoneNumber(), loginDto.getActivationCode()));
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        });
-        return activeCodeObj.getPhoneNumber().equals(loginDto.getPhoneNumber());
+        }
+
+        boolean correct = activeCodeObj.getCode().equals(loginDto.getActivationCode());
+        if (!correct) {
+            logger.warn(MessageFormat.format("user phone number:{0} entered {1} as activation code incorrectly", loginDto.getPhoneNumber(), loginDto.getActivationCode()));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        return true;
     }
 
     private void saveUserToken(User user, Token token) {
@@ -127,24 +142,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public String sendActivationCode(String phoneNumber) {
-        if (activationCodeRepository.findByPhoneNumber(phoneNumber).isPresent())
-            return "retry later";
-        String activationCode;
-        do {
-            activationCode = codeGenerator.generateActivationCode();
-        } while (activationCodeRepository.findByCode(activationCode).isPresent());
+        ActivationCode oldCode = cache.get(phoneNumber, ActivationCode.class);
+        if (oldCode != null)
+            return oldCode.getCode();
+        String activationCode = CodeGenerator.generateActivationCode();
         ActivationCode codeObj = ActivationCode.builder()
                 .phoneNumber(phoneNumber)
                 .code(activationCode)
                 .build();
-        activationCodeRepository.save(codeObj);
+        cache.put(phoneNumber, codeObj);
         smsService.sendSms(phoneNumber, "کد فعالسازی شما:" + activationCode);
         return activationCode;
-    }
-
-    private void deleteAllOldCodes(String phoneNumber) {
-        var oldCodes = activationCodeRepository.findAllByPhoneNumber(phoneNumber);
-        activationCodeRepository.deleteAll(oldCodes);
     }
 
 }

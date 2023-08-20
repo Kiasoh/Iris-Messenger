@@ -24,7 +24,9 @@ public class MessageSeeder implements Seeder {
     private final MessageRepository messageRepository;
     private final SubscriptionRepository subscriptionRepository;
 
-    static final int NUMBER_OF_INSTANCES = 2000 + PVSeeder.NUMBER_OF_INSTANCES * 2;
+    private static final int NUMBER_OF_CHAT_MESSAGES = 2000;
+    private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
+    static final int NUMBER_OF_INSTANCES = NUMBER_OF_CHAT_MESSAGES + NUMBER_OF_PV_MESSAGES;
     private final List<Message> messages = new ArrayList<>();
     private final Set<Long> mediaIds = new HashSet<>();
 
@@ -33,26 +35,28 @@ public class MessageSeeder implements Seeder {
         if (messageRepository.count() != 0)
             return;
 
-        for (int i = 0; i < NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2; i++)
-            generateRandomMessage();
-        for (int i = 0; i < PVSeeder.NUMBER_OF_INSTANCES * 2; i++)
+        for (int i = 0; i < NUMBER_OF_CHAT_MESSAGES; i++)
+            generateRandomMessageForChat();
+        for (int i = 0; i < NUMBER_OF_PV_MESSAGES; i++)
             generateMessageForPV(i + 1);
+        messages.sort(Comparator.comparing(Message::getSendAt));
         messageRepository.saveAll(messages);
     }
 
-    private void generateRandomMessage() {
+    private void generateRandomMessageForChat() {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
         long subscriptionId = faker.random().nextInt(1, SubscriptionSeeder.NUMBER_OF_INSTANCES);
         Subscription subscription = subscriptionRepository.findById(subscriptionId).orElse(new Subscription());
+
         generateMessage(subscription, id);
     }
 
     private void generateMessageForPV(long pvId) {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
 
-        Subscription subscription = subscriptionRepository
-                .findById(pvId + NUMBER_OF_INSTANCES - PVSeeder.NUMBER_OF_INSTANCES * 2).orElse(new Subscription());
+        Subscription subscription = subscriptionRepository.findById(SubscriptionSeeder.NUMBER_OF_INSTANCES + pvId).orElse(new Subscription());
+
         generateMessage(subscription, id);
     }
 
@@ -102,7 +106,7 @@ public class MessageSeeder implements Seeder {
         if (seed % 7 == 2 || seed % 7 == 6) {
             long mediaId;
             do {
-                mediaId = faker.random().nextInt(1, 1000);
+                mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
             } while (mediaIds.contains(mediaId));
             media.setMediaId(mediaId);
             mediaIds.add(mediaId);

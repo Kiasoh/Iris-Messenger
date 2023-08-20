@@ -2,6 +2,7 @@ package ir.mohaymen.iris.profile;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
+import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.user.User;
@@ -29,16 +30,17 @@ public class ProfileController extends BaseController {
     private final ChatProfileService chatProfileService;
     private final UserProfileService userProfileService;
     private final UserService userService;
-    private final MediaService mediaService;
     private final ChatService chatService;
-    private final Logger logger= LoggerFactory.getLogger(ProfileController.class);
+    private final FileService fileService;
+    private final Logger logger = LoggerFactory.getLogger(ProfileController.class);
+    private final MediaService mediaService;
 
     @GetMapping("/users/{id}")
     public ResponseEntity<List<ProfileDto>> getUserProfileById(@PathVariable Long id){
         User user = userService.getById(id);
 
         List<ProfileDto> profiles = user.getProfiles().stream()
-                .map(profile -> ProfileMapper.mapToProfileDto(profile))
+                .map(ProfileMapper::mapToProfileDto)
                 .toList();
 
         return new ResponseEntity<>(profiles, HttpStatus.OK);
@@ -55,23 +57,25 @@ public class ProfileController extends BaseController {
         return new ResponseEntity<>(profiles, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(path = "/users", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",user.getPhoneNumber(),file.getOriginalFilename()));
-        Media media = Media.builder().fileMimeType(file.getContentType()).fileName(file.getOriginalFilename()).filePath("file.getResource().getURI().toString()").build();
-        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(mediaService.createOrUpdate(media)).build();
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}", user.getPhoneNumber(), file.getOriginalFilename()));
+        Media media = fileService.saveFile(file.getOriginalFilename(), file);
+        UserProfile userProfile = UserProfile.builder().user(user).setAt(Instant.now()).media(media).build();
         userProfileService.createOrUpdate(userProfile);
         return ResponseEntity.ok("User profile added");
     }
-
     @RequestMapping(path = "/chats/{id}", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file, @PathVariable Long id){
-        Chat chat = chatService.getById(id);
-        Media media = Media.builder().fileName(file.getOriginalFilename()).filePath("not set yet").fileMimeType(file.getContentType()).build();
-        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(mediaService.createOrUpdate(media)).build();
+    public ResponseEntity<String> addChatProfile(@RequestPart("file") MultipartFile file,@PathVariable Long id) throws IOException {
+        User user = getUserByToken();
+        //TODO: check if user has permission
+        Chat chat=chatService.getById(id);
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1} for chat", user.getPhoneNumber(), file.getOriginalFilename()));
+        Media media = fileService.saveFile(file.getOriginalFilename(), file);
+        ChatProfile chatProfile = ChatProfile.builder().chat(chat).setAt(Instant.now()).media(media).build();
         chatProfileService.createOrUpdate(chatProfile);
+
         return ResponseEntity.ok("Chat profile added");
     }
-
 }

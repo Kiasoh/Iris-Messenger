@@ -3,6 +3,7 @@ package ir.mohaymen.iris.contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -23,19 +24,23 @@ public class ContactController extends BaseController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/add-contact")
-    public ResponseEntity<PostContactDto> addContact(@RequestBody GetContactDto getContactDto) {
+    public ResponseEntity<PostContactDto> addContact(@RequestBody @Valid GetContactDto getContactDto) {
         if (contactService.isInContact(getUserByToken() , getContactDto.getContactId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         Contact contact = modelMapper.map(getContactDto, Contact.class);
         contact.setSecondUser(userService.getById(getContactDto.getContactId()));
         contactService.createOrUpdate(contact);
-        return new ResponseEntity<>(modelMapper.map(contact , PostContactDto.class) , HttpStatus.OK);
+        PostContactDto postContactDto = modelMapper.map(contact , PostContactDto.class);
+        postContactDto.setSecondUserId(contact.getSecondUser().getUserId());
+        return new ResponseEntity<>( postContactDto , HttpStatus.OK);
     }
     @GetMapping("/get-contacts")
     public ResponseEntity<List<PostContactDto>> getContacts() {
         List<PostContactDto> pcdtl = new ArrayList<>();
         for (Contact con: getUserByToken().getContacts() ) {
-            pcdtl.add(modelMapper.map(con , PostContactDto.class));
+            PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
+            postContactDto.setSecondUserId(con.getSecondUser().getUserId());
+            pcdtl.add(postContactDto);
         }
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
@@ -47,8 +52,11 @@ public class ContactController extends BaseController {
     }
     public PostContactDto getContactFromList(User user , Long userId) throws Exception {
         for (Contact con: user.getContacts())
-            if (con.getSecondUser().getUserId() == userId)
-                return modelMapper.map(con , PostContactDto.class);
+            if (con.getSecondUser().getUserId() == userId){
+                PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
+                postContactDto.setSecondUserId(con.getSecondUser().getUserId());
+                return postContactDto;
+            }
         throw new Exception();
     }
 }

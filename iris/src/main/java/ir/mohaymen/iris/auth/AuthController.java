@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.auth;
 
+import ir.mohaymen.iris.user.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;

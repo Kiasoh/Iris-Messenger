@@ -2,16 +2,18 @@ package ir.mohaymen.iris.message;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.media.Media;
+import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,16 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public long countUnSeenMessages(Long lastSeenMessageId, Long chatId) {
+        return messageRepository.countUnSeenMessages(lastSeenMessageId, chatId);
+    }
+
+    @Override
+    public List<Subscription> usersSeen(Long messageId, Long chatId) {
+        return messageRepository.usersSeen(messageId, chatId);
+    }
+
+    @Override
     public Iterable<Message> getAll() {
         return messageRepository.findAll();
     }
@@ -39,6 +51,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Iterable<Message> getByChat(Chat chat) {
         return messageRepository.findByOriginChat(chat);
+    }
+
+    @Override
+    public Iterable<Message> getByMedia(Media media) {
+        return messageRepository.findAllByMedia(media);
     }
 
     @Override

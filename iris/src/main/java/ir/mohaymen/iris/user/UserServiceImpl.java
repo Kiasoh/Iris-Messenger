@@ -1,10 +1,10 @@
 package ir.mohaymen.iris.user;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Iterable<User> getAll() {
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
@@ -61,6 +61,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteByPhoneNumber(String phoneNumber) {
         userRepository.deleteByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public void setOnline(Long userId) {
+        var user=getById(userId);
+        user.setLastSeen(Instant.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void setOnline(String phoneNumber) {
+        var user=getByPhoneNumber(phoneNumber);
+        user.setLastSeen(Instant.now());
+        userRepository.save(user);
     }
 
     public Iterable<User> getById(List<Long> ids) {

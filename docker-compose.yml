@@ -2,23 +2,25 @@ services:
   api:
     build:
       context: .
-      dockerfile: ./iris/Dockerfile
+      dockerfile: ./Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - db
-      - redis
+      - elastic
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iris
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=toor
       - SPRING_JWT_SECRET_KEY=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      - REDIS_HOST=redis
       - RAYGAN_SMS_SENDER_NUMBER=null
       - RAYGAN_SMS_USERNAME=null
       - RAYGAN_SMS_PASSWORD=null
+      - ELASTIC_HOST=elastic
     restart: unless-stopped
-
+    volumes:
+      - 'app_files:/app/files'
+      - 'app_logs:/app/logs'
   db:
     image: 'postgres:latest'
     environment:
@@ -30,14 +32,19 @@ services:
     restart: unless-stopped
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
-  redis:
-    image: 'redis/redis-stack:latest'
+  elastic:
+    image: elasticsearch:7.17.9
+    environment:
+      - 'discovery.type=single-node'
+      - 'xpack.security.enabled=false'
     ports:
-      - "6379:6379"
-      - "8001:8001"
+      - "9200:9200"
     restart: unless-stopped
     volumes:
-      - "redis_data:/data"
+      - "elastic_data:/usr/share/elasticsearch/data"
+
 volumes:
-  redis_data:
   postgres_data:
+  app_files:
+  app_logs:
+  elastic_data:

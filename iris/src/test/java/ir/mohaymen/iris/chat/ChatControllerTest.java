@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashSet;
+
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class ChatControllerTest {
@@ -34,8 +36,8 @@ class ChatControllerTest {
         chat3.setChatType(ChatType.CHANNEL);
         user1 = userService.createOrUpdate(user1);
         chat1 = chatService.createOrUpdate(chat1); chat2 = chatService.createOrUpdate(chat2);chat3 = chatService.createOrUpdate(chat3);
-        Subscription sub = new Subscription(null, userService.getById(user1.getUserId()) , chat1);
-        Subscription sub1 = new Subscription(null, user1 , chat1);
+        Subscription sub = new Subscription(null, userService.getById(user1.getUserId()) , chat1,0L);
+        Subscription sub1 = new Subscription(null, user1 , chat1,0L);
         sub = subscriptionService.createOrUpdate(sub);
         subscriptionService.createOrUpdate(sub1);
         subscriptionService.createOrUpdate(sub1);

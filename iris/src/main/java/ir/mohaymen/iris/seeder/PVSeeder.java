@@ -28,7 +28,7 @@ public class PVSeeder implements Seeder {
         if (chatRepository.count() >= ChatSeeder.NUMBER_OF_INSTANCES + NUMBER_OF_INSTANCES) return;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
-            generateRandomChat();
+            generateRandomPV();
         savedChats = chatRepository.saveAll(pvs);
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
@@ -36,12 +36,12 @@ public class PVSeeder implements Seeder {
         subscriptionRepository.saveAll(subscriptionList);
     }
 
-    private void generateRandomChat() {
+    private void generateRandomPV() {
         long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         String title = null;
         String link = null;
         ChatType chatType = ChatType.PV;
-        String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |,|\\.){5,50}") : null;
+        String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |_|,|\\.){5,50}") : null;
         boolean isPublic = false;
 
         Chat chat = new Chat();
@@ -54,7 +54,7 @@ public class PVSeeder implements Seeder {
         pvs.add(chat);
     }
 
-    private void generateRandomSubscription(int i) {
+    private void generateRandomSubscription(int chatId) {
         long userId1 = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         long userId2;
         do {
@@ -67,7 +67,7 @@ public class PVSeeder implements Seeder {
         user2.setUserId(userId2);
 
 
-        Chat chat = savedChats.get(i);
+        Chat chat = savedChats.get(chatId);
 
         Subscription subscription1 = new Subscription();
         subscription1.setUser(user1);

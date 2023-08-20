@@ -1,5 +1,7 @@
 package ir.mohaymen.iris.user;
 
+import java.util.List;
+
 public interface UserService {
 
     User getById(Long id);
@@ -12,7 +14,7 @@ public interface UserService {
 
     User getByUserName(String userName);
 
-    Iterable<User> getAll();
+    List<User> getAll();
 
     User createOrUpdate(User user);
 
@@ -21,4 +23,6 @@ public interface UserService {
     void deleteByUserName(String userName);
 
     void deleteByPhoneNumber(String phoneNumber);
+    void setOnline(Long userId);
+    void setOnline(String phoneNumber);
 }

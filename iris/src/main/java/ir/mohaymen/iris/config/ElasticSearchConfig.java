@@ -1,4 +1,4 @@
-package ir.mohaymen.iris.config;
+package ir.mohaymen.iris.search;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +14,13 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @ComponentScan(basePackages = { "ir.mohaymen.iris.search.message.SearchMessageService" })
 public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
 
+    @Value("${application.elasticsearch.host}")
+    private String host="localhost";
     @Bean
     @Override
     public RestHighLevelClient elasticsearchClient(){
         ClientConfiguration clientConfiguration = ClientConfiguration.builder()
-                .connectedTo("localhost:9200")
+                .connectedTo(host+":9200")
                 .build();
 
         return RestClients.create(clientConfiguration)

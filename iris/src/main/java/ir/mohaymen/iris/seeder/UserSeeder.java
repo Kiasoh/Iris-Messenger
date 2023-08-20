@@ -22,11 +22,10 @@ public class UserSeeder implements Seeder {
     public void load() {
         if (userRepository.count() != 0) return;
 
-
-        generateUser("ali", "hoseini", null, "0910", "something", users);
+        generateUser("ali", "hoseini", null, "0910", "something");
         for (int i = 0; i < NUMBER_OF_INSTANCES - 1; i++)
             generateRandomUser();
-        generateUser("sadegh", "poolaiii", "poolai_23", "0911", null, users);
+        generateUser("sadegh", "poolaiii", "poolai_23", "0911", null);
         userRepository.saveAll(users);
     }
 
@@ -37,8 +36,12 @@ public class UserSeeder implements Seeder {
         String lastName = id % 4 == 2 ? name.lastName() : null;
         String userName = id % 5 == 3 ? name.username() + faker.regexify("(\\d|_){1,10}") : null;
         String phoneNumber = faker.phoneNumber().cellPhone().replaceAll("\\s", "");
-        String bio = id % 3 == 0 ? name.title() + faker.regexify("[\\w\\d\\s_,\\.]{1,50}") : null;
+        String bio = id % 3 == 0 ? name.title() + faker.regexify("(\\w|\\d| |_|,|\\.){1,50}") : null;
 
+        generateUser(firstName, lastName, userName, phoneNumber, bio);
+    }
+
+    private void generateUser(String firstName, String lastName, String userName, String phoneNumber, String bio) {
         User user = new User();
         user.setUserName(userName);
         user.setFirstName(firstName);
@@ -47,16 +50,5 @@ public class UserSeeder implements Seeder {
         user.setBio(bio);
 
         users.add(user);
-    }
-
-    private void generateUser(String firstName, String lastName, String userName, String phoneNumber, String bio, List<User> userList) {
-        User user = new User();
-        user.setUserName(userName);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPhoneNumber(phoneNumber);
-        user.setBio(bio);
-
-        userList.add(user);
     }
 }

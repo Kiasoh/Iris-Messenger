@@ -3,12 +3,17 @@ package ir.mohaymen.iris.chat;
 import ir.mohaymen.iris.user.User;
 
 public interface ChatService {
-    boolean isInChat(Chat chat, User user);
+
     Chat getById(Long id);
 
+    Chat getByLink(String link);
+
     Iterable<Chat> getAll();
+
+    boolean isInChat(Chat chat, User user);
 
     Chat createOrUpdate(Chat chat);
 
     void deleteById(Long id) throws Exception;
+    Long helloFromTheOtherSide (Chat chat ,Long userId);
 }

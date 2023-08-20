@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostContactDto {
     private Long id;
-    private User secondUser;
+    private Long secondUserId;
     private String firstName;
     private String lastName;
 }

@@ -6,12 +6,14 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,7 @@ public class PinController extends BaseController {
     private final PinService pinService;
 
     @PostMapping("/pin-message")
-    public ResponseEntity<Pin> pinMessage (@RequestBody PinDto pinDto) {
+    public ResponseEntity<GetPinDto> pinMessage (@RequestBody @Valid PinDto pinDto) {
         Chat chat = chatService.getById(pinDto.getChatId());
         Message message = messageService.getById(pinDto.getMessageId());
         if(!chatService.isInChat(chat , getUserByToken()) || message.getOriginChat()!=chat)
@@ -33,13 +35,19 @@ public class PinController extends BaseController {
         pin.setUser(getUserByToken());
         pin.setMessage(message);
         pin.setChat(chat);
-        pinService.createOrUpdate(pin);
-        return new ResponseEntity<Pin>(pin , HttpStatus.OK);
+        pin = pinService.createOrUpdate(pin);
+        GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessageId(pin.getPinId());
+        return new ResponseEntity<GetPinDto>(getPinDto , HttpStatus.OK);
     }
-    @GetMapping("/pinned-messages-of-one-chat")
-    public ResponseEntity<List<Pin>> allPinnedMessagesOfOneChat(@RequestBody Long chatId) {
+    @GetMapping("/pinned-messages-of-one-chat/{chatId}")
+    public ResponseEntity<List<GetPinDto>> allPinnedMessagesOfOneChat(@PathVariable Long chatId) {
         if(!chatService.isInChat(chatService.getById(chatId) , getUserByToken()))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>((List<Pin>) pinService.getByChat(chatService.getById(chatId)) , HttpStatus.OK);
+        List<GetPinDto> getPinDtoList = new ArrayList<>();
+        for (Pin pin:pinService.getByChat(chatService.getById(chatId))) {
+            GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessageId(pin.getPinId());
+            getPinDtoList.add(getPinDto);
+        }
+        return new ResponseEntity<>(getPinDtoList , HttpStatus.OK);
     }
 }
