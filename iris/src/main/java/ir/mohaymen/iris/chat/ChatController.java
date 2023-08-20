@@ -49,6 +49,8 @@ public class ChatController extends BaseController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         chat.setCreatedAt(Instant.now());
+        if (chat.getChatType() == ChatType.PV)
+            chat.setPublic(false);
         createInternalSub(chat , getUserByToken());
         chat = chatService.createOrUpdate(chat);
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
