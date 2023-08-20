@@ -27,10 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.text.MessageFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -47,6 +44,19 @@ public class ChatController extends BaseController {
     private final ContactService contactService;
     private final UserProfileService userProfileService;
     private final Logger logger = LoggerFactory.getLogger(ChatController.class);
+
+    @PutMapping("/edit-chat-info")
+    public ResponseEntity<?> editChatInfo(@RequestBody EditChatDto editChatDto) {
+        Chat chat = chatService.getById(editChatDto.getId());
+        chat.setBio(editChatDto.getBio());
+        chat.setTitle(editChatDto.getTitle());
+        chat.setLink(editChatDto.getLink());
+        if (chat.isPublic() && !editChatDto.isPublic())
+            chat.setLink(UUID.randomUUID().toString());
+        chat.setPublic(editChatDto.isPublic());
+        chatService.createOrUpdate(chat);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("/create-chat")
     @Transactional
