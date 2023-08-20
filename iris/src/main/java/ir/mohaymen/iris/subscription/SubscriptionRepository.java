@@ -17,7 +17,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     List<Subscription> findAllByChat(Chat chat);
 
     @Query("""
-            select 1
+            SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END 
             from Subscription sub
             where sub.chat.chatId=:chatId and sub.user.userId=:userId
             """)

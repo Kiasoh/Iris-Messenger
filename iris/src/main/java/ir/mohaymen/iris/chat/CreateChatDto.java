@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -19,5 +20,5 @@ public class CreateChatDto {
     private boolean isPublic;
     @NotNull
     private ChatType chatType;
-    private List<Long> userIds;
+    private Set<Long> userIds;
 }

@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -50,14 +51,16 @@ public class ChatController extends BaseController {
             logger.error("non-PV chat must have title");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV)){
+            logger.error("PV chat must have one user id in user ids");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         chat.setCreatedAt(Instant.now());
         chat = chatService.createOrUpdate(chat);
-        if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        for (Long id : createChatDto.getUserIds()) {
+        Set<Long> userIds=createChatDto.getUserIds();
+        userIds.add(getUserByToken().getUserId());
+        for (Long id : userIds) {
             User user = userService.getById(id);
-            if (chatService.isInChat(chat, user))
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             try {
                 createInternalSub(chat, user);
             } catch (Exception ex) {
