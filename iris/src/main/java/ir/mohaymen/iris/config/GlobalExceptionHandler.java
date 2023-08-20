@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler({SQLException.class, SQLDataException.class})
+    @ExceptionHandler({ SQLException.class, SQLDataException.class })
     public ResponseEntity<?> dataBase(Exception e) {
         log("SQL ERROR", e);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -53,7 +53,18 @@ public class GlobalExceptionHandler {
 
     private void log(String msg, Exception e) {
         logger.error(msg + " exception message:" + e.getMessage());
-        var stackTrace = Arrays.stream(e.getStackTrace()).limit(50).map(StackTraceElement::toString)
+        var stackTraces = e.getStackTrace();
+        int i;
+        for (i = 0; i < stackTraces.length; i++) {
+            if (stackTraces[i].getClassName().contains("Controller")) {
+                i += 2;
+                break;
+            }
+        }
+
+        var stackTrace = Arrays.stream(e.getStackTrace())
+                .limit(i)
+                .map(StackTraceElement::toString)
                 .toArray(String[]::new);
         logger.error(String.join("\n", stackTrace));
     }
