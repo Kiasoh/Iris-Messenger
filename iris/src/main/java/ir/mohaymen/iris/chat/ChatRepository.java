@@ -24,7 +24,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 //    )
 //    from User u join Subscription sub on u.userId=sub.user.userId
 //    join Chat c on sub.chat.chatId=c.chatId
-//    join Message m on c.chatId=m.originChat.chatId
+//    join Message m on c.chatId=m.chat.chatId
 //    where u.userId=:userId
 //    order by m.messageId desc
 //""")

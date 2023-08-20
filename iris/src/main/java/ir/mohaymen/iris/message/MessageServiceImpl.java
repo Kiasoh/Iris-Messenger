@@ -50,7 +50,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Iterable<Message> getByChat(Chat chat) {
-        return messageRepository.findByOriginChat(chat);
+        return messageRepository.findByChat(chat);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Iterable<Message> getByReplyMessage(Message message) {
-        return messageRepository.findByRepliedMessageId(message);
+        return messageRepository.findByRepliedMessage(message);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void deleteByChat(Chat chat) {
-        messageRepository.deleteByOriginChat(chat);
+        messageRepository.deleteByChat(chat);
     }
 
     public Iterable<Message> getByUser(Long userId) {
