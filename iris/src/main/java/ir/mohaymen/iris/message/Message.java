@@ -35,7 +35,7 @@ public class Message {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
 
-    @JoinColumn(name = "origin_chat_id")
+    @JoinColumn(name = "origin_message_id")
     @ManyToOne
 //    @OnDelete(action = OnDeleteAction.CASCADE)
     private Message originMessage;
