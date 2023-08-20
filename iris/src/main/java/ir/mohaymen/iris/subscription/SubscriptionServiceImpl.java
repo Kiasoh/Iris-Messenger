@@ -43,6 +43,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    public Subscription getSubscriptionByChatAndUser(Chat chat, User user) {
+        return subscriptionRepository.findSubscriptionByChatAndUser(chat , user);
+    }
+
+    @Override
     public void updateLastSeenMessage(Long chatId, Long userId, Long messageId) {
         subscriptionRepository.updateLastSeenMessage(chatId, userId, messageId);
     }

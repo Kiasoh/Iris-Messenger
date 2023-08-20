@@ -12,5 +12,5 @@ public interface ChatProfileRepository extends JpaRepository<ChatProfile, Long> 
 
     List<ChatProfile> findAllByMedia(Media media);
 
-    ChatProfile findFirstByChatOrderByIdChatDesc(Chat chat);
+    ChatProfile findFirstByChatOrderByIdDesc(Chat chat);
 }

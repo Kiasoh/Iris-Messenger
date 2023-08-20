@@ -48,8 +48,8 @@ public class ChatController extends BaseController {
         chat.setCreatedAt(Instant.now());
         if (chat.getChatType() == ChatType.PV)
             chat.setPublic(false);
-        createInternalSub(chat , getUserByToken());
         chat = chatService.createOrUpdate(chat);
+        createInternalSub(chat , getUserByToken());
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         for (Long id : createChatDto.getUserIds()) {
@@ -88,12 +88,13 @@ public class ChatController extends BaseController {
         List<ProfileDto> profileDtoList = new ArrayList<>();
         if (chat.getChatType() != ChatType.PV) {
             List<ChatProfile> chatProfileList = chatProfileService.getByChat(chat);
-            if (chatProfileList != null)
+            if (!chatProfileList.isEmpty())
                 chatProfileList.forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
-        } else {
+        }
+        else {
             User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
-            if (userProfileList != null)
+            if (!userProfileList.isEmpty())
                userProfileList.forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
         }
         getChatDto.setChatId(chat.getChatId());
@@ -106,21 +107,21 @@ public class ChatController extends BaseController {
         Chat chat = sub.getChat();
         MenuChatDto menuChatDto = modelMapper.map(chat, MenuChatDto.class);
         if (chat.getChatType() != ChatType.PV) {
-            List<ChatProfile> chatProfileList = chatProfileService.getByChat(chat);
-            if (chatProfileList.size() != 0)
-                menuChatDto.setMedia(chatProfileList.get(chatProfileList.size() - 1).getMedia());
+            ChatProfile chatProfile = chatProfileService.getLastChatProfile(chat);
+            if (chatProfile != null)
+                menuChatDto.setMedia(chatProfile.getMedia());
         }
         else {
             User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
-            List<UserProfile> userProfileList = userProfileService.getByUser(user);
             menuChatDto.setTitle(nameable.fullName());
-            if (userProfileList.size() != 0)
-                menuChatDto.setMedia(userProfileList.get(userProfileList.size() - 1).getMedia());
+            UserProfile userProfile = userProfileService.getLastUserProfile(user);
+            if (userProfile != null)
+                menuChatDto.setMedia(userProfile.getMedia());
             menuChatDto.setUserFirstName(nameable.getFirstName());
         }
-        if (chat.getMessages().size() != 0) {
-            Message message = messageService.getLastMessageByChatId(chat);
+        Message message = messageService.getLastMessageByChatId(chat);
+        if (message != null) {
             menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
             menuChatDto.setLastMessage(message.getText());
             menuChatDto.setSentAt(message.getSendAt());

@@ -34,6 +34,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<Subscription> getSubSeen(Long messageId, Long chatId) {
+        return messageRepository.getSubSeen(messageId , chatId);
+    }
+
+    @Override
     public List<Subscription> usersSeen(Long messageId, Long chatId) {
         return messageRepository.usersSeen(messageId, chatId);
     }

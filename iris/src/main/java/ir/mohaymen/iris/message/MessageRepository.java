@@ -42,4 +42,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 """)
     List<Message> getLastMessageByChatId(Long chatId);
     Message findFirstByOriginChatOrderByMessageIdDesc(Chat chat);
+
+    @Query(value = """
+        select s
+        from Subscription s
+        where s.lastMessageSeenId >= ?1 and s.chat.chatId = ?2
+""")
+    List<Subscription> getSubSeen(Long messageId , Long chatId);
+
 }

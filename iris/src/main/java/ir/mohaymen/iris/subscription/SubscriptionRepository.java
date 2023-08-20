@@ -27,4 +27,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
         where s.chat.chatId = ?1 and s.user.userId = ?2
 """)
     void updateLastSeenMessage(Long chatId , Long userId , Long messageId);
+
+    Subscription findSubscriptionByChatAndUser(Chat chat , User user);
 }
