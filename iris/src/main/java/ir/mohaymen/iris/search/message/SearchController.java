@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/search")
+@RequestMapping("/api/search/message")
 public class SearchController {
 
     private final SearchMessageService searchMessageService;
