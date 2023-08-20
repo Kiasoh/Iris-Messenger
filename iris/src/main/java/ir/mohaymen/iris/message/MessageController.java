@@ -110,8 +110,8 @@ public class MessageController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         } else if (!chatService.isInChat(chat, user)
                 || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE)) {
-            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to send message in this chat!",
-                    user.getPhoneNumber()));
+            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to send message in chat{1}!",
+                    user.getPhoneNumber(), chat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         }
 
@@ -157,9 +157,10 @@ public class MessageController extends BaseController {
         Message message = messageService.getById(messageId);
         Chat newChat = chatService.getById(chatId);
 
-        if (!chatService.isInChat(newChat, user)) {
-            logger.info(MessageFormat.format("user with phone number:{0} is not in chat:{1} to forward message!",
-                    user.getPhoneNumber(), chatId));
+        if (!chatService.isInChat(newChat, user)
+                || !permissionService.hasAccess(user.getUserId(), newChat.getChatId(), Permission.SEND_MESSAGE)) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to forward message in chat{1}!",
+                    user.getPhoneNumber(), newChat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         } else if (!chatService.isInChat(message.getChat(), user)) {
             logger.info(MessageFormat.format("user with phone number:{0} does not have access to message:{1} to forward it!",
@@ -167,7 +168,6 @@ public class MessageController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
 
-        // TODO: 8/20/2023 check if user has permission to send message (channels, restricted permissions, ...)
 
         Message newMessage = new Message();
         newMessage.setChat(newChat);
