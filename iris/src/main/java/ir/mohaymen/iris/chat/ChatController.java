@@ -4,6 +4,8 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.profile.ProfileDto;
 import ir.mohaymen.iris.profile.ProfileMapper;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -37,6 +40,7 @@ public class ChatController extends BaseController {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final MessageService messageService;
+    private final PermissionService permissionService;
 
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
@@ -48,6 +52,10 @@ public class ChatController extends BaseController {
         Subscription sub = new Subscription();
         sub.setChat(chat);
         sub.setUser(getUserByToken());
+        Set<Permission> ownerPermissions = chat.getChatType() == ChatType.PV
+                ? Permission.getDefaultPermissions(chat.getChatType())
+                : Permission.getOwnerPermissions();
+        sub.setPermissions(ownerPermissions);
         subscriptionService.createOrUpdate(sub);
         addedSubs.add(sub);
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
@@ -61,6 +69,7 @@ public class ChatController extends BaseController {
                 sub = new Subscription();
                 sub.setChat(chat);
                 sub.setUser(user);
+                sub.setPermissions(Permission.getDefaultPermissions(chat.getChatType()));
                 subscriptionService.createOrUpdate(sub);
                 addedSubs.add(sub);
             } catch (Exception ex) {
@@ -91,20 +100,21 @@ public class ChatController extends BaseController {
 
     private ResponseEntity<GetChatDto> getGetChatDtoResponseEntity(Chat chat) {
         GetChatDto getChatDto = new GetChatDto();
-        if ( chat.getChatType() != ChatType.PV){
+        if (chat.getChatType() != ChatType.PV) {
             getChatDto = modelMapper.map(chat, GetChatDto.class);
             List<ProfileDto> profileDtoList = new ArrayList<>();
             if (chat.getChatProfiles() != null)
-                chat.getChatProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+                chat.getChatProfiles().stream()
+                        .forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
             getChatDto.setProfileDtoList(profileDtoList);
             getChatDto.setSubCount(chat.getSubs().size());
-        }
-        else {
-            User user = userService.getById(chatService.helloFromTheOtherSide(chat , getUserByToken().getUserId()));
+        } else {
+            User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
             getChatDto.setChatId(chat.getChatId());
             getChatDto.setSubCount(2);
             List<ProfileDto> profileDtoList = new ArrayList<>();
-            user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+            user.getProfiles().stream()
+                    .forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
             getChatDto.setProfileDtoList(profileDtoList);
             getChatDto.setBio(user.getBio());
             getChatDto.setLink(chat.getLink());
@@ -125,7 +135,8 @@ public class ChatController extends BaseController {
                     menuChatDto.setMedia(chat.getChatProfiles().get(chat.getChatProfiles().size() - 1).getMedia());
             if (chat.getMessages().size() != 0) {
                 List<Message> messages = chat.getMessages();
-                menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
+                menuChatDto.setUnSeenMessages(
+                        messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
                 menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
                 menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
                 User user = messages.get(messages.size() - 1).getSender();
@@ -135,8 +146,7 @@ public class ChatController extends BaseController {
                     menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
                 }
                 menuChatDto.setUserFirstName(nameable.getFirstName());
-            }
-            else {
+            } else {
                 menuChatDto.setSentAt(chat.getCreatedAt());
                 User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
                 Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
@@ -158,13 +168,14 @@ public class ChatController extends BaseController {
 
     @DeleteMapping("delete-chat/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable Long id) throws Exception {
-        if (!chatService.isInChat(chatService.getById(id), getUserByToken()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!chatService.isInChat(chatService.getById(id), getUserByToken())
+                || !permissionService.hasAccess(getUserByToken().getUserId(), id, Permission.OWNER))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         chatService.deleteById(id);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    private Subscription createInternalSub(Chat chat , User user) {
+    private Subscription createInternalSub(Chat chat, User user) {
         return new Subscription();
     }
 }
