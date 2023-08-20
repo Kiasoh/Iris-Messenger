@@ -4,17 +4,20 @@ import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.Nameable;
 
+import java.util.List;
+
 public interface SubscriptionService {
 
     Subscription getSubscriptionBySubscriptionId(Long subscriptionId);
 
-    Nameable setName(Iterable<Contact> contacts, User user);
+    Nameable setName(List<Contact> contacts, User user);
 
-    Iterable<Subscription> getAllSubscriptionByUserId(Long userId);
+    List<Subscription> getAllSubscriptionByUserId(Long userId);
 
-    Iterable<Subscription> getAllSubscriptionByChatId(Long chatId);
 
-    Iterable<Subscription> getAll();
+    List<Subscription> getAllSubscriptionByChatId(Long chatId);
+
+    List<Subscription> getAll();
 
     Subscription createOrUpdate(Subscription subscription);
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Iterable<Contact> getContactByFirstUser(User firstUser) {
+    public List<Contact> getContactByFirstUser(User firstUser) {
         return contactRepository.findByFirstUser(firstUser);
     }
     @Override
