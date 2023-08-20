@@ -61,7 +61,7 @@ public class MessageController extends BaseController {
         if (floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
-        for (Message message : messages.subList(messages.size() - ceil , messages.size() - floor)) {
+        for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         List<GetMessageDto> sorted = getMessageDtoList.stream()
@@ -97,23 +97,22 @@ public class MessageController extends BaseController {
         System.out.println(1);
         Chat chat = chatService.getById(messageDto.getChatId());
         User user = getUserByToken();
-        Message repliedMessage = messageService.getById(messageDto.getRepliedMessageId());
+        Message repliedMessage = (messageDto.getRepliedMessageId() != null) ? messageService.getById(messageDto.getRepliedMessageId()) : null;
 
-        if (!repliedMessage.getChat().getChatId().equals(chat.getChatId()))
+        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId()))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
         if (!chatService.isInChat(chat, user))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        var file=messageDto.getFile();
+        var file = messageDto.getFile();
         Media media;
-        if (file==null || file.isEmpty()){
-            media=null;
-            if (messageDto.getText().isBlank()){
+        if (file == null || file.isEmpty()) {
+            media = null;
+            if (messageDto.getText().isBlank()) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
             }
-        }
-        else {
-            media=fileService.saveFile(file.getOriginalFilename(),file);
+        } else {
+            media = fileService.saveFile(file.getOriginalFilename(), file);
         }
         Message message = new Message();
         message.setRepliedMessageId(repliedMessage);
@@ -141,8 +140,8 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
-        getMessageDto.setRepliedMessageId(message.getRepliedMessageId().getMessageId());
-        getMessageDto.setSendAt(message.getSendAt());
+        if (message.getRepliedMessageId() != null)
+            getMessageDto.setRepliedMessageId(message.getRepliedMessageId().getMessageId());
         return getMessageDto;
     }
 }
