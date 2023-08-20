@@ -42,6 +42,26 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.findSubscriptionByUser(user);
     }
 
+    @Override
+    public boolean isInChat(Chat chat, User user) {
+        return subscriptionRepository.userIsInChat(chat.getChatId() , user.getUserId());
+    }
+
+    @Override
+    public Subscription getSubscriptionByChatAndUser(Chat chat, User user) {
+        return subscriptionRepository.findSubscriptionByChatAndUser(chat , user);
+    }
+
+    @Override
+    public void updateLastSeenMessage(Long chatId, Long userId, Long messageId) {
+        subscriptionRepository.updateLastSeenMessage(chatId, userId, messageId);
+    }
+
+    @Override
+    public Integer subscriptionCount(Long chatId) {
+        return subscriptionRepository.subscriptionCount(chatId);
+    }
+
 
     @Override
     public List<Subscription> getAllSubscriptionByChatId(Long chatId) {

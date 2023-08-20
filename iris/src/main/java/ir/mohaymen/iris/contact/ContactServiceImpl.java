@@ -33,7 +33,7 @@ public class ContactServiceImpl implements ContactService {
     }
     @Override
     public boolean isInContact (User firstUser , Long secondUserId) {
-        return firstUser.getContacts().stream().anyMatch(c -> c.getSecondUser().getUserId() == secondUserId);
+        return contactRepository.userInContact(firstUser.getUserId() , secondUserId);
     }
 
     @Override
@@ -57,6 +57,11 @@ public class ContactServiceImpl implements ContactService {
         for (Contact contact : contacts)
             users.add(contact.getSecondUser());
         return users;
+    }
+
+    @Override
+    public Contact getContact(Long firstUserId, Long secondUserId) {
+        return contactRepository.getContact(firstUserId , secondUserId);
     }
 
     @Override

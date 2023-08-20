@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.subscription;
 
+import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.Nameable;
@@ -14,6 +15,13 @@ public interface SubscriptionService {
 
     List<Subscription> getAllSubscriptionByUserId(Long userId);
 
+    boolean isInChat(Chat chat , User user);
+
+    Subscription getSubscriptionByChatAndUser(Chat chat , User user);
+
+    void updateLastSeenMessage(Long chatId , Long userId , Long messageId);
+
+    Integer subscriptionCount(Long chatId);
 
     List<Subscription> getAllSubscriptionByChatId(Long chatId);
 

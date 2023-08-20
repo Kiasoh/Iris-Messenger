@@ -21,6 +21,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         return userProfileRepository.findAll();
     }
 
+
     @Override
     public boolean isProfilePicture(Media media) {
         return userProfileRepository.existsByMedia(media);
@@ -34,6 +35,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public List<UserProfile> getByUser(User user) {
         return userProfileRepository.findByUser(user);
+    }
+
+    @Override
+    public UserProfile getLastUserProfile(User user) {
+        return userProfileRepository.findFirstByUserOrderByIdDesc(user);
     }
 
     @Override

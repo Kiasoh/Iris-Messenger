@@ -2,6 +2,8 @@ package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
+import ir.mohaymen.iris.subscription.SubscriptionService;
+
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
     private final SubscriptionRepository subscriptionRepository;
-
+    private final SubscriptionService subscriptionService;
     @Override
     public Chat getById(Long id) {
         return chatRepository.findById(id).orElseThrow(EntityNotFoundException::new);

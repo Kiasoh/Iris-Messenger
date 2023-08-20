@@ -11,6 +11,7 @@ import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.SubDto;
+import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
@@ -68,9 +69,9 @@ public class MessageController extends BaseController {
         for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
-        List<GetMessageDto> sorted = getMessageDtoList.stream()
-                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
-                .collect(Collectors.toList());
+//        List<GetMessageDto> sorted = getMessageDtoList.stream()
+//                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
+//                .collect(Collectors.toList());
         return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);
     }
 
@@ -79,7 +80,7 @@ public class MessageController extends BaseController {
         if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         List<SubDto> users = new ArrayList<>();
-        messageService.usersSeen(messageId, chatId).forEach(s -> {
+        messageService.getSubSeen(messageId, chatId).forEach(s -> {
             SubDto subDto = new SubDto();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), s.getUser());
             subDto.setFirstName(nameable.getFirstName());
@@ -131,7 +132,8 @@ public class MessageController extends BaseController {
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
-//        GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message);
+//        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser(chat , user);
+//        subscription.setLastMessageSeenId();
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 

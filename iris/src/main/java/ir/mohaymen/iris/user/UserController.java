@@ -21,8 +21,8 @@ public class UserController extends BaseController {
     private final ContactService contactService;
     private final SubscriptionService subscriptionService;
     @GetMapping("/by-phoneNumber/{phone}")
-    public ResponseEntity<Long> getUserIdByPhoneNumber (@PathVariable String phoneNumber) {
-        return new ResponseEntity<>(userService.getByPhoneNumber(phoneNumber).getUserId() , HttpStatus.OK);
+    public ResponseEntity<Long> getUserIdByPhoneNumber (@PathVariable String phone) {
+        return new ResponseEntity<>(userService.getByPhoneNumber(phone).getUserId() , HttpStatus.OK);
     }
 
 
