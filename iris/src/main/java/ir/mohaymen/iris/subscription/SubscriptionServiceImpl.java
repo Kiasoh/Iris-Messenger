@@ -43,6 +43,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    public boolean isInChat(Chat chat, User user) {
+        return subscriptionRepository.userIsInChat(chat.getChatId() , user.getUserId());
+    }
+
+    @Override
     public Subscription getSubscriptionByChatAndUser(Chat chat, User user) {
         return subscriptionRepository.findSubscriptionByChatAndUser(chat , user);
     }

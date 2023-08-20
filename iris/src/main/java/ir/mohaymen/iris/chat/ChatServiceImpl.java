@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.chat;
 
 import ir.mohaymen.iris.subscription.Subscription;
+import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Set;
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
+    private final SubscriptionService subscriptionService;
 
     @Override
     public Chat getById(Long id) {
@@ -30,8 +32,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public boolean isInChat(Chat chat, User user) {
-        Set<Subscription> subs = chat.getSubs();
-        return subs.stream().anyMatch(s -> Objects.equals(s.getUser().getUserId(), user.getUserId()));
+        return subscriptionService.isInChat(chat , user);
     }
 
     @Override
@@ -52,13 +53,13 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.findByTitle(title);
     }
     public Long helloFromTheOtherSide (Chat chat ,Long userId) {
-        if (chat.getSubs() == null)
+        List<Subscription> subs = subscriptionService.getAllSubscriptionByChatId(chat.getChatId());
+        if (subs == null || subs.isEmpty())
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 //        if (chat.getChatType() != ChatType.PV || chat.getSubs().size() != 2)
 //            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Subscription> bothSide = chat.getSubs().stream().toList();
-        if (bothSide.get(0).getUser().getUserId() == userId)
-            return bothSide.get(1).getUser().getUserId();
-        return bothSide.get(0).getUser().getUserId();
+        if (subs.get(0).getUser().getUserId() == userId)
+            return subs.get(1).getUser().getUserId();
+        return subs.get(0).getUser().getUserId();
     }
 }

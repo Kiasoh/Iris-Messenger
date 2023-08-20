@@ -15,6 +15,8 @@ public interface SubscriptionService {
 
     List<Subscription> getAllSubscriptionByUserId(Long userId);
 
+    boolean isInChat(Chat chat , User user);
+
     Subscription getSubscriptionByChatAndUser(Chat chat , User user);
 
     void updateLastSeenMessage(Long chatId , Long userId , Long messageId);

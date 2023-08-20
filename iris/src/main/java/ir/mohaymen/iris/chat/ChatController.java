@@ -10,6 +10,7 @@ import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import ir.mohaymen.iris.utility.Nameable;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -41,7 +42,7 @@ public class ChatController extends BaseController {
     private final MessageService messageService;
     private final ContactService contactService;
     private final UserProfileService userProfileService;
-
+    @Transactional
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
