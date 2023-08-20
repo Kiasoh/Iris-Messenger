@@ -16,4 +16,11 @@ public interface TokenRepository extends CrudRepository<Token, Integer> {
   List<Token> findAllValidTokenByUserPhoneNumber(String phoneNumber);
 
   Optional<Token> findByToken(String token);
+
+  @Query("""
+  delete
+  from Token t
+  where t.expiresAt <current_timestamp
+""")
+  void deleteAllExpiredTokens();
 }
