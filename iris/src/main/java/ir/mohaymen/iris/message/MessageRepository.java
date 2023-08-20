@@ -6,6 +6,7 @@ import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -26,30 +27,30 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = """
                 select count(m)
                 From Message m
-                where m.messageId > ?1 and m.chat.chatId = ?2
+                where m.messageId > :lastSeenMessageId and m.chat.chatId = :chatId
             """)
-    long countUnSeenMessages(Long lastSeenMessageId, Long chatId);
+    long countUnSeenMessages(@Param("lastSeenMessageId") Long lastSeenMessageId,@Param("chatId") Long chatId);
 
     @Query(value = """
                 select s
                 From Subscription s
-                where s.lastMessageSeenId > ?1 and s.chat = ?2
+                where s.lastMessageSeenId > :messageId and s.chat = :chatId
             """)
-    List<Subscription> usersSeen(Long messageId, Long chatId);
+    List<Subscription> usersSeen(@Param("messageId") Long messageId,@Param("chatId") Long chatId);
 
     @Query(value = """
         select m
         from Message m
-        where m.chat.chatId = ?1
+        where m.chat.chatId = :chatId
         order by m.messageId desc 
 """)
-    List<Message> getLastMessageByChatId(Long chatId);
+    List<Message> getLastMessageByChatId(@Param("chatId") Long chatId);
     Message findFirstByChatOrderByMessageIdDesc(Chat chat);
     @Query(value = """
         select s
         from Subscription s
-        where s.lastMessageSeenId >= ?1 and s.chat.chatId = ?2
+        where s.lastMessageSeenId >= :messageId and s.chat.chatId = :chatId
 """)
-    List<Subscription> getSubSeen(Long messageId , Long chatId);
+    List<Subscription> getSubSeen(@Param("messageId") Long messageId ,@Param("chatId") Long chatId);
 
 }
