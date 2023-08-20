@@ -13,6 +13,8 @@ public interface MessageService {
 
     long countUnSeenMessages(Long lastSeenMessageId, Long chatId);
 
+    Message getLastMessageByChatId(Chat chat);
+
     List<Subscription> usersSeen(Long messageId, Long chatId);
 
     Iterable<Message> getAll();

@@ -42,6 +42,11 @@ public class ChatProfileServiceImpl implements ChatProfileService {
     }
 
     @Override
+    public ChatProfile getLastChatProfile(Chat chat) {
+        return chatProfileRepository.findFirstByChatOrderByIdChatDesc(chat);
+    }
+
+    @Override
     public void deleteById(Long id) {
         chatProfileRepository.deleteById(id);
     }

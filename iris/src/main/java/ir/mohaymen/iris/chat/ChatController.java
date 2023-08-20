@@ -114,13 +114,13 @@ public class ChatController extends BaseController {
             User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
-            menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
+            menuChatDto.setTitle(nameable.fullName());
             if (userProfileList.size() != 0)
                 menuChatDto.setMedia(userProfileList.get(userProfileList.size() - 1).getMedia());
             menuChatDto.setUserFirstName(nameable.getFirstName());
         }
         if (chat.getMessages().size() != 0) {
-            Message message = messageService.getLastMessageByChatId(chat.getChatId());
+            Message message = messageService.getLastMessageByChatId(chat);
             menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
             menuChatDto.setLastMessage(message.getText());
             menuChatDto.setSentAt(message.getSendAt());
@@ -128,7 +128,6 @@ public class ChatController extends BaseController {
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
             if (user.getProfiles().size() != 0) {
                 menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
-                menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
             }
             menuChatDto.setUserFirstName(nameable.getFirstName());
         }
