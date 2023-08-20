@@ -19,7 +19,7 @@ public interface MessageService {
 
     Iterable<Message> getByUser(User user);
 
-    Iterable<Message> getByChat(Chat chat);
+    List<Message> getByChat(Chat chat);
 
     Iterable<Message> getByMedia(Media media);
 

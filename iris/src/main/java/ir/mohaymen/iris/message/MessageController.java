@@ -76,13 +76,12 @@ public class MessageController extends BaseController {
 
     @GetMapping("/seen-users/{chatId}/{messageId}")
     public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        Iterable<Contact> contacts = contactService.getContactByFirstUser(getUserByToken());
         if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         List<SubDto> users = new ArrayList<>();
         messageService.usersSeen(messageId, chatId).forEach(s -> {
             SubDto subDto = new SubDto();
-            Nameable nameable = subscriptionService.setName(contacts, s.getUser());
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), s.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(s.getUser().getUserId());

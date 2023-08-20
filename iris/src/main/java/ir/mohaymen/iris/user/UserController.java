@@ -18,6 +18,7 @@ import java.util.List;
 public class UserController extends BaseController {
 
     private final UserService userService;
+    private final ContactService contactService;
     private final SubscriptionService subscriptionService;
     @GetMapping("/by-phoneNumber/{phone}")
     public ResponseEntity<Long> getUserIdByPhoneNumber (@PathVariable String phoneNumber) {
@@ -29,7 +30,7 @@ public class UserController extends BaseController {
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userService.getById(id);
         UserDto userDto = UserMapper.mapToUserDto(user);
-        Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
+        Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
         userDto.setFirstName(nameable.getFirstName());
         userDto.setLastName(nameable.getFirstName());
         return new ResponseEntity<>(userDto, HttpStatus.OK);

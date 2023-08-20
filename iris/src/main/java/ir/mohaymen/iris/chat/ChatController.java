@@ -1,9 +1,9 @@
 package ir.mohaymen.iris.chat;
 
+import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageService;
-import ir.mohaymen.iris.profile.ProfileDto;
-import ir.mohaymen.iris.profile.ProfileMapper;
+import ir.mohaymen.iris.profile.*;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,38 +37,28 @@ public class ChatController extends BaseController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final ChatProfileService chatProfileService;
     private final MessageService messageService;
+    private final ContactService contactService;
+    private final UserProfileService userProfileService;
 
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
-        Set<Subscription> addedSubs = new HashSet<>();
-        chat.setSubs(addedSubs);
         chat.setCreatedAt(Instant.now());
         chat = chatService.createOrUpdate(chat);
-        Subscription sub = new Subscription();
-        sub.setChat(chat);
-        sub.setUser(getUserByToken());
-        subscriptionService.createOrUpdate(sub);
-        addedSubs.add(sub);
         if ((createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         for (Long id : createChatDto.getUserIds()) {
-            chat = chatService.getById(chat.getChatId());
             User user = userService.getById(id);
             if (chatService.isInChat(chat, user))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             try {
-                sub = new Subscription();
-                sub.setChat(chat);
-                sub.setUser(user);
-                subscriptionService.createOrUpdate(sub);
-                addedSubs.add(sub);
+                createInternalSub(chat, user);
             } catch (Exception ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
         }
-        chat.setSubs(addedSubs);
         return getGetChatDtoResponseEntity(chat);
     }
 
@@ -90,63 +81,65 @@ public class ChatController extends BaseController {
     }
 
     private ResponseEntity<GetChatDto> getGetChatDtoResponseEntity(Chat chat) {
-        GetChatDto getChatDto = new GetChatDto();
-        if ( chat.getChatType() != ChatType.PV){
-            getChatDto = modelMapper.map(chat, GetChatDto.class);
-            List<ProfileDto> profileDtoList = new ArrayList<>();
-            if (chat.getChatProfiles() != null)
-                chat.getChatProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
-            getChatDto.setProfileDtoList(profileDtoList);
-            getChatDto.setSubCount(chat.getSubs().size());
+        GetChatDto getChatDto = modelMapper.map(chat, GetChatDto.class);
+        List<ProfileDto> profileDtoList = new ArrayList<>();
+        if (chat.getChatType() != ChatType.PV) {
+            List<ChatProfile> chatProfileList = chatProfileService.getByChat(chat);
+            if (chatProfileList != null)
+                chatProfileList.forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+        } else {
+            User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
+            List<UserProfile> userProfileList = userProfileService.getByUser(user);
+            if (userProfileList != null)
+                user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+        }
+        getChatDto.setChatId(chat.getChatId());
+        getChatDto.setProfileDtoList(profileDtoList);
+        getChatDto.setSubCount(subscriptionService.getAllSubscriptionByChatId(chat.getChatId()).size());
+        return new ResponseEntity<>(getChatDto, HttpStatus.OK);
+    }
+
+    public MenuChatDto createMenuChat(Subscription sub) {
+        Chat chat = sub.getChat();
+        MenuChatDto menuChatDto = modelMapper.map(chat, MenuChatDto.class);
+        if (chat.getChatType() != ChatType.PV) {
+            List<ChatProfile> chatProfileList = chatProfileService.getByChat(chat);
+            if (chatProfileList.size() != 0)
+                menuChatDto.setMedia(chatProfileList.get(chatProfileList.size() - 1).getMedia());
         }
         else {
-            User user = userService.getById(chatService.helloFromTheOtherSide(chat , getUserByToken().getUserId()));
-            getChatDto.setChatId(chat.getChatId());
-            getChatDto.setSubCount(2);
-            List<ProfileDto> profileDtoList = new ArrayList<>();
-            user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
-            getChatDto.setProfileDtoList(profileDtoList);
-            getChatDto.setBio(user.getBio());
-            getChatDto.setLink(chat.getLink());
-            getChatDto.setPublic(chat.isPublic());
-            getChatDto.setChatType(chat.getChatType());
+            User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
+            List<UserProfile> userProfileList = userProfileService.getByUser(user);
+            menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
+            if (userProfileList.size() != 0)
+                menuChatDto.setMedia(userProfileList.get(userProfileList.size() - 1).getMedia());
+            menuChatDto.setUserFirstName(nameable.getFirstName());
         }
-        return new ResponseEntity<>(getChatDto, HttpStatus.OK);
+        if (chat.getMessages().size() != 0) {
+            List<Message> messages = messageService.getByChat(chat);
+            menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
+            menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
+            menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
+            User user = messages.get(messages.size() - 1).getSender();
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
+            if (user.getProfiles().size() != 0) {
+                menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
+                menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
+            }
+            menuChatDto.setUserFirstName(nameable.getFirstName());
+        }
+        else {
+            menuChatDto.setSentAt(chat.getCreatedAt());
+        }
+        return menuChatDto;
     }
 
     @GetMapping("/get-all-chats")
     public ResponseEntity<List<MenuChatDto>> getAllChats() {
         List<MenuChatDto> menuChatDtos = new ArrayList<>();
-        for (Subscription sub : getUserByToken().getSubs()) {
-            Chat chat = sub.getChat();
-            MenuChatDto menuChatDto = modelMapper.map(chat, MenuChatDto.class);
-            if (chat.getChatType() != ChatType.PV)
-                if (chat.getChatProfiles().size() != 0)
-                    menuChatDto.setMedia(chat.getChatProfiles().get(chat.getChatProfiles().size() - 1).getMedia());
-            if (chat.getMessages().size() != 0) {
-                List<Message> messages = chat.getMessages();
-                menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
-                menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
-                menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
-                User user = messages.get(messages.size() - 1).getSender();
-                Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
-                if (user.getProfiles().size() != 0) {
-                    menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
-                    menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
-                }
-                menuChatDto.setUserFirstName(nameable.getFirstName());
-            }
-            else {
-                menuChatDto.setSentAt(chat.getCreatedAt());
-                User user = userService.getById(chatService.helloFromTheOtherSide(chat, getUserByToken().getUserId()));
-                Nameable nameable = subscriptionService.setName(getUserByToken().getContacts(), user);
-                if (user.getProfiles().size() != 0) {
-                    menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
-                    menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
-                }
-                menuChatDto.setUserFirstName(nameable.getFirstName());
-            }
-            menuChatDtos.add(menuChatDto);
+        for (Subscription sub : subscriptionService.getAllSubscriptionByUserId(getUserByToken().getUserId())) {
+            menuChatDtos.add(createMenuChat(sub));
         }
         Collections.sort(menuChatDtos, (o1, o2) -> {
             if (o1.getSentAt().isBefore(o2.getSentAt()))
@@ -164,7 +157,11 @@ public class ChatController extends BaseController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    private Subscription createInternalSub(Chat chat , User user) {
-        return new Subscription();
+    private Subscription createInternalSub(Chat chat, User user) {
+        Subscription sub = new Subscription();
+        sub.setChat(chat);
+        sub.setUser(user);
+        subscriptionService.createOrUpdate(sub);
+        return sub;
     }
 }

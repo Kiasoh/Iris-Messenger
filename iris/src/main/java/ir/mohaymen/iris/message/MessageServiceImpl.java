@@ -49,7 +49,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Iterable<Message> getByChat(Chat chat) {
+    public List<Message> getByChat(Chat chat) {
         return messageRepository.findByOriginChat(chat);
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ChatProfileRepository extends JpaRepository<ChatProfile, Long> {
 
-    Iterable<ChatProfile> findByChat(Chat chat);
+    List<ChatProfile> findByChat(Chat chat);
 
     List<ChatProfile> findAllByMedia(Media media);
 }
