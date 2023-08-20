@@ -40,9 +40,14 @@ public class SubscriptionController extends BaseController {
         if (addSubDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
-        for (Long id : addSubDto.getUserIds())
-            subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
-                    chat, chat.getMessages().get(chat.getMessages().size() - 1).getMessageId()));
+        for (Long id : addSubDto.getUserIds()) {
+            if (chat.getMessages()==null||chat.getMessages().size() == 0)
+                subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
+                        chat, 0L));
+            else
+                subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
+                        chat, chat.getMessages().get(chat.getMessages().size() - 1).getMessageId()));
+        }
 
         GetChatDto getChatDto = modelMapper.map(chat, GetChatDto.class);
         getChatDto.setSubCount(chat.getSubs().size());
