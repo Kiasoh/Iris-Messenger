@@ -2,13 +2,15 @@ package ir.mohaymen.iris.contact;
 
 import ir.mohaymen.iris.user.User;
 
+import java.util.List;
+
 public interface ContactService {
 
     Contact getById(Long id);
 
     Iterable<Contact> getAll();
 
-    Iterable<Contact> getContactByFirstUser(User firstUser);
+    List<Contact> getContactByFirstUser(User firstUser);
 
     Iterable<User> getUserByFirstUser(User firstUser);
     boolean isInContact (User firstUser , Long secondUserId);

@@ -8,7 +8,10 @@ import ir.mohaymen.iris.user.UserRepository;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.search.aggregations.metrics.InternalHDRPercentiles;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +27,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Iterable<Subscription> getAllSubscriptionByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
-        return subscriptionRepository.findSubscriptionByUser(user);
-    }
-
-    @Override
-    public Nameable setName(Iterable<Contact> contacts, User user) {
+    public Nameable setName(List<Contact> contacts, User user) {
         for (Contact contact : contacts) {
             if (contact.getSecondUser() == user) {
                 return contact;
@@ -40,13 +37,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Iterable<Subscription> getAllSubscriptionByChatId(Long chatId) {
+    public List<Subscription> getAllSubscriptionByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        return subscriptionRepository.findSubscriptionByUser(user);
+    }
+
+
+    @Override
+    public List<Subscription> getAllSubscriptionByChatId(Long chatId) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(EntityNotFoundException::new);
         return subscriptionRepository.findAllByChat(chat);
     }
 
     @Override
-    public Iterable<Subscription> getAll() {
+    public List<Subscription> getAll() {
         return subscriptionRepository.findAll();
     }
 

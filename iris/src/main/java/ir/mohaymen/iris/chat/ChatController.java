@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/chats")
 @RequiredArgsConstructor
@@ -43,7 +44,8 @@ public class ChatController extends BaseController {
     @PostMapping("/create-chat")
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
         Chat chat = modelMapper.map(createChatDto, Chat.class);
-        logger.info(MessageFormat.format("user with phone number:{0} wants to create chat ", getUserByToken().getPhoneNumber()));
+        logger.info(MessageFormat.format("user with phone number:{0} wants to create chat ",
+                getUserByToken().getPhoneNumber()));
         if (!chat.getChatType().equals(ChatType.PV) && chat.getTitle().isBlank()) {
             logger.error("non-PV chat must have title");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -94,7 +96,8 @@ public class ChatController extends BaseController {
             User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
             if (userProfileList != null)
-                user.getProfiles().stream().forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
+                user.getProfiles().stream()
+                        .forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
         }
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
@@ -109,10 +112,10 @@ public class ChatController extends BaseController {
             List<ChatProfile> chatProfileList = chatProfileService.getByChat(chat);
             if (chatProfileList.size() != 0)
                 menuChatDto.setMedia(chatProfileList.get(chatProfileList.size() - 1).getMedia());
-        }
-        else {
+        } else {
             User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
-            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
+                    user);
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
             menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
             if (userProfileList.size() != 0)
@@ -121,18 +124,19 @@ public class ChatController extends BaseController {
         }
         if (chat.getMessages().size() != 0) {
             List<Message> messages = messageService.getByChat(chat);
-            menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
+            menuChatDto.setUnSeenMessages(
+                    messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
             menuChatDto.setLastMessage(messages.get(messages.size() - 1).getText());
             menuChatDto.setSentAt(messages.get(messages.size() - 1).getSendAt());
             User user = messages.get(messages.size() - 1).getSender();
-            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
+                    user);
             if (user.getProfiles().size() != 0) {
                 menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
                 menuChatDto.setTitle(nameable.getFirstName() + " " + nameable.getLastName());
             }
             menuChatDto.setUserFirstName(nameable.getFirstName());
-        }
-        else {
+        } else {
             menuChatDto.setSentAt(chat.getCreatedAt());
         }
         return menuChatDto;
@@ -169,6 +173,3 @@ public class ChatController extends BaseController {
     }
 
 }
-
-
-

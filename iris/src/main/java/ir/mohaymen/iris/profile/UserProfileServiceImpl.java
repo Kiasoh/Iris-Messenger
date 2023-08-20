@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
@@ -30,7 +32,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public Iterable<UserProfile> getByUser(User user) {
+    public List<UserProfile> getByUser(User user) {
         return userProfileRepository.findByUser(user);
     }
 
