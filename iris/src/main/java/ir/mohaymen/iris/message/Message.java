@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -48,7 +49,7 @@ public class Message {
     @OneToOne
     private Media media;
 
-    @NotNull
+    @CreationTimestamp
     private Instant sendAt;
 
     private Instant editedAt;
