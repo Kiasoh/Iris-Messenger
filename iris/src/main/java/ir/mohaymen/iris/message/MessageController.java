@@ -69,10 +69,10 @@ public class MessageController extends BaseController {
         for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
-//        List<GetMessageDto> sorted = getMessageDtoList.stream()
-//                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
-//                .collect(Collectors.toList());
-        return new ResponseEntity<>(getMessageDtoList, HttpStatus.OK);
+        List<GetMessageDto> sorted = getMessageDtoList.stream()
+                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(sorted, HttpStatus.OK);
     }
 
     @GetMapping("/seen-users/{chatId}/{messageId}")
