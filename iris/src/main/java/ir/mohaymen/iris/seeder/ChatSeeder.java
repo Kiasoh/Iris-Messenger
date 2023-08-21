@@ -1,19 +1,14 @@
 package ir.mohaymen.iris.seeder;
 
-import com.github.javafaker.DateAndTime;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.chat.ChatType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +18,7 @@ public class ChatSeeder implements Seeder {
 
     static final int NUMBER_OF_INSTANCES = 100;
     private final List<Chat> chats = new ArrayList<>();
+    private final Set<String> links = new HashSet<>();
 
     @Override
     public void load() {
@@ -40,9 +36,7 @@ public class ChatSeeder implements Seeder {
         ChatType chatType = ChatType.values()[faker.random().nextInt(1, ChatType.values().length - 1)];
         String bio = generateBio(id);
         boolean isPublic = id % 2 == 0;
-        String link = (isPublic || id % 5 == 0)
-                ? faker.artist().name().replaceAll("\\s", "_").concat(faker.regexify("(\\w|\\d){2,5}"))
-                : null;
+        String link = (isPublic || id % 5 == 0) ? generateLink() : null;
 
         Date sendingTimeLowerBound = Date
                 .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
@@ -70,5 +64,14 @@ public class ChatSeeder implements Seeder {
             case 3 -> faker.dune().quote();
             default -> faker.rickAndMorty().quote();
         };
+    }
+
+    private String generateLink() {
+        String link;
+        do {
+            link = faker.artist().name().replaceAll("\\s", "_").concat(faker.regexify("_\\d{2,5}_")).concat(faker.lordOfTheRings().character().replaceAll("\\s", "_"));
+        } while (links.contains(link));
+        links.add(link);
+        return link;
     }
 }
