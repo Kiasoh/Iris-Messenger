@@ -11,10 +11,9 @@ public enum Permission {
     ADD_USER,
     CHANGE_CHAT_INFO,
     PIN_MESSAGE,
-    ADMIN,
-    OWNER;
+    ADMIN;
 
-    public static Set<Permission> getOwnerPermissions(){
+    public static Set<Permission> getAdminPermissions(){
         Set<Permission> permissions=new HashSet<>();
         permissions.addAll(List.of(Permission.values()));
         return permissions;
@@ -39,10 +38,8 @@ public enum Permission {
         return permissions;
     }
     public static boolean isAdmin(Set<Permission> permissions){
-        return permissions.contains(ADMIN) || permissions.contains(OWNER);
+        return permissions.contains(ADMIN);
     }
-    public static boolean isOwner(Set<Permission> permissions){
-        return permissions.contains(OWNER);
-    }
+
 
 }

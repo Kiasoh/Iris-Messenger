@@ -85,12 +85,15 @@ public class ChatController extends BaseController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         chat.setCreatedAt(Instant.now());
-        if (chat.getChatType() == ChatType.PV)
+        chat.setOwner(getUserByToken());
+        if (chat.getChatType() == ChatType.PV){
             chat.setPublic(false);
+            chat.setOwner(null);
+        }
         chat = chatService.createOrUpdate(chat);
         Set<Permission> ownerPermissions = chat.getChatType() == ChatType.PV
                 ? Permission.getDefaultPermissions(chat.getChatType())
-                : Permission.getOwnerPermissions();
+                : Permission.getAdminPermissions();
         createInternalSub(chat, getUserByToken(), ownerPermissions);
         for (Long userId : createChatDto.getUserIds()) {
             try {
@@ -140,6 +143,7 @@ public class ChatController extends BaseController {
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
+        getChatDto.setOwnerId(chat.getOwner().getUserId());
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
@@ -193,8 +197,7 @@ public class ChatController extends BaseController {
 
     @DeleteMapping("delete-chat/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable Long id) throws Exception {
-        if (!chatService.isInChat(chatService.getById(id), getUserByToken())
-                || !permissionService.hasAccess(getUserByToken().getUserId(), id, Permission.OWNER))
+        if (!permissionService.isOwner(getUserByToken().getUserId(), id))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         chatService.deleteById(id);
         return new ResponseEntity<>(null, HttpStatus.OK);
