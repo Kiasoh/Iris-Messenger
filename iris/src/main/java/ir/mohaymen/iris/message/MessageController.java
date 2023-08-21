@@ -75,12 +75,13 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(sorted, HttpStatus.OK);
     }
 
-    @GetMapping("/seen-users/{chatId}/{messageId}")
-    public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
+    @GetMapping("/seen-users/{messageId}")
+    public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long messageId) {
+        Chat chat = messageService.getById(messageId).getChat();
+        if (chat.getChatType() == ChatType.CHANNEL)
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         List<SubDto> users = new ArrayList<>();
-        messageService.getSubSeen(messageId, chatId).forEach(s -> {
+        messageService.getSubSeen(messageId, chat.getChatId()).forEach(s -> {
             SubDto subDto = new SubDto();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), s.getUser());
             subDto.setFirstName(nameable.getFirstName());
@@ -91,9 +92,10 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/seen-user-count/{chatId}/{messageId}")
-    public ResponseEntity<Integer> userSeenCount(@PathVariable Long chatId, @PathVariable Long messageId) {
-        return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
+    @GetMapping("/seen-user-count/{messageId}")
+    public ResponseEntity<Integer> userSeenCount (@PathVariable Long messageId) {
+        Message message = messageService.getById(messageId);
+        return new ResponseEntity<>(messageService.usersSeen(messageId, message.getChat().getChatId()).size(), HttpStatus.OK);
     }
     @DeleteMapping("/delete-message/{id}")
     public ResponseEntity<?> deleteMessage(@PathVariable Long id) {
