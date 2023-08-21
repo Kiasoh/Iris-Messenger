@@ -56,7 +56,7 @@ public class MessageController extends BaseController {
 
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId,
-                                                           @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
+            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = new ArrayList<>();
@@ -82,7 +82,8 @@ public class MessageController extends BaseController {
         List<SubDto> users = new ArrayList<>();
         messageService.getSubSeen(messageId, chatId).forEach(s -> {
             SubDto subDto = new SubDto();
-            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), s.getUser());
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
+                    s.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(s.getUser().getUserId());
@@ -95,39 +96,43 @@ public class MessageController extends BaseController {
     public ResponseEntity<Integer> userSeenCount(@PathVariable Long chatId, @PathVariable Long messageId) {
         return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
     }
+
     @DeleteMapping("/delete-message/{id}")
     public ResponseEntity<?> deleteMessage(@PathVariable Long id) {
         Message message = messageService.getById(id);
         Chat chat = message.getChat();
         User user = getUserByToken();
-        //TODO:delete permission
-//        if (!chatService.isInChat(chat, user)
-//                || !permissionService.hasAccess(user.getUserId(), chat.getChatId(), Permission.)) {
-//            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
-//                    user.getPhoneNumber(), chat.getChatId()));
-//            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-//        }
+       if (!chatService.isInChat(chat, user)
+               || !permissionService.hasAccessToDeleteMessage(message,user.getUserId(), chat.getChatId())) {
+           logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
+                   user.getPhoneNumber(), chat.getChatId()));
+           throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+       }
         messageService.deleteById(id);
         return ResponseEntity.ok("If you only could delete feelings the same way you delete a text message");
     }
 
-    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/send-message", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         User user = getUserByToken();
         Chat chat = chatService.getById(messageDto.getChatId());
         logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to send message in chat:{1}!",
                 user.getPhoneNumber(), chat.getChatId()));
 
-        Message repliedMessage = (messageDto.getRepliedMessageId() != null) ? messageService.getById(messageDto.getRepliedMessageId()) : null;
+        Message repliedMessage = (messageDto.getRepliedMessageId() != null)
+                ? messageService.getById(messageDto.getRepliedMessageId())
+                : null;
 
         if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId())) {
-            logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to reply a message which is in another chat!",
+            logger.info(MessageFormat.format(
+                    "user with phoneNumber:{0} attempts to reply a message which is in another chat!",
                     user.getPhoneNumber()));
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         } else if (!chatService.isInChat(chat, user)
                 || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE)) {
-            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to send message in chat{1}!",
-                    user.getPhoneNumber(), chat.getChatId()));
+            logger.info(
+                    MessageFormat.format("user with phoneNumber:{0} does not have access to send message in chat{1}!",
+                            user.getPhoneNumber(), chat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         }
 
@@ -147,8 +152,9 @@ public class MessageController extends BaseController {
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
-//        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser(chat , user);
-//        subscription.setLastMessageSeenId();
+        // Subscription subscription =
+        // subscriptionService.getSubscriptionByChatAndUser(chat , user);
+        // subscription.setLastMessageSeenId();
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 
@@ -176,15 +182,16 @@ public class MessageController extends BaseController {
 
         if (!chatService.isInChat(newChat, user)
                 || !permissionService.hasAccess(user.getUserId(), newChat.getChatId(), Permission.SEND_MESSAGE)) {
-            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to forward message in chat{1}!",
+            logger.info(MessageFormat.format(
+                    "user with phoneNumber:{0} does not have access to forward message in chat{1}!",
                     user.getPhoneNumber(), newChat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         } else if (!chatService.isInChat(message.getChat(), user)) {
-            logger.info(MessageFormat.format("user with phone number:{0} does not have access to message:{1} to forward it!",
+            logger.info(MessageFormat.format(
+                    "user with phone number:{0} does not have access to message:{1} to forward it!",
                     user.getPhoneNumber(), messageId));
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
-
 
         Message newMessage = new Message();
         newMessage.setChat(newChat);
@@ -208,7 +215,8 @@ public class MessageController extends BaseController {
     }
 
     @PostMapping("/forward-message/{chatId}")
-    public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId, @RequestBody @Valid List<Long> messageIds) {
+    public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId,
+            @RequestBody @Valid List<Long> messageIds) {
         logger.info(MessageFormat.format("user with phone number:{0} attempts to forward {} message(s) to chat:{2}",
                 getUserByToken().getPhoneNumber(), messageIds.size(), chatId));
         List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
@@ -230,7 +238,8 @@ public class MessageController extends BaseController {
     }
 
     private ForwardMessageDto mapMessageToForwardMessageDto(Message message) {
-        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message), ForwardMessageDto.class);
+        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message),
+                ForwardMessageDto.class);
         forwardMessageDto.setUserId(message.getSender().getUserId());
         return forwardMessageDto;
     }
