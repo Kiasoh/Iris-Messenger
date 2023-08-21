@@ -7,6 +7,7 @@ import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,6 +46,7 @@ public class User implements UserDetails, Nameable {
 
     private String bio;
 
+    @NotNull
     private Instant lastSeen;
 
     @OneToMany(mappedBy = "user")

@@ -8,6 +8,7 @@ import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
+import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class MessageSeeder implements Seeder {
 
     private final MessageRepository messageRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
 
     private static final int NUMBER_OF_CHAT_MESSAGES = 2000;
     private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
@@ -82,6 +84,10 @@ public class MessageSeeder implements Seeder {
         message.setMedia(media);
         message.setSendAt(sendingTime);
         message.setEditedAt(editingTime);
+
+        if (editingTime != null) user.setLastSeen(editingTime);
+        else user.setLastSeen(sendingTime);
+        userRepository.save(user);
 
         messages.add(message);
     }

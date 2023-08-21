@@ -6,6 +6,7 @@ import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class UserSeeder implements Seeder {
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
         user.setBio(bio);
+        user.setLastSeen(Instant.now());
 
         users.add(user);
     }
