@@ -61,16 +61,27 @@ public class ChatController extends BaseController {
     @PostMapping("/create-chat")
     @Transactional
     public ResponseEntity<GetChatDto> createChat(@RequestBody @Valid CreateChatDto createChatDto) {
+        if (createChatDto.getChatType() == ChatType.PV) {
+            if (createChatDto.getUserIds().size() != 1) {
+                if (createChatDto.getUserIds().contains(getUserByToken().getUserId())){
+                    logger.error("PV chat can't have owner in adding list");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                }
+                logger.error("PV chat must have one user id in user ids");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+            Chat chat;
+            if ((chat = subscriptionService.PVExistance(getUserByToken().getUserId() , createChatDto.getUserIds().stream().toList().get(0) )) != null) {
+                logger.info("Found a already existing PV chat. returning the chat.");
+                return getGetChatDtoResponseEntity(chat);
+            }
+        }
         Chat chat = modelMapper.map(createChatDto, Chat.class);
+
         logger.info(MessageFormat.format("user with phone number:{0} wants to create chat ",
                 getUserByToken().getPhoneNumber()));
         if (!chat.getChatType().equals(ChatType.PV) && chat.getTitle().isBlank()) {
             logger.error("non-PV chat must have title");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        if (createChatDto.getUserIds().size() != 1 && chat.getChatType() == ChatType.PV
-                && createChatDto.getUserIds().contains(getUserByToken().getUserId())) {
-            logger.error("PV chat must have one user id in user ids");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         chat.setCreatedAt(Instant.now());

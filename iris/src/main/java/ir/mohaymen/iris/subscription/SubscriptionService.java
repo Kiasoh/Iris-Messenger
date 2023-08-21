@@ -11,6 +11,8 @@ public interface SubscriptionService {
 
     Subscription getSubscriptionBySubscriptionId(Long subscriptionId);
 
+    Chat PVExistance(Long userId1 , Long userId2);
+
     Nameable setName(List<Contact> contacts, User user);
 
     List<Subscription> getAllSubscriptionByUserId(Long userId);

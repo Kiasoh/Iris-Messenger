@@ -27,6 +27,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    public Chat PVExistance(Long userId1, Long userId2) {
+        return subscriptionRepository.PVExists(userId1 , userId2);
+    }
+
+    @Override
     public Nameable setName(List<Contact> contacts, User user) {
         for (Contact contact : contacts) {
             if (contact.getSecondUser() == user) {
