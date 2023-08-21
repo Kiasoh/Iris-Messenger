@@ -70,7 +70,7 @@ public class MessageController extends BaseController {
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         List<GetMessageDto> sorted = getMessageDtoList.stream()
-                .sorted(Comparator.comparing(GetMessageDto::getSendAt))
+                .sorted(Comparator.comparing(GetMessageDto::getMessageId))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(sorted, HttpStatus.OK);
     }
@@ -94,6 +94,21 @@ public class MessageController extends BaseController {
     @GetMapping("/seen-user-count/{chatId}/{messageId}")
     public ResponseEntity<Integer> userSeenCount(@PathVariable Long chatId, @PathVariable Long messageId) {
         return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
+    }
+    @DeleteMapping("/delete-message/{id}")
+    public ResponseEntity<?> deleteMessage(@PathVariable Long id) {
+        Message message = messageService.getById(id);
+        Chat chat = message.getChat();
+        User user = getUserByToken();
+        //TODO:delete permission
+//        if (!chatService.isInChat(chat, user)
+//                || !permissionService.hasAccess(user.getUserId(), chat.getChatId(), Permission.)) {
+//            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
+//                    user.getPhoneNumber(), chat.getChatId()));
+//            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+//        }
+        messageService.deleteById(id);
+        return ResponseEntity.ok("If you only could delete feelings the same way you delete a text message");
     }
 
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
