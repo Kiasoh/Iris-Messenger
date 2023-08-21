@@ -191,6 +191,7 @@ public class MessageController extends BaseController {
         newMessage.setOriginMessage(message);
         newMessage.setSender(user);
         newMessage.setText(message.getText());
+        newMessage.setSendAt(Instant.now());
 
         if (message.getMedia() != null) {
             Media media = message.getMedia();

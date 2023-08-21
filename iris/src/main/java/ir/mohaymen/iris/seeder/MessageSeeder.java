@@ -44,7 +44,7 @@ public class MessageSeeder implements Seeder {
     }
 
     private void generateRandomMessageForChat() {
-        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+        long id = faker.random().nextInt(1, 99999);
 
         long subscriptionId = faker.random().nextInt(1, SubscriptionSeeder.NUMBER_OF_INSTANCES);
         Subscription subscription = subscriptionRepository.findById(subscriptionId).orElse(new Subscription());
@@ -53,7 +53,7 @@ public class MessageSeeder implements Seeder {
     }
 
     private void generateMessageForPV(long pvId) {
-        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+        long id = faker.random().nextInt(1, 99999);
 
         Subscription subscription = subscriptionRepository.findById(SubscriptionSeeder.NUMBER_OF_INSTANCES + pvId).orElse(new Subscription());
 
@@ -66,11 +66,10 @@ public class MessageSeeder implements Seeder {
 
         Media media = generateRandomMedia(id);
 
-        String text = generateRandomText(id);
+        String text = String.join(" ", faker.lorem().paragraphs((int) id % 5 + 1));
 
         DateAndTime date = faker.date();
-        Date sendingTimeLowerBound = Date
-                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(200).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeLowerBound = Date.from(chat.getCreatedAt());
         Date sendingTimeUpperBound = Date
                 .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
         Instant sendingTime = date.between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
@@ -87,19 +86,7 @@ public class MessageSeeder implements Seeder {
         messages.add(message);
     }
 
-    private String generateRandomText(Long seed) {
-        return switch ((int) (seed % 7)) {
-            case 0 -> faker.harryPotter().quote();
-            case 1 -> faker.howIMetYourMother().quote();
-            case 2 -> faker.gameOfThrones().quote();
-            case 3 -> faker.hobbit().quote();
-            case 4 -> faker.dune().quote();
-            case 5 -> faker.rickAndMorty().quote();
-            default -> null;
-        };
-    }
-
-    private Media generateRandomMedia(Long seed) {
+    private Media generateRandomMedia(long seed) {
         Media media;
 
         media = new Media();

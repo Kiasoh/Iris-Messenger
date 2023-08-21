@@ -48,7 +48,8 @@ public class Message {
     @OneToOne
     private Media media;
 
-    @CreationTimestamp
+//    @CreationTimestamp
+    @NotNull
     private Instant sendAt;
 
     private Instant editedAt;

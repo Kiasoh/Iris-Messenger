@@ -29,7 +29,7 @@ public class ContactSeeder implements Seeder {
     }
 
     private void generateRandomContact() {
-        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+        long id = faker.random().nextInt(1, 99999);
 
         long firstUserId = faker.random().nextInt(1, UserSeeder.NUMBER_OF_INSTANCES);
         User firstUser = new User();
@@ -46,7 +46,7 @@ public class ContactSeeder implements Seeder {
 
         Name name = faker.name();
         String firstName = name.firstName();
-        String lastName = id % 5 == 0 ? name.lastName() : null;
+        String lastName = id % 4 == 0 ? name.lastName() : null;
 
         Contact contact = new Contact();
         contact.setFirstUser(firstUser);

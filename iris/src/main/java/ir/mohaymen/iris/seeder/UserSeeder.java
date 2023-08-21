@@ -30,7 +30,7 @@ public class UserSeeder implements Seeder {
     }
 
     private void generateRandomUser() {
-        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
+        long id = faker.random().nextInt(1, 99999);
         Name name = faker.name();
         String firstName = name.firstName();
         String lastName = id % 4 == 2 ? name.lastName() : null;

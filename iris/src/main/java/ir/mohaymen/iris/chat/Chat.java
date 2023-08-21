@@ -6,6 +6,7 @@ import ir.mohaymen.iris.subscription.Subscription;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -38,11 +39,13 @@ public class Chat {
     @NotNull
     private ChatType chatType;
 
+    @NotNull
+    private Instant createdAt;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
     public Set<Subscription> subs = new HashSet<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
     public List<ChatProfile> chatProfiles = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
     public List<Message> messages = new ArrayList<>();
-    private Instant createdAt;
 }
