@@ -3,6 +3,7 @@ package ir.mohaymen.iris.chat;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.subscription.Subscription;
+import ir.mohaymen.iris.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -41,6 +42,10 @@ public class Chat {
 
     @NotNull
     private Instant createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
     public Set<Subscription> subs = new HashSet<>();
