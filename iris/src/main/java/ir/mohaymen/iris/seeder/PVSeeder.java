@@ -9,7 +9,11 @@ import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -37,19 +41,24 @@ public class PVSeeder implements Seeder {
     }
 
     private void generateRandomPV() {
-        long id = Long.parseLong(faker.regexify("\\d{1,5}"));
         String title = null;
         String link = null;
         ChatType chatType = ChatType.PV;
-        String bio = id % 3 == 0 ? faker.regexify("(\\w|\\d| |_|,|\\.){5,50}") : null;
         boolean isPublic = false;
+
+        Date sendingTimeLowerBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(150).atZone(ZoneId.systemDefault()).toInstant());
+        Date sendingTimeUpperBound = Date
+                .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
+        Instant createdTime = faker.date().between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
+//        Instant createdTime = faker.date().past(100, TimeUnit.DAYS).toInstant();
 
         Chat chat = new Chat();
         chat.setTitle(title);
         chat.setLink(link);
         chat.setPublic(isPublic);
         chat.setChatType(chatType);
-        chat.setBio(bio);
+        chat.setCreatedAt(createdTime);
 
         pvs.add(chat);
     }

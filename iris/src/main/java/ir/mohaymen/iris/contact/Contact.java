@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "contacts")
+@Table(name = "contacts", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"first_user_id", "second_user_id"})})
 @Getter
 @Setter
 public class Contact implements Nameable {
@@ -18,10 +19,11 @@ public class Contact implements Nameable {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "first_user_id")
     private User firstUser;
 
     @ManyToOne
+    @JoinColumn(name = "second_user_id")
     private User secondUser;
 
     @NotBlank
