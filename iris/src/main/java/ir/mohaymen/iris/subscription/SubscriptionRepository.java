@@ -47,4 +47,12 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     Long getOtherPVUserId(@Param("chatId") Long chatId, @Param("userId") Long userId);
 
     Subscription findSubscriptionByChatAndUser(Chat chat , User user);
+
+    @Query("""
+                SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+                from Subscription sub1 inner join Subscription sub2 on sub1.chat.chatId=sub2.chat.chatId
+                where sub1.user.userId = :userId1 and sub2.user.userId = :userId2
+            """)
+    boolean PVExists(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
 }
