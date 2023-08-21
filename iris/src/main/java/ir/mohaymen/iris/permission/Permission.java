@@ -38,5 +38,11 @@ public enum Permission {
         }
         return permissions;
     }
+    public static boolean isAdmin(Set<Permission> permissions){
+        return permissions.contains(ADMIN) || permissions.contains(OWNER);
+    }
+    public static boolean isOwner(Set<Permission> permissions){
+        return permissions.contains(OWNER);
+    }
 
 }
