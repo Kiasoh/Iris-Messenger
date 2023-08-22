@@ -31,6 +31,7 @@ public class MessageSeeder implements Seeder {
     private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
     static final int NUMBER_OF_INSTANCES = NUMBER_OF_CHAT_MESSAGES + NUMBER_OF_PV_MESSAGES;
     private final List<Message> messages = new ArrayList<>();
+    private final Map<Long, Instant> userIdToLastSeenMap = new HashMap<>();
 
     @Override
     public void load() {
@@ -41,6 +42,7 @@ public class MessageSeeder implements Seeder {
         for (int i = 1; i <= NUMBER_OF_PV_MESSAGES; i++)
             generateMessageForPV(i);
 
+        updateUsersLastSeen();
         messages.sort(Comparator.comparing(Message::getSendAt));
         messageRepository.saveAll(messages);
         clearReferences();
@@ -93,7 +95,9 @@ public class MessageSeeder implements Seeder {
         message.setEditedAt(editingTime);
 
         Instant updateTime = (editingTime == null) ? sendingTime : editingTime;
-        userRepository.updateLastSeen(userId, updateTime);
+
+        if (userIdToLastSeenMap.get(userId) == null) userIdToLastSeenMap.put(userId, updateTime);
+        else if (userIdToLastSeenMap.get(userId).isBefore(updateTime)) userIdToLastSeenMap.put(userId, updateTime);
 
         messages.add(message);
     }
@@ -116,5 +120,10 @@ public class MessageSeeder implements Seeder {
             media = null;
 
         return media;
+    }
+
+    private void updateUsersLastSeen() {
+        for (Long userId : userIdToLastSeenMap.keySet())
+            userRepository.updateLastSeen(userId, userIdToLastSeenMap.get(userId));
     }
 }
