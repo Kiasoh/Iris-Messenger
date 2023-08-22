@@ -36,6 +36,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public boolean isInChat(Long chatId, Long userId){
+        return subscriptionRepository.userIsInChat(userId, chatId);
+    }
+
+    @Override
     public Chat createOrUpdate(Chat chat) {
         return chatRepository.save(chat);
     }
