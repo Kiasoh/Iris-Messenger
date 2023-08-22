@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.search.contact;
 
 import lombok.AllArgsConstructor;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -59,7 +60,8 @@ public class SearchContactServiceImpl implements SearchContactService{
         MultiMatchQueryBuilder query = QueryBuilders
                 .multiMatchQuery(name)
                 .field("firstName")
-                .field("lastName");
+                .field("lastName")
+                .fuzziness(Fuzziness.AUTO);
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(query)
