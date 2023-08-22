@@ -46,6 +46,7 @@ public class ChatServiceImpl implements ChatService {
     public void deleteById(Long id) {
         chatRepository.deleteById(id);
     }
+
     @Override
     public Chat getByLink(String link) {
         return chatRepository.findByLink(link).orElseThrow(EntityNotFoundException::new);
@@ -54,9 +55,11 @@ public class ChatServiceImpl implements ChatService {
     public Iterable<Chat> getByTitle(String title) {
         return chatRepository.findByTitle(title);
     }
+    @Override
     public Long getOtherPVUser(Chat chat , Long userId) {
         if (!chat.getChatType().equals(ChatType.PV))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         return subscriptionRepository.getOtherPVUserId(chat.getChatId(),userId);
     }
+
 }
