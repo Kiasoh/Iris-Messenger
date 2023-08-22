@@ -55,7 +55,7 @@ public class SearchContactServiceImpl implements SearchContactService{
     }
 
     @Override
-    public List<SearchContactDto> searchByName(String name) {
+    public List<SearchContactDto> searchByName(String name, Long userId) {
 
         MultiMatchQueryBuilder query = QueryBuilders
                 .multiMatchQuery(name)
