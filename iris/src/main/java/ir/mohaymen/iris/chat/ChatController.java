@@ -94,7 +94,7 @@ public class ChatController extends BaseController {
         createInternalSub(chat, getUserByToken(), ownerPermissions);
         for (Long userId : createChatDto.getUserIds()) {
             try {
-                createInternalSub(chat, User.builder().userId(userId).build());
+                createInternalSub(chat, User.builder().userId(userId).lastSeen(Instant.now()).build());
             } catch (Exception ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
@@ -134,7 +134,7 @@ public class ChatController extends BaseController {
             User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
             if (userProfileList != null || !userProfileList.isEmpty())
-                user.getProfiles()
+                userProfileList
                         .forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
         }
         getChatDto.setChatId(chat.getChatId());
@@ -167,9 +167,9 @@ public class ChatController extends BaseController {
             menuChatDto.setSentAt(message.getSendAt());
             User user = message.getSender();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
-            if (user.getProfiles().size() != 0) {
-                menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
-            }
+            UserProfile userProfile = userProfileService.getLastUserProfile(user);
+            if (userProfile != null)
+                menuChatDto.setMedia(userProfile.getMedia());
             menuChatDto.setUserFirstName(nameable.getFirstName());
         } else {
             menuChatDto.setSentAt(chat.getCreatedAt());

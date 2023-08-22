@@ -41,11 +41,4 @@ public class Chat {
 
     @NotNull
     private Instant createdAt;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public Set<Subscription> subs = new HashSet<>();
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public List<ChatProfile> chatProfiles = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public List<Message> messages = new ArrayList<>();
 }
