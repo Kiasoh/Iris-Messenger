@@ -37,7 +37,7 @@ public class ContactController extends BaseController {
         contact.setId(null);
         contact.setFirstUser(getUserByToken());
         contact = contactService.createOrUpdate(contact);
-        searchContactService.index(new SearchContactDto(contact.getId(), contact.getFirstName(), contact.getLastName()));
+        searchContactService.index(new SearchContactDto(contact.getId(), contact.getFirstUser().getUserId(), contact.getSecondUser().getUserId(), contact.getFirstName(), contact.getLastName()));
         return new ResponseEntity<>( makePostContact(contact) , HttpStatus.OK);
     }
     @GetMapping("/get-contacts")

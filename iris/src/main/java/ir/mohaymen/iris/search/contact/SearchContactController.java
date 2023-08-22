@@ -24,9 +24,14 @@ public class SearchContactController extends BaseController {
         return new ResponseEntity<>(searchContactService.searchByName(name, getUserByToken().getUserId()), HttpStatus.OK);
     }
 
-    @PostMapping()
-    public ResponseEntity<String> indexContact(@RequestBody SearchContactDto contact){
+    @PostMapping("")
+    public ResponseEntity<String> index(@RequestBody SearchContactDto contact){
 //        logger.info(MessageFormat.format());
         return new ResponseEntity<>(searchContactService.index(contact), HttpStatus.OK);
+    }
+
+    @PostMapping("/multi")
+    public ResponseEntity<List<String>> bulkIndex(@RequestBody List<SearchContactDto> contacts){
+        return new ResponseEntity<>(searchContactService.bulkIndex(contacts), HttpStatus.OK);
     }
 }
