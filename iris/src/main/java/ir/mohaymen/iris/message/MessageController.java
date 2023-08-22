@@ -5,6 +5,7 @@ import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
+import ir.mohaymen.iris.file.FileMultipartFile;
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaService;
@@ -26,8 +27,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -56,7 +59,7 @@ public class MessageController extends BaseController {
 
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId,
-            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
+                                                           @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = new ArrayList<>();
@@ -102,17 +105,17 @@ public class MessageController extends BaseController {
         Message message = messageService.getById(id);
         Chat chat = message.getChat();
         User user = getUserByToken();
-       if (!chatService.isInChat(chat, user)
-               || !permissionService.hasAccessToDeleteMessage(message,user.getUserId(), chat)) {
-           logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
-                   user.getPhoneNumber(), chat.getChatId()));
-           throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-       }
+        if (!chatService.isInChat(chat, user)
+                || !permissionService.hasAccessToDeleteMessage(message, user.getUserId(), chat)) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
+                    user.getPhoneNumber(), chat.getChatId()));
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        }
         messageService.deleteById(id);
         return ResponseEntity.ok("If you only could delete feelings the same way you delete a text message");
     }
 
-    @RequestMapping(path = "/send-message", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         User user = getUserByToken();
         Chat chat = chatService.getById(messageDto.getChatId());
@@ -202,22 +205,17 @@ public class MessageController extends BaseController {
 
         if (message.getMedia() != null) {
             Media media = message.getMedia();
-
-            Media newMedia = new Media();
-            newMedia.setFileName(media.getFileName());
-            newMedia.setFilePath(media.getFilePath());
-            newMedia.setFileMimeType(media.getFileMimeType());
-
-            newMedia = mediaService.createOrUpdate(newMedia);
+            Media newMedia = fileService.duplicateMediaById(media.getMediaId());
             newMessage.setMedia(newMedia);
         }
 
-        return new ResponseEntity<>(mapMessageToForwardMessageDto(newMessage), HttpStatus.OK);
+        Message savedMessage = messageService.createOrUpdate(newMessage);
+        return new ResponseEntity<>(mapMessageToForwardMessageDto(savedMessage), HttpStatus.OK);
     }
 
     @PostMapping("/forward-message/{chatId}")
     public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId,
-            @RequestBody @Valid List<Long> messageIds) {
+                                                                  @RequestBody @Valid List<Long> messageIds) {
         logger.info(MessageFormat.format("user with phone number:{0} attempts to forward {} message(s) to chat:{2}",
                 getUserByToken().getPhoneNumber(), messageIds.size(), chatId));
         List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
@@ -239,8 +237,7 @@ public class MessageController extends BaseController {
     }
 
     private ForwardMessageDto mapMessageToForwardMessageDto(Message message) {
-        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message),
-                ForwardMessageDto.class);
+        ForwardMessageDto forwardMessageDto = modelMapper.map(message, ForwardMessageDto.class);
         forwardMessageDto.setUserId(message.getSender().getUserId());
         return forwardMessageDto;
     }
