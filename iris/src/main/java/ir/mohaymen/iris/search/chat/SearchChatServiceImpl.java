@@ -40,7 +40,7 @@ public class SearchChatServiceImpl implements SearchChatService{
     }
 
     @Override
-    public List<String> bulkIndex(List<SearchChatDto> chats){
+    public List<String> bulkIndex(List<SearchChatDto> chats, Long userId){
         List<IndexQuery> indexQueries = chats.stream()
                 .map(chat -> new IndexQueryBuilder()
                         .withId(chat.getId().toString())
@@ -59,22 +59,22 @@ public class SearchChatServiceImpl implements SearchChatService{
     @Override
     public List<SearchChatDto> search(String text, Long userId) {
 
-        MatchQueryBuilder matchQuery = QueryBuilders
+        MatchQueryBuilder titleQuery = QueryBuilders
                 .matchQuery("title", text)
                 .fuzziness(Fuzziness.AUTO);
 
-//        MatchQueryBuilder filterQuery = QueryBuilders
-//                .termQuery()
+        MatchQueryBuilder userQuery = QueryBuilders
+                .matchQuery("userId", userId);
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(matchQuery)
+                .withQuery(titleQuery)
+                .withFilter(userQuery)
                 .build();
 
         SearchHits<SearchChatDto> hits = elasticsearchOperations.search(searchQuery, SearchChatDto.class, IndexCoordinates.of(INDEX_NAME));
 
         return hits.stream()
                 .map(hit -> hit.getContent())
-                .filter(chat -> chatService.isInChat(chat.getId(), userId))
                 .collect(Collectors.toList());
     }
 }
