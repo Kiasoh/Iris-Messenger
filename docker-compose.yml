@@ -28,7 +28,7 @@ services:
       - 'POSTGRES_USER=root'
       - 'POSTGRES_PASSWORD=toor'
     ports:
-      - '5432'
+      - '5433:5432'
     restart: unless-stopped
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
