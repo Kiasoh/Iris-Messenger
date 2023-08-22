@@ -38,7 +38,6 @@ public class Message {
 
     @JoinColumn(name = "origin_message_id")
     @ManyToOne
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Message originMessage;
 
     @JoinColumn(name = "userId")
@@ -49,7 +48,8 @@ public class Message {
     @OneToOne
     private Media media;
 
-    @CreationTimestamp
+//    @CreationTimestamp
+    @NotNull
     private Instant sendAt;
 
     private Instant editedAt;

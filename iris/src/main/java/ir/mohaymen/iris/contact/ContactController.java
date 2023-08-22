@@ -1,5 +1,8 @@
 package ir.mohaymen.iris.contact;
 
+import ir.mohaymen.iris.search.contact.SearchContactDto;
+import ir.mohaymen.iris.search.contact.SearchContactService;
+import ir.mohaymen.iris.search.message.SearchMessageService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
@@ -22,6 +25,7 @@ public class ContactController extends BaseController {
     private final UserService userService;
     private final ContactService contactService;
     private final ModelMapper modelMapper;
+    private final SearchContactService searchContactService;
 
     @PostMapping("/add-contact")
     public ResponseEntity<PostContactDto> addContact(@RequestBody @Valid GetContactDto getContactDto) {
@@ -33,6 +37,7 @@ public class ContactController extends BaseController {
         contact.setId(null);
         contact.setFirstUser(getUserByToken());
         contact = contactService.createOrUpdate(contact);
+        searchContactService.index(new SearchContactDto(contact.getId(), contact.getFirstName(), contact.getLastName()));
         return new ResponseEntity<>( makePostContact(contact) , HttpStatus.OK);
     }
     @GetMapping("/get-contacts")
@@ -43,15 +48,30 @@ public class ContactController extends BaseController {
         }
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
-    @GetMapping("/get-contact")
-    public ResponseEntity<PostContactDto> getContact(@RequestParam Long userId) {
+    @GetMapping("/get-contact-by-user")
+    public ResponseEntity<PostContactDto> getContactBySecondUser(@RequestParam Long userId) {
         if(!contactService.isInContact(getUserByToken() , userId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(makePostContact(contactService.getContact(getUserByToken().getUserId(), userId)) , HttpStatus.OK);
+    }
+    @GetMapping("/get-contact/{contactId}")
+    public ResponseEntity<PostContactDto> getContact(   @PathVariable Long contactId) {
+        Contact contact = contactService.getById(contactId);
+        if (contact.getFirstUser().getUserId() != getUserByToken().getUserId())
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(makePostContact(contact) , HttpStatus.OK);
     }
     public PostContactDto makePostContact(Contact con){
         PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
         postContactDto.setSecondUserId(con.getSecondUser().getUserId());
         return postContactDto;
+    }
+    @DeleteMapping("/delete-contact/{id}")
+    public ResponseEntity<?> deleteContact(@PathVariable Long id){
+        if (!contactService.isInContact(getUserByToken(), id)) {
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        contactService.deleteBySecondUser(userService.getById(id));
+        return ResponseEntity.ok("contact deleted");
     }
 }

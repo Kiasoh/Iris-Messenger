@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
         var user = User.builder()
                 .firstName("کاربر")
                 .phoneNumber(phoneNumber)
+                .lastSeen(Instant.now())
                 .build();
         var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
@@ -61,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
                 .user(UserMapper.mapToUserDto(savedUser))
+                .isRegistered(true)
                 .build();
     }
 

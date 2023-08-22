@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -30,6 +27,7 @@ public class ChatProfileSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomChatProfile();
+        chatProfiles.sort(Comparator.comparing(ChatProfile::getSetAt));
         chatProfileRepository.saveAll(chatProfiles);
     }
 
@@ -45,7 +43,7 @@ public class ChatProfileSeeder implements Seeder {
         Media media = new Media();
         media.setMediaId(mediaId);
 
-        Instant sendingTime = faker.date().past(200, TimeUnit.DAYS).toInstant();
+        Instant sendingTime = faker.date().past(100, TimeUnit.DAYS).toInstant();
 
         ChatProfile chatProfile = new ChatProfile();
         chatProfile.setChat(chat);

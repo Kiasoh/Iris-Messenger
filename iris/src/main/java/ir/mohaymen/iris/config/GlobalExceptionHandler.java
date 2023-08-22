@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler({SQLException.class, SQLDataException.class})
+    @ExceptionHandler({ SQLException.class, SQLDataException.class })
     public ResponseEntity<?> dataBase(Exception e) {
         log("SQL ERROR", e);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
