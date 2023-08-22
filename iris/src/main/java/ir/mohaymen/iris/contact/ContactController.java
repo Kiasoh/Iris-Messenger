@@ -48,11 +48,18 @@ public class ContactController extends BaseController {
         }
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
-    @GetMapping("/get-contact")
-    public ResponseEntity<PostContactDto> getContact(@RequestParam Long userId) {
+    @GetMapping("/get-contact-by-user")
+    public ResponseEntity<PostContactDto> getContactBySecondUser(@RequestParam Long userId) {
         if(!contactService.isInContact(getUserByToken() , userId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(makePostContact(contactService.getContact(getUserByToken().getUserId(), userId)) , HttpStatus.OK);
+    }
+    @GetMapping("/get-contact/{contactId}")
+    public ResponseEntity<PostContactDto> getContact(@@PathVariable Long contactId) {
+        Contact contact = contactService.getById(contactId);
+        if (contact.getFirstUser().getUserId() != getUserByToken().getUserId())
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(makePostContact(contact) , HttpStatus.OK);
     }
     public PostContactDto makePostContact(Contact con){
         PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
