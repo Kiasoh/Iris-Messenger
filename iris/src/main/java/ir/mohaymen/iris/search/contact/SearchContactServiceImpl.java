@@ -12,67 +12,66 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
 
+import ir.mohaymen.iris.search.message.SearchMessageDto;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class SearchContactServiceImpl implements SearchContactService{
+public class SearchContactServiceImpl implements SearchContactService {
 
-    private static final String INDEX_NAME = "contact";
-    private final SearchContactRepository searchContactRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
+        private static final String INDEX_NAME = "contact";
+        private final SearchContactRepository searchContactRepository;
+        private final ElasticsearchOperations elasticsearchOperations;
 
-    @Override
-    public String index(SearchContactDto contact) {
+        @Override
+        public String index(SearchContactDto contact) {
 
-        IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(contact.getId().toString())
-                .withObject(contact)
-                .build();
+                IndexQuery indexQuery = new IndexQueryBuilder()
+                                .withId(contact.getId().toString())
+                                .withObject(contact)
+                                .build();
 
-        return elasticsearchOperations.index(indexQuery, IndexCoordinates.of(INDEX_NAME));
-    }
+                return elasticsearchOperations.index(indexQuery, IndexCoordinates.of(INDEX_NAME));
+        }
 
-    public List<String> bulkIndex(List<SearchContactDto> contacts){
+        public List<String> bulkIndex(List<SearchContactDto> contacts) {
 
-        List<IndexQuery> queries =
-                contacts.stream()
-                .map(contact -> new IndexQueryBuilder()
-                        .withId(contact.getId().toString())
-                        .withObject(contact)
-                        .build())
-                .collect(Collectors.toList());
+                List<IndexQuery> queries = contacts.stream()
+                                .map(contact -> new IndexQueryBuilder()
+                                                .withId(contact.getId().toString())
+                                                .withObject(contact)
+                                                .build())
+                                .collect(Collectors.toList());
 
-        return elasticsearchOperations.bulkIndex(queries, IndexCoordinates.of(INDEX_NAME));
-    }
+                return elasticsearchOperations.bulkIndex(queries, IndexCoordinates.of(INDEX_NAME));
+        }
 
+        @Override
+        public void deleteById(Long id) {
+                searchContactRepository.deleteById(id);
+        }
 
+        @Override
+        public List<SearchContactDto> searchByName(String name) {
 
-    @Override
-    public void deleteById(Long id) {
-        searchContactRepository.deleteById(id);
-    }
+                MultiMatchQueryBuilder query = QueryBuilders
+                                .multiMatchQuery(name)
+                                .field("firstName")
+                                .field("lastName")
+                                .fuzziness(Fuzziness.AUTO);
 
-    @Override
-    public List<SearchContactDto> searchByName(String name) {
+                Query searchQuery = new NativeSearchQueryBuilder()
+                                .withQuery(query)
+                                .build();
 
-        MultiMatchQueryBuilder query = QueryBuilders
-                .multiMatchQuery(name)
-                .field("firstName")
-                .field("lastName")
-                .fuzziness(Fuzziness.AUTO);
+                SearchHits<SearchContactDto> hits = elasticsearchOperations.search(searchQuery, SearchContactDto.class,
+                                IndexCoordinates.of(INDEX_NAME));
 
-        Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(query)
-                .build();
-
-        SearchHits<SearchContactDto> hits = elasticsearchOperations.search(searchQuery, SearchContactDto.class, IndexCoordinates.of(INDEX_NAME));
-
-        return hits.stream()
-                .map(SearchHit::getContent)
-                .collect(Collectors.toList());
-    }
-
+                return hits.stream()
+                                .map(SearchHit::getContent)
+                                .collect(Collectors.toList());
+        }
 
 }

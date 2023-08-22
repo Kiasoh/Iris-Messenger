@@ -6,11 +6,15 @@ import ir.mohaymen.iris.chat.ChatSeederDto;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
+import ir.mohaymen.iris.search.message.SearchMessageDto;
+import ir.mohaymen.iris.search.message.SearchMessageService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -26,6 +30,8 @@ public class MessageSeeder implements Seeder {
     private final MessageRepository messageRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+    private final SearchMessageService searchMessageService;
+    private final ModelMapper modelMapper;
 
     private static final int NUMBER_OF_CHAT_MESSAGES = ChatSeeder.NUMBER_OF_INSTANCES * 10;
     private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
@@ -35,7 +41,8 @@ public class MessageSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (messageRepository.count() != 0) return;
+        if (messageRepository.count() != 0)
+            return;
 
         for (int i = 0; i < NUMBER_OF_CHAT_MESSAGES; i++)
             generateRandomMessageForChat();
@@ -44,7 +51,9 @@ public class MessageSeeder implements Seeder {
 
         updateUsersLastSeen();
         messages.sort(Comparator.comparing(Message::getSendAt));
-        messageRepository.saveAll(messages);
+        var savedMessages = messageRepository.saveAll(messages);
+        searchMessageService
+                .createBulk(savedMessages.stream().map(m -> modelMapper.map(m, SearchMessageDto.class)).toList());
         clearReferences();
     }
 
@@ -96,8 +105,10 @@ public class MessageSeeder implements Seeder {
 
         Instant updateTime = (editingTime == null) ? sendingTime : editingTime;
 
-        if (userIdToLastSeenMap.get(userId) == null) userIdToLastSeenMap.put(userId, updateTime);
-        else if (userIdToLastSeenMap.get(userId).isBefore(updateTime)) userIdToLastSeenMap.put(userId, updateTime);
+        if (userIdToLastSeenMap.get(userId) == null)
+            userIdToLastSeenMap.put(userId, updateTime);
+        else if (userIdToLastSeenMap.get(userId).isBefore(updateTime))
+            userIdToLastSeenMap.put(userId, updateTime);
 
         messages.add(message);
     }
@@ -105,7 +116,8 @@ public class MessageSeeder implements Seeder {
     private Media generateRandomMedia(long seed) {
         Media media;
 
-        if (MediaSeeder.NUMBER_OF_USED_MEDIAS >= MediaSeeder.NUMBER_OF_INSTANCES) return null;
+        if (MediaSeeder.NUMBER_OF_USED_MEDIAS >= MediaSeeder.NUMBER_OF_INSTANCES)
+            return null;
 
         media = new Media();
         if (seed % 7 == 2 || seed % 7 == 6) {
