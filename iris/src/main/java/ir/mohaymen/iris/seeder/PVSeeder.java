@@ -3,6 +3,7 @@ package ir.mohaymen.iris.seeder;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
@@ -13,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class PVSeeder implements Seeder {
     static final int NUMBER_OF_INSTANCES = 30;
     private final List<Subscription> subscriptionList = new ArrayList<>();
     private final List<Chat> pvs = new ArrayList<>();
-    private List<Chat> savedChats;
+    private List<Chat> savedPvs;
 
     @Override
     public void load() {
@@ -33,7 +33,7 @@ public class PVSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomPV();
-        savedChats = chatRepository.saveAll(pvs);
+        savedPvs = chatRepository.saveAll(pvs);
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription(i);
@@ -76,14 +76,17 @@ public class PVSeeder implements Seeder {
         user2.setUserId(userId2);
 
 
-        Chat chat = savedChats.get(chatId);
+        Chat chat = savedPvs.get(chatId);
 
         Subscription subscription1 = new Subscription();
         subscription1.setUser(user1);
         subscription1.setChat(chat);
+        subscription1.setPermissions(Permission.getDefaultPermissions(ChatType.PV));
+
         Subscription subscription2 = new Subscription();
         subscription2.setUser(user2);
         subscription2.setChat(chat);
+        subscription2.setPermissions(Permission.getDefaultPermissions(ChatType.PV));
 
         subscriptionList.add(subscription1);
         subscriptionList.add(subscription2);

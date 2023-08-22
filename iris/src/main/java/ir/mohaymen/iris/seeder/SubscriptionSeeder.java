@@ -1,6 +1,10 @@
 package ir.mohaymen.iris.seeder;
 
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.chat.ChatType;
+import ir.mohaymen.iris.permission.Permission;
+import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
@@ -14,6 +18,7 @@ import java.util.*;
 public class SubscriptionSeeder implements Seeder {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final ChatRepository chatRepository;
 
     static final int NUMBER_OF_INSTANCES = 500;
     static final List<Subscription> subscriptions = new ArrayList<>();
@@ -31,23 +36,13 @@ public class SubscriptionSeeder implements Seeder {
     }
 
     private void addOwnersToSubscription() {
-        Map<Long, Set<Long>> ownerToChatMap = ChatSeeder.ownerToChatMap;
         for (Long ownerId : ChatSeeder.ownerToChatMap.keySet()) {
             Set<Long> chats = ChatSeeder.ownerToChatMap.get(ownerId);
             User owner = new User();
             owner.setUserId(ownerId);
-            for (Long chatId : chats) {
-                Chat chat = new Chat();
-                chat.setChatId(chatId);
-
-                Subscription subscription = new Subscription();
-                subscription.setUser(owner);
-                subscription.setChat(chat);
-
-                subscriptions.add(subscription);
-                userToChatMap.computeIfAbsent(ownerId, k -> new HashSet<>());
-                userToChatMap.get(ownerId).add(chatId);
-            }
+            userToChatMap.computeIfAbsent(ownerId, k -> new HashSet<>());
+            for (Long chatId : chats)
+                createSubscription(owner, chatId);
         }
     }
 
@@ -62,14 +57,22 @@ public class SubscriptionSeeder implements Seeder {
         do {
             chatId = faker.random().nextInt(1, ChatSeeder.NUMBER_OF_INSTANCES);
         } while (userToChatMap.get(userId).contains(chatId));
+
+        createSubscription(user, chatId);
+    }
+
+    private void createSubscription(User user, long chatId) {
         Chat chat = new Chat();
         chat.setChatId(chatId);
+
+        ChatType chatType = chatRepository.getChatType(chatId);
 
         Subscription subscription = new Subscription();
         subscription.setUser(user);
         subscription.setChat(chat);
+        subscription.setPermissions(Permission.getDefaultPermissions(chatType));
 
         subscriptions.add(subscription);
-        userToChatMap.get(userId).add(chatId);
+        userToChatMap.get(user.getUserId()).add(chatId);
     }
 }
