@@ -85,8 +85,10 @@ public class ChatController extends BaseController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         chat.setCreatedAt(Instant.now());
-        if (chat.getChatType() == ChatType.PV)
+        if (chat.getChatType() == ChatType.PV) {
             chat.setPublic(false);
+            chat.setLink(null);
+        }
         chat = chatService.createOrUpdate(chat);
         Set<Permission> ownerPermissions = chat.getChatType() == ChatType.PV
                 ? Permission.getDefaultPermissions(chat.getChatType())
