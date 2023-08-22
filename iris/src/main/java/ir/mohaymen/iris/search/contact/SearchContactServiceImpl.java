@@ -2,6 +2,7 @@ package ir.mohaymen.iris.search.contact;
 
 import lombok.AllArgsConstructor;
 import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -54,16 +55,20 @@ public class SearchContactServiceImpl implements SearchContactService{
     }
 
     @Override
-    public List<SearchContactDto> searchByName(String name) {
+    public List<SearchContactDto> searchByName(String name, Long userId) {
 
-        MultiMatchQueryBuilder query = QueryBuilders
+        MultiMatchQueryBuilder nameQuery = QueryBuilders
                 .multiMatchQuery(name)
                 .field("firstName")
                 .field("lastName")
                 .fuzziness(Fuzziness.AUTO);
 
+        MatchQueryBuilder userQuery = QueryBuilders
+                .matchQuery("userId", userId);
+
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(query)
+                .withQuery(nameQuery)
+                .withQuery(userQuery)
                 .build();
 
         SearchHits<SearchContactDto> hits = elasticsearchOperations.search(searchQuery, SearchContactDto.class, IndexCoordinates.of(INDEX_NAME));
@@ -72,6 +77,4 @@ public class SearchContactServiceImpl implements SearchContactService{
                 .map(SearchHit::getContent)
                 .collect(Collectors.toList());
     }
-
-
 }

@@ -15,6 +15,9 @@ public class SearchContactDto {
     @Id
     private Long id;
 
+    @Field(type = FieldType.Long)
+    private Long userId;
+
     @Field(type = FieldType.Text)
     private String firstName;
 
