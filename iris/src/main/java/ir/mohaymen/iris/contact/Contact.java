@@ -30,11 +30,11 @@ public class Contact implements Nameable {
     private String firstName;
 
     private String lastName;
+
     @Override
     public String fullName() {
         String name = firstName;
-        if(lastName!=null)
-            name =name + " " + lastName;
+        if (lastName != null) name = name + " " + lastName;
         return name;
     }
 }

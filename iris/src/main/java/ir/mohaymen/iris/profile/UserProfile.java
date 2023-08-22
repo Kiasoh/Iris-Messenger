@@ -21,11 +21,11 @@ public class UserProfile {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "mediaId")
+    @JoinColumn(name = "media_id")
     private Media media;
 
     private Instant setAt;
