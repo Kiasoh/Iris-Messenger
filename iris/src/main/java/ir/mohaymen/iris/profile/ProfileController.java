@@ -44,9 +44,8 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<List<ProfileDto>> getUserProfileById(@PathVariable Long id) {
-        User user = userService.getById(id);
-
-        List<ProfileDto> profiles = user.getProfiles().stream()
+        List<UserProfile> userProfileList = userProfileService.getByUser(userService.getById(id));
+        List<ProfileDto> profiles = userProfileList.stream()
                 .map(ProfileMapper::mapToProfileDto)
                 .toList();
 
@@ -55,9 +54,8 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/chats/{id}")
     public ResponseEntity<List<ProfileDto>> getChatProfileById(@PathVariable Long id) {
-        Chat chat = chatService.getById(id);
-
-        List<ProfileDto> profiles = chat.getChatProfiles().stream()
+        List<ChatProfile> chatProfileList = chatProfileService.getByChat(chatService.getById(id));
+        List<ProfileDto> profiles = chatProfileList.stream()
                 .map(profile -> ProfileMapper.mapToProfileDto(profile))
                 .toList();
 

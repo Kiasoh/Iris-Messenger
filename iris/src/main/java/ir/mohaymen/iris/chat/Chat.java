@@ -46,13 +46,4 @@ public class Chat {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public Set<Subscription> subs = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public List<ChatProfile> chatProfiles = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
-    public List<Message> messages = new ArrayList<>();
 }

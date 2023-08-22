@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.*;
 
 @RestController
@@ -63,12 +64,33 @@ public class SubscriptionController extends BaseController {
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
-    @PutMapping("/set-last-seen/{chatId}/{messageId}")
-    public ResponseEntity<?> setLastSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        subscriptionService.updateLastSeenMessage(chatId , getUserByToken().getUserId() , messageId);
+    @PutMapping("/set-last-seen/{messageId}")
+    public ResponseEntity<?> setLastSeen(@PathVariable Long messageId) {
+        Message message = messageService.getById(messageId);
+        subscriptionService.updateLastSeenMessage(message.getChat().getChatId() , getUserByToken().getUserId() , messageId);
         return ResponseEntity.ok("... YoU hAvE SeEn ThE tRuTh ...");
     }
-
+    @DeleteMapping("/delete-sub/{subId}")
+    public ResponseEntity<?> leaveGroupBySubId(@PathVariable Long subId) throws Exception {
+        Subscription subscription = subscriptionService.getSubscriptionBySubscriptionId(subId);
+        if (subscription.getChat().getChatType() == ChatType.PV) {
+            chatService.deleteById(subscription.getChat().getChatId());
+            return ResponseEntity.ok("PV deleted.");
+        }
+        subscriptionService.deleteById(subId);
+        return ResponseEntity.ok("you have left the group!");
+    }
+    @DeleteMapping("/delete-sub/{chatId}")
+    public ResponseEntity<?> leaveGroupByChatId(@PathVariable Long chatId) throws Exception {
+        Chat chat = new Chat(); chat.setChatId(chatId); chat.setChatType(ChatType.PV); chat.setCreatedAt(Instant.now());
+        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser( chat, getUserByToken());
+        if (subscription.getChat().getChatType() == ChatType.PV) {
+            chatService.deleteById(subscription.getChat().getChatId());
+            return ResponseEntity.ok("PV deleted.");
+        }
+        subscriptionService.deleteById(subscription.getSubId());
+        return ResponseEntity.ok("you have left the group!");
+    }
     @GetMapping("/chat-subs/{id}")
     public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
         List<SubDto> subDtoList = new ArrayList<>();

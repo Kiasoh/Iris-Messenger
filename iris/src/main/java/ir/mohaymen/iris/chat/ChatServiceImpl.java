@@ -21,7 +21,6 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private final SubscriptionService subscriptionService;
     @Override
     public Chat getById(Long id) {
         return chatRepository.findById(id).orElseThrow(EntityNotFoundException::new);

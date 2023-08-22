@@ -43,9 +43,9 @@ public class ContactController extends BaseController {
     @GetMapping("/get-contacts")
     public ResponseEntity<List<PostContactDto>> getContacts() {
         List<PostContactDto> pcdtl = new ArrayList<>();
-        for (Contact con: getUserByToken().getContacts() ) {
-            pcdtl.add(makePostContact(con));
-        }
+        List<Contact> contacts = contactService.getContactByFirstUser(getUserByToken());
+        contacts.stream()
+                .forEach(c -> pcdtl.add(makePostContact(c)));
         return new ResponseEntity<>(pcdtl, HttpStatus.OK);
     }
     @GetMapping("/get-contact-by-user")
