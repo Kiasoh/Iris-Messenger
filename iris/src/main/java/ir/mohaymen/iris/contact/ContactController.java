@@ -55,7 +55,7 @@ public class ContactController extends BaseController {
         return new ResponseEntity<>(makePostContact(contactService.getContact(getUserByToken().getUserId(), userId)) , HttpStatus.OK);
     }
     @GetMapping("/get-contact/{contactId}")
-    public ResponseEntity<PostContactDto> getContact(@@PathVariable Long contactId) {
+    public ResponseEntity<PostContactDto> getContact(   @PathVariable Long contactId) {
         Contact contact = contactService.getById(contactId);
         if (contact.getFirstUser().getUserId() != getUserByToken().getUserId())
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
