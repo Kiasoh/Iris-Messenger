@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.subscription;
 
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.chat.ChatSeederDto;
 import ir.mohaymen.iris.user.User;
 import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,20 @@ import java.util.List;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
+
+    @Query("""
+            select sub.user.userId
+            from Subscription sub
+            where sub.subId=:subId
+            """)
+    Long findUserIdBySubscriptionId(@Param("subId") Long subId);
+
+    @Query("""
+            select new ir.mohaymen.iris.chat.ChatSeederDto(sub.chat.chatId, sub.chat.createdAt)
+            from Subscription sub
+            where sub.subId=:subId
+            """)
+    ChatSeederDto findChatBySubscriptionId(@Param("subId") Long subId);
 
     List<Subscription> findSubscriptionByUser(User user);
 

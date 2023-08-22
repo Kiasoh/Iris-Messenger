@@ -51,7 +51,7 @@ public class MediaSeeder implements Seeder {
     }
 
     private void readFiles() {
-        String path = "./src/main/resources/images";
+        String path = "./iris/src/main/resources/images";
         try (Stream<Path> paths = Files.walk(Paths.get(path))) {
             filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
         } catch (IOException e) {
