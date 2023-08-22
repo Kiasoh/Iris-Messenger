@@ -105,7 +105,7 @@ public class MessageController extends BaseController {
         Chat chat = message.getChat();
         User user = getUserByToken();
        if (!chatService.isInChat(chat, user)
-               || !permissionService.hasAccessToDeleteMessage(message,user.getUserId(), chat.getChatId())) {
+               || !permissionService.hasAccessToDeleteMessage(message,user.getUserId(), chat)) {
            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
                    user.getPhoneNumber(), chat.getChatId()));
            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);

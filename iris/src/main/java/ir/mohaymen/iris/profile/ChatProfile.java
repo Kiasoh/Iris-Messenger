@@ -22,11 +22,11 @@ public class ChatProfile {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "chatId")
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 
     @OneToOne
-    @JoinColumn(name = "mediaId")
+    @JoinColumn(name = "media_id")
     private Media media;
 
     @NotNull

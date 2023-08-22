@@ -17,9 +17,8 @@ public class ChatProfileSeeder implements Seeder {
 
     private final ChatProfileRepository chatProfileRepository;
 
-    static final int NUMBER_OF_INSTANCES = 30;
+    static final int NUMBER_OF_INSTANCES = ChatSeeder.NUMBER_OF_INSTANCES / 2;
     private final List<ChatProfile> chatProfiles = new ArrayList<>();
-    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
@@ -27,8 +26,15 @@ public class ChatProfileSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomChatProfile();
+
         chatProfiles.sort(Comparator.comparing(ChatProfile::getSetAt));
         chatProfileRepository.saveAll(chatProfiles);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        chatProfiles.clear();
     }
 
     private void generateRandomChatProfile() {
@@ -39,7 +45,7 @@ public class ChatProfileSeeder implements Seeder {
         long mediaId;
         do {
             mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
-        } while (mediaIds.contains(mediaId));
+        } while (MediaSeeder.mediaIds.contains(mediaId));
         Media media = new Media();
         media.setMediaId(mediaId);
 
@@ -50,7 +56,8 @@ public class ChatProfileSeeder implements Seeder {
         chatProfile.setMedia(media);
         chatProfile.setSetAt(sendingTime);
 
-        mediaIds.add(mediaId);
+        MediaSeeder.mediaIds.add(mediaId);
+        MediaSeeder.NUMBER_OF_USED_MEDIAS++;
         chatProfiles.add(chatProfile);
     }
 }

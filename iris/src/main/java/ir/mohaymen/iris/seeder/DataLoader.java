@@ -14,10 +14,10 @@ public class DataLoader implements CommandLineRunner {
     private final SubscriptionSeeder subscriptionSeeder;
     private final PVSeeder pvSeeder;
     private final MediaSeeder mediaSeeder;
-    private final MessageSeeder messageSeeder;
-    private final PinSeeder pinSeeder;
     private final UserProfileSeeder userProfileSeeder;
     private final ChatProfileSeeder chatProfileSeeder;
+    private final MessageSeeder messageSeeder;
+    private final PinSeeder pinSeeder;
 
     @Override
     public void run(String... args) {
@@ -27,9 +27,15 @@ public class DataLoader implements CommandLineRunner {
         subscriptionSeeder.load();
         pvSeeder.load();
         mediaSeeder.load();
-        messageSeeder.load();
-        pinSeeder.load();
         userProfileSeeder.load();
         chatProfileSeeder.load();
+        messageSeeder.load();
+        pinSeeder.load();
+        clearReferences();
+    }
+
+    private void clearReferences() {
+        ChatSeeder.ownerToChatMap.clear();
+        MediaSeeder.mediaIds.clear();
     }
 }

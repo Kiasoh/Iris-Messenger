@@ -104,8 +104,7 @@ public class User implements UserDetails, Nameable {
     @Override
     public String fullName() {
         String name = firstName;
-        if(lastName!=null)
-            name =name + " " + lastName;
+        if (lastName != null) name = name + " " + lastName;
         return name;
     }
 }

@@ -11,4 +11,6 @@ public interface Seeder {
     Faker faker = new Faker(locale, new Random(100));
 
     void load();
+
+    void clearReferences();
 }

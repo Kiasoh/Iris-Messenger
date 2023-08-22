@@ -25,7 +25,15 @@ public class ContactSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomContact();
+
         contactRepository.saveAll(contacts);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        contacts.clear();
+        userIds.clear();
     }
 
     private void generateRandomContact() {

@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "subscriptions", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"userId", "chatId"})})
+        @UniqueConstraint(columnNames = {"user_id", "chat_id"})})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,12 +24,12 @@ public class Subscription {
     private Long subId;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "chatId")
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 
     private Long lastMessageSeenId = 0L;

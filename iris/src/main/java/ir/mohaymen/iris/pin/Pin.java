@@ -19,14 +19,14 @@ public class Pin {
     private Long pinId;
 
     @OneToOne
-    @JoinColumn(name = "messageId")
+    @JoinColumn(name = "message_id")
     private Message message;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "chatId")
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 }

@@ -24,7 +24,7 @@ public class PinSeeder implements Seeder {
     private final MessageRepository messageRepository;
     private final SubscriptionRepository subscriptionRepository;
 
-    static final int NUMBER_OF_INSTANCES = 40;
+    static final int NUMBER_OF_INSTANCES = MessageSeeder.NUMBER_OF_INSTANCES / 20;
     private final List<Pin> pins = new ArrayList<>();
     private final Set<Long> messageIds = new HashSet<>();
 
@@ -34,7 +34,15 @@ public class PinSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomPin();
+
         pinRepository.saveAll(pins);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        pins.clear();
+        messageIds.clear();
     }
 
     private void generateRandomPin() {
@@ -42,14 +50,17 @@ public class PinSeeder implements Seeder {
         do {
             messageId = faker.random().nextInt(1, MessageSeeder.NUMBER_OF_INSTANCES);
         } while (messageIds.contains(messageId));
-        Message message = messageRepository.findById(messageId).orElse(new Message());
+        Message message = new Message();
+        message.setMessageId(messageId);
 
-        Chat chat = message.getChat();
+        Long chatId = messageRepository.findChatByMessageId(messageId);
+        Chat chat = new Chat();
+        chat.setChatId(chatId);
 
-        List<Subscription> subscriptions = new ArrayList<>();
-        subscriptionRepository.findAllByChat(chat).iterator().forEachRemaining(subscriptions::add);
-        int subscriptionId = faker.random().nextInt(0, subscriptions.size() - 1);
-        User user = subscriptions.get(subscriptionId).getUser();
+        List<Long> userIds = subscriptionRepository.findUserIdByChatId(chatId);
+        Integer index = faker.random().nextInt(0, userIds.size() - 1);
+        User user = new User();
+        user.setUserId(userIds.get(index));
 
         Pin pin = new Pin();
         pin.setMessage(message);

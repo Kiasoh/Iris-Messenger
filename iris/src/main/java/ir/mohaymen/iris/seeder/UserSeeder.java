@@ -16,7 +16,7 @@ public class UserSeeder implements Seeder {
 
     private final UserRepository userRepository;
 
-    static final int NUMBER_OF_INSTANCES = 100;
+    static final int NUMBER_OF_INSTANCES = 30;
     private final List<User> users = new ArrayList<>();
 
     @Override
@@ -27,7 +27,14 @@ public class UserSeeder implements Seeder {
         for (int i = 0; i < NUMBER_OF_INSTANCES - 1; i++)
             generateRandomUser();
         generateUser("sadegh", "poolaiii", "poolai_23", "0911", null);
+
         userRepository.saveAll(users);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        users.clear();
     }
 
     private void generateRandomUser() {

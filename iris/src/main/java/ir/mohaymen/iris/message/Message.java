@@ -31,7 +31,7 @@ public class Message {
     @Column(columnDefinition = "TEXT")
     private String text;
 
-    @JoinColumn(name = "chatId")
+    @JoinColumn(name = "chat_id")
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
@@ -40,15 +40,14 @@ public class Message {
     @ManyToOne
     private Message originMessage;
 
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     @ManyToOne
     private User sender;
 
-    @JoinColumn(name = "mediaId")
+    @JoinColumn(name = "media_id")
     @OneToOne
     private Media media;
 
-//    @CreationTimestamp
     @NotNull
     private Instant sendAt;
 
