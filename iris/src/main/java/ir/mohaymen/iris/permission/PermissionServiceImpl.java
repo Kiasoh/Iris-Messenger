@@ -1,6 +1,8 @@
 package ir.mohaymen.iris.permission;
 
 import ir.mohaymen.iris.chat.Chat;
+import ir.mohaymen.iris.chat.ChatService;
+import ir.mohaymen.iris.chat.ChatServiceImpl;
 import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
@@ -17,8 +19,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {
     private final SubscriptionRepository subscriptionRepository;
+    private final ChatService chatService;
     private boolean test = true;
-
+    @Override
     public boolean hasAccess(long userId, long chatId, Permission permission) {
         if (test) return true;
         Subscription sub = getSubByUserAndChat(userId, chatId);
@@ -27,22 +30,32 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean hasAccessToDeleteMessage(Message message, long userId, long chatId) {
+    public boolean isOwner(long userId, Chat chat) {
+        return chat.getOwner().getUserId().equals(userId);
+    }
+
+    @Override
+    public boolean isOwner(long userId, long chatId) {
+        return isOwner(userId,chatService.getById(chatId));
+    }
+
+    @Override
+    public boolean hasAccessToDeleteMessage(Message message, long userId, Chat chat) {
         if (test) return true;
         if (message.getSender().getUserId().equals(userId)) return true;
-        Subscription sub = getSubByUserAndChat(userId, chatId);
-        Subscription subSender = getSubByUserAndChat(message.getSender().getUserId(), chatId);
+        Subscription sub = getSubByUserAndChat(userId, chat.getChatId());
+        Subscription subSender = getSubByUserAndChat(message.getSender().getUserId(), chat.getChatId());
         var permissions = getPermissionsBySub(sub);
         var permissionsSender = getPermissionsBySub(subSender);
-        if (Permission.isOwner(permissions)) return true;
+        if (isOwner(userId,chat)) return true;
         if (Permission.isAdmin(permissions) && Permission.isAdmin(permissionsSender)) return false;
         return Permission.isAdmin(permissions);
     }
-
+    @Override
     public Set<Permission> getPermissions(Long subId, Long userId) {
         var sub = subscriptionRepository.findById(subId).orElseThrow();
         Set<Permission> permissions = getPermissionsBySub(sub);
-        if (!sub.getUser().getUserId().equals(userId) && !Permission.isAdmin(permissions))
+        if (!sub.getUser().getUserId().equals(userId) && !Permission.isAdmin(permissions)&& !isOwner(userId,sub.getChat()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         return permissions;
     }
@@ -53,7 +66,7 @@ public class PermissionServiceImpl implements PermissionService {
         var subDoer = subscriptionRepository.findByChatAndUser(subDoe.getChat(), User.builder().userId(userIdDoer).build()).orElseThrow();
         var subDoePermissions = getPermissionsBySub(subDoe);
         var subDoerPermissions = getPermissionsBySub(subDoer);
-        if (Permission.isOwner(subDoePermissions)
+        if (isOwner(subDoe.getUser().getUserId(),subDoe.getChat())
                 || (Permission.isAdmin(subDoePermissions) && Permission.isAdmin(subDoerPermissions))
                 || !Permission.isAdmin(subDoerPermissions))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
