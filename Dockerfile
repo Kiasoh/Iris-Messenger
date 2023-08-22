@@ -8,7 +8,7 @@ ADD ./iris $HOME
 RUN mvn package -DskipTests
 
 FROM openjdk:22-jdk-slim
-RUN apt-get update && apt-get install curl
+RUN apt-get update && apt-get install -y curl
 COPY --from=build /usr/app/src/main/resources/ /app/resources/
 COPY --from=build /usr/app/target/iris-*.jar /app/runner.jar
 WORKDIR /app
