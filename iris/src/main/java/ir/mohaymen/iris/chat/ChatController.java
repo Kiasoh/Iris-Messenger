@@ -97,7 +97,7 @@ public class ChatController extends BaseController {
         createInternalSub(chat, getUserByToken(), ownerPermissions);
         for (Long userId : createChatDto.getUserIds()) {
             try {
-                createInternalSub(chat, User.builder().userId(userId).build());
+                createInternalSub(chat, User.builder().userId(userId).lastSeen(Instant.now()).build());
             } catch (Exception ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
