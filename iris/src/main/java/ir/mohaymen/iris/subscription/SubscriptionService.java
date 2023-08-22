@@ -13,6 +13,8 @@ public interface SubscriptionService {
 
     Chat PVExistance(Long userId1 , Long userId2);
 
+    Subscription createSavedMessage(User user);
+
     Nameable setName(List<Contact> contacts, User user);
 
     List<Subscription> getAllSubscriptionByUserId(Long userId);

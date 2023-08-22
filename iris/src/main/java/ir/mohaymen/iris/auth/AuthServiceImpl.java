@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.auth;
 
 import ir.mohaymen.iris.code.ActivationCode;
+import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.token.Token;
 import ir.mohaymen.iris.token.TokenRepository;
 import ir.mohaymen.iris.user.*;
@@ -26,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final SubscriptionService subscriptionService;
     private final AuthenticationManager authenticationManager;
     private final ModelMapper mapper;
     private final SMSService smsService;
@@ -33,11 +35,12 @@ public class AuthServiceImpl implements AuthService {
     private final Cache cache;
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthServiceImpl(UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, ModelMapper mapper, SMSService smsService, UserService userService, CacheManager cacheManager) {
+    public AuthServiceImpl(UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder, JwtService jwtService, SubscriptionService subscriptionService, AuthenticationManager authenticationManager, ModelMapper mapper, SMSService smsService, UserService userService, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.subscriptionService = subscriptionService;
         this.authenticationManager = authenticationManager;
         this.mapper = mapper;
         this.smsService = smsService;
@@ -52,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastSeen(Instant.now())
                 .build();
         var savedUser = userRepository.save(user);
+        subscriptionService.createSavedMessage(savedUser);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken();
         saveUserToken(savedUser, refreshToken);
@@ -99,6 +103,7 @@ public class AuthServiceImpl implements AuthService {
         userService.setOnline(userDto.getUserId());
         logger.info(MessageFormat.format("user phone number:{0} registered refresh_token:{1} jwt_token:{2} logined",
                 loginDto.getPhoneNumber(), refreshToken, jwtToken));
+
         return AuthDto.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)

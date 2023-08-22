@@ -65,8 +65,12 @@ public class ProfileController extends BaseController {
     }
 
     @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> addUserProfile(@RequestPart(value = "file" , required = false) MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
+        if (file == null || file.getBytes() == null || file.getSize() < 2) {
+            logger.info(MessageFormat.format("user with phone number:{0} attempts to upload empty profile picture", user.getPhoneNumber()));
+            return ResponseEntity.ok("No profile added");
+        }
         logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",
                 user.getPhoneNumber(), file.getOriginalFilename()));
         Media media = fileService.saveFile(file.getOriginalFilename(), file);
