@@ -19,7 +19,7 @@ public class ChatSeeder implements Seeder {
 
     private final ChatRepository chatRepository;
 
-    static final int NUMBER_OF_INSTANCES = 100;
+    static final int NUMBER_OF_INSTANCES = 50;
     private final List<Chat> chats = new ArrayList<>();
     private final Set<String> links = new HashSet<>();
     static final Map<Long, Set<Long>> ownerToChatMap = new HashMap<>();
@@ -30,8 +30,16 @@ public class ChatSeeder implements Seeder {
 
         for (int i = 1; i <= NUMBER_OF_INSTANCES; i++)
             generateRandomChat(i);
+
         chats.sort(Comparator.comparing(Chat::getCreatedAt));
         chatRepository.saveAll(chats);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        chats.clear();
+        links.clear();
     }
 
     private void generateRandomChat(long chatIndex) {

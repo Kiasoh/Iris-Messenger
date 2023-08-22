@@ -12,6 +12,13 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
+    @Query(value = """
+            select m.chat.chatId
+            from Message m
+            where m.messageId = :id
+            """)
+    Long findChatByMessageId(@Param("id") Long id);
+
     List<Message> findBySender(User user);
 
     List<Message> findByChat(Chat chat);
@@ -29,28 +36,30 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                 From Message m
                 where m.messageId > :lastSeenMessageId and m.chat.chatId = :chatId
             """)
-    long countUnSeenMessages(@Param("lastSeenMessageId") Long lastSeenMessageId,@Param("chatId") Long chatId);
+    long countUnSeenMessages(@Param("lastSeenMessageId") Long lastSeenMessageId, @Param("chatId") Long chatId);
 
     @Query(value = """
                 select s
                 From Subscription s
                 where s.lastMessageSeenId > :messageId and s.chat = :chatId
             """)
-    List<Subscription> usersSeen(@Param("messageId") Long messageId,@Param("chatId") Long chatId);
+    List<Subscription> usersSeen(@Param("messageId") Long messageId, @Param("chatId") Long chatId);
 
     @Query(value = """
-        select m
-        from Message m
-        where m.chat.chatId = :chatId
-        order by m.messageId desc 
-""")
+                    select m
+                    from Message m
+                    where m.chat.chatId = :chatId
+                    order by m.messageId desc 
+            """)
     List<Message> getLastMessageByChatId(@Param("chatId") Long chatId);
+
     Message findFirstByChatOrderByMessageIdDesc(Chat chat);
+
     @Query(value = """
-        select s
-        from Subscription s
-        where s.lastMessageSeenId >= :messageId and s.chat.chatId = :chatId
-""")
-    List<Subscription> getSubSeen(@Param("messageId") Long messageId ,@Param("chatId") Long chatId);
+                    select s
+                    from Subscription s
+                    where s.lastMessageSeenId >= :messageId and s.chat.chatId = :chatId
+            """)
+    List<Subscription> getSubSeen(@Param("messageId") Long messageId, @Param("chatId") Long chatId);
 
 }

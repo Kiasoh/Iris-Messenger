@@ -5,19 +5,17 @@ import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileItem;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,7 +25,9 @@ public class MediaSeeder implements Seeder {
 
     private final MediaRepository mediaRepository;
 
-    static final int NUMBER_OF_INSTANCES = 1000;
+    static final int NUMBER_OF_INSTANCES = UserProfileSeeder.NUMBER_OF_INSTANCES + ChatProfileSeeder.NUMBER_OF_INSTANCES + MessageSeeder.NUMBER_OF_INSTANCES + 140;
+    static final Set<Long> mediaIds = new HashSet<>();
+    static int NUMBER_OF_USED_MEDIAS = 0;
     private final List<Media> medias = new ArrayList<>();
     private List<Path> filePaths;
     private final FileService fileService;
@@ -39,7 +39,15 @@ public class MediaSeeder implements Seeder {
         readFiles();
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomMedia();
+
         mediaRepository.saveAll(medias);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        medias.clear();
+        filePaths.clear();
     }
 
     private void readFiles() {

@@ -26,49 +26,54 @@ public class MessageSeeder implements Seeder {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
 
-    private static final int NUMBER_OF_CHAT_MESSAGES = 2000;
+    private static final int NUMBER_OF_CHAT_MESSAGES = ChatSeeder.NUMBER_OF_INSTANCES * 10;
     private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
     static final int NUMBER_OF_INSTANCES = NUMBER_OF_CHAT_MESSAGES + NUMBER_OF_PV_MESSAGES;
     private final List<Message> messages = new ArrayList<>();
-    private final Set<Long> mediaIds = new HashSet<>();
 
     @Override
     public void load() {
-        if (messageRepository.count() != 0)
-            return;
+        if (messageRepository.count() != 0) return;
 
         for (int i = 0; i < NUMBER_OF_CHAT_MESSAGES; i++)
             generateRandomMessageForChat();
-        for (int i = 0; i < NUMBER_OF_PV_MESSAGES; i++)
-            generateMessageForPV(i + 1);
+        for (int i = 1; i <= NUMBER_OF_PV_MESSAGES; i++)
+            generateMessageForPV(i);
+
         messages.sort(Comparator.comparing(Message::getSendAt));
         messageRepository.saveAll(messages);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        messages.clear();
     }
 
     private void generateRandomMessageForChat() {
-        long id = faker.random().nextInt(1, 99999);
-
         long subscriptionId = faker.random().nextInt(1, SubscriptionSeeder.NUMBER_OF_INSTANCES);
         Subscription subscription = subscriptionRepository.findById(subscriptionId).orElse(new Subscription());
 
-        generateMessage(subscription, id);
+        generateMessage(subscription);
     }
 
     private void generateMessageForPV(long pvId) {
-        long id = faker.random().nextInt(1, 99999);
-
         Subscription subscription = subscriptionRepository.findById(SubscriptionSeeder.NUMBER_OF_INSTANCES + pvId).orElse(new Subscription());
 
-        generateMessage(subscription, id);
+        generateMessage(subscription);
     }
 
-    private void generateMessage(Subscription subscription, long id) {
+    private void generateMessage(Subscription subscription) {
+        long id = faker.random().nextInt(1, 99999);
+
         User user = subscription.getUser();
         Chat chat = subscription.getChat();
 
         Media media = generateRandomMedia(id);
 
-        String text = String.join(" ", faker.lorem().paragraphs((int) id % 5 + 1));
+        String text = (media == null || id % 6 == 0)
+                ? String.join(" ", faker.lorem().paragraphs((int) id % 5 + 1))
+                : null;
 
         DateAndTime date = faker.date();
         Date sendingTimeLowerBound = Date.from(chat.getCreatedAt());
@@ -95,14 +100,17 @@ public class MessageSeeder implements Seeder {
     private Media generateRandomMedia(long seed) {
         Media media;
 
+        if (MediaSeeder.NUMBER_OF_USED_MEDIAS >= MediaSeeder.NUMBER_OF_INSTANCES) return null;
+
         media = new Media();
         if (seed % 7 == 2 || seed % 7 == 6) {
             long mediaId;
             do {
                 mediaId = faker.random().nextInt(1, MediaSeeder.NUMBER_OF_INSTANCES);
-            } while (mediaIds.contains(mediaId));
+            } while (MediaSeeder.mediaIds.contains(mediaId));
             media.setMediaId(mediaId);
-            mediaIds.add(mediaId);
+            MediaSeeder.mediaIds.add(mediaId);
+            MediaSeeder.NUMBER_OF_USED_MEDIAS++;
         } else
             media = null;
 

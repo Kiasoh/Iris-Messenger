@@ -22,7 +22,7 @@ public class PVSeeder implements Seeder {
     private final ChatRepository chatRepository;
     private final SubscriptionRepository subscriptionRepository;
 
-    static final int NUMBER_OF_INSTANCES = 30;
+    static final int NUMBER_OF_INSTANCES = UserSeeder.NUMBER_OF_INSTANCES / 3;
     private final List<Subscription> subscriptionList = new ArrayList<>();
     private final List<Chat> pvs = new ArrayList<>();
     private List<Chat> savedPvs;
@@ -37,7 +37,16 @@ public class PVSeeder implements Seeder {
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription(i);
+
         subscriptionRepository.saveAll(subscriptionList);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        subscriptionList.clear();
+        pvs.clear();
+        savedPvs.clear();
     }
 
     private void generateRandomPV() {
@@ -51,7 +60,6 @@ public class PVSeeder implements Seeder {
         Date sendingTimeUpperBound = Date
                 .from(LocalDateTime.now(ZoneId.of("GB")).minusDays(100).atZone(ZoneId.systemDefault()).toInstant());
         Instant createdTime = faker.date().between(sendingTimeLowerBound, sendingTimeUpperBound).toInstant();
-//        Instant createdTime = faker.date().past(100, TimeUnit.DAYS).toInstant();
 
         Chat chat = new Chat();
         chat.setTitle(title);

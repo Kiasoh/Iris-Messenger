@@ -20,19 +20,26 @@ public class SubscriptionSeeder implements Seeder {
     private final SubscriptionRepository subscriptionRepository;
     private final ChatRepository chatRepository;
 
-    static final int NUMBER_OF_INSTANCES = 500;
-    static final List<Subscription> subscriptions = new ArrayList<>();
-    static final Map<Long, Set<Long>> userToChatMap = new HashMap<>();
+    static final int NUMBER_OF_INSTANCES = ChatSeeder.NUMBER_OF_INSTANCES * 4;
+    private final List<Subscription> subscriptions = new ArrayList<>();
+    private final Map<Long, Set<Long>> userToChatMap = new HashMap<>();
 
     @Override
     public void load() {
         if (subscriptionRepository.count() != 0) return;
 
         addOwnersToSubscription();
-        System.out.println(1);
         for (int i = 0; i < NUMBER_OF_INSTANCES - ChatSeeder.NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription();
+
         subscriptionRepository.saveAll(subscriptions);
+        clearReferences();
+    }
+
+    @Override
+    public void clearReferences() {
+        subscriptions.clear();
+        userToChatMap.clear();
     }
 
     private void addOwnersToSubscription() {
