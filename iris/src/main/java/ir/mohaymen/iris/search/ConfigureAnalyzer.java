@@ -23,7 +23,11 @@ public class ConfigureAnalyzer implements CommandLineRunner {
     private String host = "localhost";
 
     public void run(String... args) throws Exception {
-
+        if (isWindows())
+        {
+            logger.warn("running in windows! can not create index for elastic search");
+            return;
+        }
         try {
             logger.info("start curl configure analyzer");
             configureMessage();
@@ -45,6 +49,10 @@ public class ConfigureAnalyzer implements CommandLineRunner {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    public boolean isWindows() {
+        String OS = System.getProperty("os.name").toLowerCase();
+        return (OS.indexOf("win") >= 0);
     }
     private void logOutput(InputStream inputStream, String prefix) {
         new Thread(() -> {
