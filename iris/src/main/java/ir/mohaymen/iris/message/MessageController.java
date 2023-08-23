@@ -139,22 +139,19 @@ public class MessageController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
         }
 
-        var file = messageDto.getFile();
-        Media media;
+        MultipartFile file = messageDto.getFile();
+        Media media = null;
         if (file == null || file.isEmpty()) {
-            media = null;
-            if (messageDto.getText().isBlank()) {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            media = fileService.saveFile(file.getOriginalFilename(), file);
-        }
+            if (messageDto.getText().isBlank()) throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        } else media = fileService.saveFile(file.getOriginalFilename(), file);
+
         Message message = new Message();
         message.setText(messageDto.getText());
         message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
+        message.setRepliedMessage(repliedMessage);
         // Subscription subscription =
         // subscriptionService.getSubscriptionByChatAndUser(chat , user);
         // subscription.setLastMessageSeenId();
