@@ -29,13 +29,14 @@ public class ContactController extends BaseController {
 
     @PostMapping("/add-contact")
     public ResponseEntity<PostContactDto> addContact(@RequestBody @Valid GetContactDto getContactDto) {
-        if (contactService.isInContact(getUserByToken() , getContactDto.getContactId()))
+        User mainUser = getUserByToken();
+        if (contactService.isInContact(getUserByToken() , getContactDto.getContactId()) || getContactDto.getContactId() == mainUser.getUserId())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         Contact contact = modelMapper.map(getContactDto, Contact.class);
         User user = userService.getById(getContactDto.getContactId());
         contact.setSecondUser(user);
         contact.setId(null);
-        contact.setFirstUser(getUserByToken());
+        contact.setFirstUser(mainUser);
         contact = contactService.createOrUpdate(contact);
         searchContactService.index(new SearchContactDto(contact.getId(), contact.getFirstUser().getUserId(), contact.getSecondUser().getUserId(), contact.getFirstName(), contact.getLastName()));
         return new ResponseEntity<>( makePostContact(contact) , HttpStatus.OK);
