@@ -113,6 +113,7 @@ public class SubscriptionController extends BaseController {
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(subscription.getUser().getUserId());
             subDto.setLastSeen(subscription.getUser().getLastSeen());
+            subDto.setAdmin(Permission.isAdmin(subscription.getPermissions()));
             UserProfile profile = userProfileService.getLastUserProfile(subscription.getUser());
             if (profile != null)
                 subDto.setProfile(ProfileMapper.mapToProfileDto(profile));

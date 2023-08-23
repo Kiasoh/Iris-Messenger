@@ -147,6 +147,8 @@ public class ChatController extends BaseController {
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
+        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser(chat , getUserByToken());
+        getChatDto.setPermissions(subscription.getPermissions());
         if (chat.getOwner() != null)
             getChatDto.setOwnerId(chat.getOwner().getUserId());
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
@@ -176,9 +178,6 @@ public class ChatController extends BaseController {
             menuChatDto.setSentAt(message.getSendAt());
             User user = message.getSender();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
-            UserProfile userProfile = userProfileService.getLastUserProfile(user);
-            if (userProfile != null)
-                menuChatDto.setMedia(userProfile.getMedia());
             menuChatDto.setUserFirstName(nameable.getFirstName());
         } else {
             menuChatDto.setSentAt(chat.getCreatedAt());

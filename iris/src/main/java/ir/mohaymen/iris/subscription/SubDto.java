@@ -17,4 +17,5 @@ public class SubDto {
     private String lastName;
     private ProfileDto profile;
     private Instant lastSeen;
+    private boolean isAdmin;
 }

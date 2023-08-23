@@ -38,7 +38,7 @@ public enum Permission {
         return permissions;
     }
     public static boolean isAdmin(Set<Permission> permissions){
-        return permissions.contains(ADMIN);
+        return permissions==null ? false : permissions.contains(ADMIN);
     }
 
 
