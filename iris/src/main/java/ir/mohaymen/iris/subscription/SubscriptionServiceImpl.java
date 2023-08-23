@@ -41,7 +41,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         chat.setCreatedAt(Instant.now());
         chat.setTitle("Saved Message");
         chat.setPublic(false);
-        chat.setChatType(ChatType.GROUP);
+        chat.setChatType(ChatType.SAVED_MESSAGE);
         chat = chatRepository.save(chat);
         Subscription subscription = new Subscription();
         subscription.setLastMessageSeenId(0L);

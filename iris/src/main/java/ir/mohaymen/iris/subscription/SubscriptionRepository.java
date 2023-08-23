@@ -3,8 +3,10 @@ package ir.mohaymen.iris.subscription;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatSeederDto;
 import ir.mohaymen.iris.user.User;
+import jakarta.transaction.Transactional;
 import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -48,6 +50,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
             """)
     Integer subscriptionCount(@Param("chatId") Long chatId);
 
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = """
                     update Subscription s
                     set s.lastMessageSeenId = :messageId

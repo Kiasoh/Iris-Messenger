@@ -155,10 +155,12 @@ public class MessageController extends BaseController {
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
-//         Subscription subscription =
+        GetMessageDto getMessageDto = mapMessageToGetMessageDto(message);
+//        Subscription subscription =
 //         subscriptionService.getSubscriptionByChatAndUser(chat , user);
-//         subscription.setLastMessageSeenId();
-        return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
+//         subscription.setLastMessageSeenId(getMessageDto.getMessageId());
+         subscriptionService.updateLastSeenMessage(chat.getChatId() , user.getUserId() , getMessageDto.getMessageId());
+        return new ResponseEntity<>(getMessageDto, HttpStatus.OK);
     }
 
     @PatchMapping("/edit-message")
@@ -236,8 +238,12 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setSeen(
+                messageService.usersSeen(message.getMessageId(), message.getChat().getChatId()).size() > 1);
         if (message.getRepliedMessage() != null)
-            getMessageDto.setRepliedMessageId(message.getRepliedMessage().getMessageId());
+            getMessageDto.setRepliedMessagePlacement(
+                    messageService.messagePlacementInChat(message.getRepliedMessage().getMessageId() , message.getChat().getChatId())
+            );
         return getMessageDto;
     }
 

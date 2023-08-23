@@ -9,5 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GetPinDto {
-    private Long messageId;
+    private Long messagePlacement;
+    private String messageText;
 }

@@ -21,6 +21,8 @@ public interface MessageService {
 
     Iterable<Message> getAll();
 
+    Long messagePlacementInChat(Long messageId , Long chatId);
+
     Iterable<Message> getByUser(User user);
 
     List<Message> getByChat(Chat chat);
