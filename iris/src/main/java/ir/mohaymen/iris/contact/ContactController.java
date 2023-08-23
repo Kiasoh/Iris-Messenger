@@ -61,11 +61,6 @@ public class ContactController extends BaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(makePostContact(contact) , HttpStatus.OK);
     }
-    public PostContactDto makePostContact(Contact con){
-        PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
-        postContactDto.setSecondUserId(con.getSecondUser().getUserId());
-        return postContactDto;
-    }
     @DeleteMapping("/delete-contact/{id}")
     public ResponseEntity<?> deleteContact(@PathVariable Long id){
         if (!contactService.isInContact(getUserByToken(), id)) {
@@ -73,5 +68,11 @@ public class ContactController extends BaseController {
         }
         contactService.deleteBySecondUser(userService.getById(id));
         return ResponseEntity.ok("contact deleted");
+    }
+    public PostContactDto makePostContact(Contact con){
+        PostContactDto postContactDto = modelMapper.map(con , PostContactDto.class);
+        postContactDto.setSecondUserId(con.getSecondUser().getUserId());
+        postContactDto.setLastSeen(con.getSecondUser().getLastSeen());
+        return postContactDto;
     }
 }
