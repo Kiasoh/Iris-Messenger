@@ -8,7 +8,6 @@ import ir.mohaymen.iris.message.Message;
 import ir.mohaymen.iris.message.MessageRepository;
 import ir.mohaymen.iris.search.message.SearchMessageDto;
 import ir.mohaymen.iris.search.message.SearchMessageService;
-import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
@@ -136,6 +135,6 @@ public class MessageSeeder implements Seeder {
 
     private void updateUsersLastSeen() {
         for (Long userId : userIdToLastSeenMap.keySet())
-            userRepository.updateLastSeen(userId, userIdToLastSeenMap.get(userId));
+            userRepository.updateLastSeenById(userId, userIdToLastSeenMap.get(userId));
     }
 }

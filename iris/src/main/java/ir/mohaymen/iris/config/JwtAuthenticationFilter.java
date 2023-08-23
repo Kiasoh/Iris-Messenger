@@ -28,7 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
-  private final TokenRepository tokenRepository;
   private final UserService userService;
 
   @Override
@@ -57,8 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authToken.setDetails(
             new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+        userService.setOnline(userPhoneNumber);
       }
-      userService.setOnline(userPhoneNumber);
 
     }
     filterChain.doFilter(request, response);

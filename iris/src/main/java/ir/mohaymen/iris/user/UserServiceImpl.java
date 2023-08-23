@@ -65,16 +65,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void setOnline(Long userId) {
-        var user=getById(userId);
-        user.setLastSeen(Instant.now());
-        userRepository.save(user);
+        userRepository.updateLastSeenById(userId,Instant.now());
     }
 
     @Override
     public void setOnline(String phoneNumber) {
-        var user=getByPhoneNumber(phoneNumber);
-        user.setLastSeen(Instant.now());
-        userRepository.save(user);
+        userRepository.updateLastSeenByPhoneNumber(phoneNumber,Instant.now());
     }
 
     public Iterable<User> getById(List<Long> ids) {
