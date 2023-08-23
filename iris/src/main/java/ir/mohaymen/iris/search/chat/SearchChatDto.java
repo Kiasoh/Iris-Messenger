@@ -20,6 +20,9 @@ public class SearchChatDto {
     @Field(type = FieldType.Long)
     private Long userId;
 
+    @Field(type = FieldType.Long)
+    private Long chatId;
+
     @Field(type = FieldType.Text)
     private String title;
 

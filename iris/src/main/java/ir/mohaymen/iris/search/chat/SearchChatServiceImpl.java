@@ -1,9 +1,9 @@
 package ir.mohaymen.iris.search.chat;
 
 import lombok.AllArgsConstructor;
+import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
@@ -55,12 +55,13 @@ public class SearchChatServiceImpl implements SearchChatService {
                                 .matchQuery("title", text)
                                 .fuzziness(Fuzziness.AUTO);
 
-                MatchQueryBuilder userQuery = QueryBuilders
-                                .matchQuery("userId", userId);
+                TermQueryBuilder userQuery = QueryBuilders
+                                .termQuery("userId", userId);
+
 
                 Query searchQuery = new NativeSearchQueryBuilder()
-                                .withQuery(titleQuery)
                                 .withFilter(userQuery)
+                                .withQuery(titleQuery)
                                 .build();
 
                 SearchHits<SearchChatDto> hits = elasticsearchOperations.search(searchQuery, SearchChatDto.class,

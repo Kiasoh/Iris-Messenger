@@ -62,7 +62,7 @@ public class SubscriptionController extends BaseController {
         for (Long id : addSubDto.getUserIds()) {
             Subscription savedSub = subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
                     chat, lastMessageSeenId, Permission.getDefaultPermissions(chat.getChatType())));
-            searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getTitle()));
+            searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
 
         }
         GetChatDto getChatDto = modelMapper.map(chat, GetChatDto.class);
