@@ -116,7 +116,9 @@ public class MessageController extends BaseController {
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         User user = getUserByToken();
-        Chat chat = Chat.builder().chatId(messageDto.getChatId()).build();
+        Chat chat = new Chat(){{
+            setChatId(messageDto.getChatId());
+        }};
 
         logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to send message in chat:{1}!",
                 user.getPhoneNumber(), chat.getChatId()));
@@ -195,7 +197,9 @@ public class MessageController extends BaseController {
 
     private Message generateForwardMessage(long chatId, long messageId) {
         User user = getUserByToken();
-        Chat newChat = Chat.builder().chatId(chatId).build();
+        Chat newChat =new Chat(){{
+            setChatId(chatId);
+        }};
 
         GetForwardMessageDto originMessage = messageService.getForwardMessageDto(messageId);
 
@@ -208,7 +212,7 @@ public class MessageController extends BaseController {
                     "user with phoneNumber:{0} does not have access to forward message in chat{1}!",
                     user.getPhoneNumber(), newChat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        } else if (!chatService.isInChat(Chat.builder().chatId(originMessage.getChatId()).build(), user)) {
+        } else if (!chatService.isInChat(new Chat(){{setChatId(originMessage.getChatId());}}, user)) {
             logger.info(MessageFormat.format(
                     "user with phone number:{0} does not have access to message:{1} to forward it!",
                     user.getPhoneNumber(), messageId));
