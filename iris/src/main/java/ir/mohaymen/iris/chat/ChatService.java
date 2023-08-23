@@ -12,6 +12,8 @@ public interface ChatService {
 
     boolean isInChat(Chat chat, User user);
 
+    boolean isInChat(Long chatId, Long userId);
+
     Chat createOrUpdate(Chat chat);
 
     void deleteById(Long id) throws Exception;

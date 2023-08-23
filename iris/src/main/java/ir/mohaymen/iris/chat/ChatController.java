@@ -8,6 +8,8 @@ import ir.mohaymen.iris.profile.ProfileMapper;
 import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.profile.*;
+import ir.mohaymen.iris.search.chat.SearchChatDto;
+import ir.mohaymen.iris.search.chat.SearchChatService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -43,6 +45,7 @@ public class ChatController extends BaseController {
     private final PermissionService permissionService;
     private final ContactService contactService;
     private final UserProfileService userProfileService;
+    private final SearchChatService searchChatService;
     private final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     @PutMapping("/edit-chat-info")
@@ -213,7 +216,9 @@ public class ChatController extends BaseController {
         sub.setChat(chat);
         sub.setUser(user);
         sub.setPermissions(permissions);
-        return subscriptionService.createOrUpdate(sub);
+        Subscription savedSub = subscriptionService.createOrUpdate(sub);
+        searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getTitle()));
+        return savedSub;
     }
 
 }
