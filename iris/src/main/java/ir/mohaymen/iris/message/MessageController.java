@@ -149,6 +149,7 @@ public class MessageController extends BaseController {
             media = fileService.saveFile(file.getOriginalFilename(), file);
         }
         Message message = new Message();
+        message.setRepliedMessage(repliedMessage);
         message.setText(messageDto.getText());
         message.setChat(chat);
         message.setSender(user);
