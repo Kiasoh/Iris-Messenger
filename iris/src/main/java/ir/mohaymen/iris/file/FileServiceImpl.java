@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +79,14 @@ public class FileServiceImpl implements FileService {
         if (foundFile == null)
             Files.delete(foundFile);
     }
-
+    public void deleteAllMedia() throws IOException {
+        Path pathToDelete = Paths.get(path);
+        try (Stream<Path> pathStream = Files.walk(pathToDelete)) {
+            pathStream.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
+    }
     @Override
     public Media duplicateMediaById(Media media) {
         Path path = null;

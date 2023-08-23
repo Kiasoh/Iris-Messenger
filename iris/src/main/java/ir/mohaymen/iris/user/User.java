@@ -8,6 +8,7 @@ import ir.mohaymen.iris.utility.Nameable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +40,7 @@ public class User implements UserDetails, Nameable {
 
     @NotBlank
     @Column(unique = true)
+    @Pattern(regexp = "^09\\d{9}$")
     private String phoneNumber;
 
     @Column(unique = true)

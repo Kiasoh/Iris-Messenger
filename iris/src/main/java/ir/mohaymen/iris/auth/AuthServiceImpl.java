@@ -18,8 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Instant;
+import java.util.Arrays;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -158,7 +161,14 @@ public class AuthServiceImpl implements AuthService {
                 .code(activationCode)
                 .build();
         cache.put(phoneNumber, codeObj);
-        smsService.sendSms(phoneNumber, "کد فعالسازی شما:" + activationCode);
+//        String message=
+//                ;
+        var utfMessage= """
+Welcome to Iris Messenger.
+Your Activation code:
+                """.getBytes(StandardCharsets.UTF_8);
+        var stringUtfMessage= new String(utfMessage, StandardCharsets.UTF_8);
+        smsService.sendSms(phoneNumber, stringUtfMessage + activationCode);
         return activationCode;
     }
 

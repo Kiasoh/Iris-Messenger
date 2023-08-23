@@ -40,6 +40,7 @@ public class MediaSeeder implements Seeder {
     public void load() {
         if (mediaRepository.count() != 0) return;
 
+        deleteFiles();
         readFiles();
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomMedia();
@@ -53,7 +54,13 @@ public class MediaSeeder implements Seeder {
         medias.clear();
         filePaths.clear();
     }
-
+    public void deleteFiles(){
+        try {
+            fileService.deleteAllMedia();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void readFiles() {
         String path =resourcePath + "/images";
         try (Stream<Path> paths = Files.walk(Paths.get(path))) {
