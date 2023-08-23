@@ -58,6 +58,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                                 .multiMatchQuery(name)
                                 .field("firstName")
                                 .field("lastName")
+                                .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
                                 .fuzziness(Fuzziness.ONE);
 
                 TermQueryBuilder userQuery = QueryBuilders
