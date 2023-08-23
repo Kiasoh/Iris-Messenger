@@ -74,12 +74,13 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(sorted, HttpStatus.OK);
     }
 
-    @GetMapping("/seen-users/{chatId}/{messageId}")
-    public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        if (chatService.getById(chatId).getChatType() == ChatType.CHANNEL)
+    @GetMapping("/seen-users/{messageId}")
+    public ResponseEntity<List<SubDto>> usersSeen(@PathVariable Long messageId) {
+        Chat chat = messageService.getById(messageId).getChat();
+        if (chat.getChatType() == ChatType.CHANNEL)
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         List<SubDto> users = new ArrayList<>();
-        messageService.getSubSeen(messageId, chatId).forEach(s -> {
+        messageService.getSubSeen(messageId, chat.getChatId()).forEach(s -> {
             SubDto subDto = new SubDto();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
                     s.getUser());
@@ -91,9 +92,10 @@ public class MessageController extends BaseController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/seen-user-count/{chatId}/{messageId}")
-    public ResponseEntity<Integer> userSeenCount(@PathVariable Long chatId, @PathVariable Long messageId) {
-        return new ResponseEntity<>(messageService.usersSeen(messageId, chatId).size(), HttpStatus.OK);
+    @GetMapping("/seen-user-count/{messageId}")
+    public ResponseEntity<Integer> userSeenCount (@PathVariable Long messageId) {
+        Message message = messageService.getById(messageId);
+        return new ResponseEntity<>(messageService.usersSeen(messageId, message.getChat().getChatId()).size(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-message/{id}")
@@ -143,16 +145,17 @@ public class MessageController extends BaseController {
         } else media = fileService.saveFile(file.getOriginalFilename(), file);
 
         Message message = new Message();
+        message.setRepliedMessage(repliedMessage);
         message.setText(messageDto.getText());
         message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
         message.setRepliedMessage(repliedMessage);
-        // Subscription subscription =
-        // subscriptionService.getSubscriptionByChatAndUser(chat , user);
-        // subscription.setLastMessageSeenId();
-        return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
+
+        GetMessageDto getMessageDto = mapMessageToGetMessageDto(message);
+         subscriptionService.updateLastSeenMessage(chat.getChatId() , user.getUserId() , getMessageDto.getMessageId());
+        return new ResponseEntity<>(getMessageDto, HttpStatus.OK);
     }
 
     @PatchMapping("/edit-message")
@@ -231,8 +234,12 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setSeen(
+                messageService.usersSeen(message.getMessageId(), message.getChat().getChatId()).size() > 1);
         if (message.getRepliedMessage() != null)
-            getMessageDto.setRepliedMessageId(message.getRepliedMessage().getMessageId());
+            getMessageDto.setRepliedMessagePlacement(
+                    messageService.messagePlacementInChat(message.getRepliedMessage().getMessageId() , message.getChat().getChatId())
+            );
         return getMessageDto;
     }
 

@@ -12,6 +12,9 @@ import ir.mohaymen.iris.message.MessageService;
 import ir.mohaymen.iris.profile.ProfileMapper;
 import ir.mohaymen.iris.profile.UserProfile;
 import ir.mohaymen.iris.profile.UserProfileService;
+import ir.mohaymen.iris.search.chat.SearchChatDto;
+import ir.mohaymen.iris.search.chat.SearchChatService;
+import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import ir.mohaymen.iris.utility.Nameable;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.*;
 
 @RestController
@@ -38,7 +42,7 @@ public class SubscriptionController extends BaseController {
     private final ModelMapper modelMapper;
     private final ContactService contactService;
     private final PermissionService permissionService;
-
+    SearchChatService searchChatService;
     private final MessageService messageService;
     private final UserProfileService userProfileService;
 
@@ -55,31 +59,61 @@ public class SubscriptionController extends BaseController {
         Message message = messageService.getLastMessageByChatId(chat.getChatId());
         if (message != null)
             lastMessageSeenId = message.getMessageId();
-        for (Long id : addSubDto.getUserIds())
-            subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
+        for (Long id : addSubDto.getUserIds()) {
+            Subscription savedSub = subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
                     chat, lastMessageSeenId, Permission.getDefaultPermissions(chat.getChatType())));
+            searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
+
+        }
         GetChatDto getChatDto = modelMapper.map(chat, GetChatDto.class);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
-    @PutMapping("/set-last-seen/{chatId}/{messageId}")
-    public ResponseEntity<?> setLastSeen(@PathVariable Long chatId, @PathVariable Long messageId) {
-        subscriptionService.updateLastSeenMessage(chatId , getUserByToken().getUserId() , messageId);
+    @PutMapping("/set-last-seen/{messageId}")
+    public ResponseEntity<?> setLastSeen(@PathVariable Long messageId) {
+        Message message = messageService.getById(messageId);
+        subscriptionService.updateLastSeenMessage(message.getChat().getChatId() , getUserByToken().getUserId() , messageId);
         return ResponseEntity.ok("... YoU hAvE SeEn ThE tRuTh ...");
     }
-
+    @DeleteMapping("/delete-sub/{subId}")
+    public ResponseEntity<?> leaveGroupBySubId(@PathVariable Long subId) throws Exception {
+        Subscription subscription = subscriptionService.getSubscriptionBySubscriptionId(subId);
+        if (subscription.getChat().getChatType() == ChatType.PV) {
+            chatService.deleteById(subscription.getChat().getChatId());
+            return ResponseEntity.ok("PV deleted.");
+        }
+        subscriptionService.deleteById(subId);
+        return ResponseEntity.ok("you have left the group!");
+    }
+    @DeleteMapping("/delete-sub/{chatId}")
+    public ResponseEntity<?> leaveGroupByChatId(@PathVariable Long chatId) throws Exception {
+        Chat chat = new Chat(); chat.setChatId(chatId); chat.setChatType(ChatType.PV); chat.setCreatedAt(Instant.now());
+        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser( chat, getUserByToken());
+        if (subscription.getChat().getChatType() == ChatType.PV) {
+            chatService.deleteById(subscription.getChat().getChatId());
+            return ResponseEntity.ok("PV deleted.");
+        }
+        subscriptionService.deleteById(subscription.getSubId());
+        return ResponseEntity.ok("you have left the group!");
+    }
     @GetMapping("/chat-subs/{id}")
     public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
         List<SubDto> subDtoList = new ArrayList<>();
+        Chat chat = new Chat(); chat.setChatId(id);
+        User user = getUserByToken();
+        Subscription sub = subscriptionService.getSubscriptionByChatAndUser(chat , user);
+        if ( sub.getPermissions() == null ||(chat.getChatType() == ChatType.CHANNEL && !sub.getPermissions().contains(Permission.ADMIN) ) )
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         for (Subscription subscription : subscriptionService.getAllSubscriptionByChatId(id)) {
             SubDto subDto = new SubDto();
-            // contact
-            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(user),
                     subscription.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(subscription.getUser().getUserId());
+            subDto.setLastSeen(subscription.getUser().getLastSeen());
+            subDto.setAdmin(Permission.isAdmin(subscription.getPermissions()));
             UserProfile profile = userProfileService.getLastUserProfile(subscription.getUser());
             if (profile != null)
                 subDto.setProfile(ProfileMapper.mapToProfileDto(profile));

@@ -1,5 +1,6 @@
 package ir.mohaymen.iris.chat;
 
+import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.profile.ChatProfile;
 import ir.mohaymen.iris.profile.ProfileDto;
 import ir.mohaymen.iris.subscription.Subscription;
@@ -28,4 +29,5 @@ public class GetChatDto {
     public int subCount;
 //    private Set<Subscription> subs;
     public List<ProfileDto> profileDtoList;
+    private Set<Permission> permissions;
 }

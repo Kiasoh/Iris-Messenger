@@ -1,19 +1,18 @@
-package ir.mohaymen.iris.search.contact;
+package ir.mohaymen.iris.search.chat;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+@AllArgsConstructor
 @Getter
 @Setter
-@Document(indexName = "contact")
-@AllArgsConstructor
-public class SearchContactDto {
+@Document(indexName = "chat")
+public class SearchChatDto {
 
     @Id
     private Long id;
@@ -22,11 +21,9 @@ public class SearchContactDto {
     private Long userId;
 
     @Field(type = FieldType.Long)
-    private Long contactId;
+    private Long chatId;
 
     @Field(type = FieldType.Text)
-    private String firstName;
+    private String title;
 
-    @Field(type = FieldType.Text)
-    private String lastName;
 }

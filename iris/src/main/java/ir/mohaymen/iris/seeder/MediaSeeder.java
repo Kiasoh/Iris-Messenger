@@ -5,6 +5,8 @@ import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
 import ir.mohaymen.iris.media.MediaRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,8 +26,10 @@ import java.util.stream.Stream;
 public class MediaSeeder implements Seeder {
 
     private final MediaRepository mediaRepository;
-
-    static final int NUMBER_OF_INSTANCES = UserProfileSeeder.NUMBER_OF_INSTANCES + ChatProfileSeeder.NUMBER_OF_INSTANCES + MessageSeeder.NUMBER_OF_INSTANCES + 140;
+    @Value("${application.resource.path}")
+    private String resourcePath;
+    static final int NUMBER_OF_INSTANCES = UserProfileSeeder.NUMBER_OF_INSTANCES + ChatProfileSeeder.NUMBER_OF_INSTANCES
+            + MessageSeeder.NUMBER_OF_INSTANCES + 140;
     static final Set<Long> mediaIds = new HashSet<>();
     static int NUMBER_OF_USED_MEDIAS = 0;
     private final List<Media> medias = new ArrayList<>();
@@ -51,7 +55,7 @@ public class MediaSeeder implements Seeder {
     }
 
     private void readFiles() {
-        String path = "./iris/src/main/resources/images";
+        String path =resourcePath + "/images";
         try (Stream<Path> paths = Files.walk(Paths.get(path))) {
             filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
         } catch (IOException e) {

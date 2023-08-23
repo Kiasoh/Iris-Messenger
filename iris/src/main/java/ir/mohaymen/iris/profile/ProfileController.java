@@ -44,9 +44,8 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<List<ProfileDto>> getUserProfileById(@PathVariable Long id) {
-        User user = userService.getById(id);
-
-        List<ProfileDto> profiles = user.getProfiles().stream()
+        List<UserProfile> userProfileList = userProfileService.getByUser(userService.getById(id));
+        List<ProfileDto> profiles = userProfileList.stream()
                 .map(ProfileMapper::mapToProfileDto)
                 .toList();
 
@@ -55,9 +54,8 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/chats/{id}")
     public ResponseEntity<List<ProfileDto>> getChatProfileById(@PathVariable Long id) {
-        Chat chat = chatService.getById(id);
-
-        List<ProfileDto> profiles = chat.getChatProfiles().stream()
+        List<ChatProfile> chatProfileList = chatProfileService.getByChat(chatService.getById(id));
+        List<ProfileDto> profiles = chatProfileList.stream()
                 .map(profile -> ProfileMapper.mapToProfileDto(profile))
                 .toList();
 
@@ -65,8 +63,12 @@ public class ProfileController extends BaseController {
     }
 
     @RequestMapping(path = "/users", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<String> addUserProfile(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> addUserProfile(@RequestPart(value = "file" , required = false) MultipartFile file) throws IOException {
         User user = userService.getById(getUserByToken().getUserId());
+        if (file == null || file.getBytes() == null || file.getSize() < 2) {
+            logger.info(MessageFormat.format("user with phone number:{0} attempts to upload empty profile picture", user.getPhoneNumber()));
+            return ResponseEntity.ok("No profile added");
+        }
         logger.info(MessageFormat.format("user with phone number:{0} attempts to upload profile picture:{1}",
                 user.getPhoneNumber(), file.getOriginalFilename()));
         Media media = fileService.saveFile(file.getOriginalFilename(), file);

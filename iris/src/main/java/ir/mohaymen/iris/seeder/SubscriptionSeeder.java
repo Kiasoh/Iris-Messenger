@@ -5,6 +5,8 @@ import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
+import ir.mohaymen.iris.search.chat.SearchChatDto;
+import ir.mohaymen.iris.search.chat.SearchChatService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
@@ -23,6 +25,7 @@ public class SubscriptionSeeder implements Seeder {
     static final int NUMBER_OF_INSTANCES = ChatSeeder.NUMBER_OF_INSTANCES * 4;
     private final List<Subscription> subscriptions = new ArrayList<>();
     private final Map<Long, Set<Long>> userToChatMap = new HashMap<>();
+    private final SearchChatService searchChatService;
 
     @Override
     public void load() {
@@ -32,7 +35,11 @@ public class SubscriptionSeeder implements Seeder {
         for (int i = 0; i < NUMBER_OF_INSTANCES - ChatSeeder.NUMBER_OF_INSTANCES; i++)
             generateRandomSubscription();
 
-        subscriptionRepository.saveAll(subscriptions);
+        var savedSubs = subscriptionRepository.saveAll(subscriptions);
+        searchChatService
+                .bulkIndex(savedSubs.stream()
+                        .map(s -> new SearchChatDto(s.getSubId(), s.getUser().getUserId(), s.getChat().getChatId(), s.getChat().getTitle()))
+                        .toList());
         clearReferences();
     }
 

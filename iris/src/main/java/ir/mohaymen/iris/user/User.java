@@ -49,18 +49,6 @@ public class User implements UserDetails, Nameable {
     @NotNull
     private Instant lastSeen;
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "firstUser")
-    private Set<Contact> contacts;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private Set<Subscription> subs;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private List<UserProfile> profiles;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>();

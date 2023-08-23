@@ -8,6 +8,8 @@ import ir.mohaymen.iris.profile.ProfileMapper;
 import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.profile.*;
+import ir.mohaymen.iris.search.chat.SearchChatDto;
+import ir.mohaymen.iris.search.chat.SearchChatService;
 import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
@@ -43,6 +45,7 @@ public class ChatController extends BaseController {
     private final PermissionService permissionService;
     private final ContactService contactService;
     private final UserProfileService userProfileService;
+    private final SearchChatService searchChatService;
     private final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     @PutMapping("/edit-chat-info")
@@ -89,6 +92,7 @@ public class ChatController extends BaseController {
         if (chat.getChatType() == ChatType.PV){
             chat.setPublic(false);
             chat.setOwner(null);
+            chat.setLink(null);
         }
         chat = chatService.createOrUpdate(chat);
         Set<Permission> ownerPermissions = chat.getChatType() == ChatType.PV
@@ -97,7 +101,7 @@ public class ChatController extends BaseController {
         createInternalSub(chat, getUserByToken(), ownerPermissions);
         for (Long userId : createChatDto.getUserIds()) {
             try {
-                createInternalSub(chat, User.builder().userId(userId).build());
+                createInternalSub(chat, User.builder().userId(userId).lastSeen(Instant.now()).build());
             } catch (Exception ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
@@ -137,13 +141,16 @@ public class ChatController extends BaseController {
             User user = userService.getById(chatService.getOtherPVUser(chat, getUserByToken().getUserId()));
             List<UserProfile> userProfileList = userProfileService.getByUser(user);
             if (userProfileList != null || !userProfileList.isEmpty())
-                user.getProfiles()
+                userProfileList
                         .forEach(chatProfile -> profileDtoList.add(ProfileMapper.mapToProfileDto(chatProfile)));
         }
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
-        getChatDto.setOwnerId(chat.getOwner().getUserId());
+        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser(chat , getUserByToken());
+        getChatDto.setPermissions(subscription.getPermissions());
+        if (chat.getOwner() != null)
+            getChatDto.setOwnerId(chat.getOwner().getUserId());
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
@@ -171,9 +178,6 @@ public class ChatController extends BaseController {
             menuChatDto.setSentAt(message.getSendAt());
             User user = message.getSender();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);
-            if (user.getProfiles().size() != 0) {
-                menuChatDto.setMedia(user.getProfiles().get(user.getProfiles().size() - 1).getMedia());
-            }
             menuChatDto.setUserFirstName(nameable.getFirstName());
         } else {
             menuChatDto.setSentAt(chat.getCreatedAt());
@@ -212,7 +216,9 @@ public class ChatController extends BaseController {
         sub.setChat(chat);
         sub.setUser(user);
         sub.setPermissions(permissions);
-        return subscriptionService.createOrUpdate(sub);
+        Subscription savedSub = subscriptionService.createOrUpdate(sub);
+        searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
+        return savedSub;
     }
 
 }

@@ -2,7 +2,9 @@ package ir.mohaymen.iris.subscription;
 
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
+import ir.mohaymen.iris.chat.ChatType;
 import ir.mohaymen.iris.contact.Contact;
+import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
 import ir.mohaymen.iris.utility.Nameable;
@@ -11,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.elasticsearch.search.aggregations.metrics.InternalHDRPercentiles;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.PVExists(userId1 , userId2);
     }
 
+    @Override
+    public Subscription createSavedMessage(User user) {
+        Chat chat = new Chat();
+        chat.setCreatedAt(Instant.now());
+        chat.setTitle("Saved Message");
+        chat.setPublic(false);
+        chat.setChatType(ChatType.SAVED_MESSAGE);
+        chat = chatRepository.save(chat);
+        Subscription subscription = new Subscription();
+        subscription.setLastMessageSeenId(0L);
+        subscription.setPermissions(Permission.getDefaultPermissions(ChatType.PV));
+        subscription.setUser(user);
+        subscription.setChat(chat);
+        return subscriptionRepository.save(subscription);
+    }
     @Override
     public Nameable setName(List<Contact> contacts, User user) {
         for (Contact contact : contacts) {

@@ -49,6 +49,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public Long messagePlacementInChat(Long messageId, Long chatId) {
+        return messageRepository.messagePlacementInChat(messageId , chatId);
+    }
+
+    @Override
     public Iterable<Message> getByUser(User user) {
         return messageRepository.findBySender(user);
     }

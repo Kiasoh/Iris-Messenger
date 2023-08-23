@@ -3,8 +3,14 @@ package ir.mohaymen.iris.seeder;
 import com.github.javafaker.Name;
 import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactRepository;
+import ir.mohaymen.iris.search.contact.SearchContactDto;
+import ir.mohaymen.iris.search.contact.SearchContactService;
 import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
+
+import org.checkerframework.checker.units.qual.m;
+import org.elasticsearch.search.internal.ContextIndexSearcher;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -14,7 +20,8 @@ import java.util.*;
 public class ContactSeeder implements Seeder {
 
     private final ContactRepository contactRepository;
-
+    private final SearchContactService searchContactService;
+    private final ModelMapper modelMapper;
     static final int NUMBER_OF_INSTANCES = 200;
     private final List<Contact> contacts = new ArrayList<>();
     private final Map<Long, Set<Long>> userIds = new HashMap<>();
@@ -26,7 +33,11 @@ public class ContactSeeder implements Seeder {
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomContact();
 
-        contactRepository.saveAll(contacts);
+        List<Contact> savedContacts = contactRepository.saveAll(contacts);
+        searchContactService
+                .bulkIndex(savedContacts.stream().map(c -> new SearchContactDto(c.getId(), c.getFirstUser().getUserId(),
+                        c.getSecondUser().getUserId(), c.getFirstName(), c.getLastName())).toList());
+
         clearReferences();
     }
 

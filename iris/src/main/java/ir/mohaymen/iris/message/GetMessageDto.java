@@ -13,11 +13,12 @@ import java.time.Instant;
 @NoArgsConstructor
 public class GetMessageDto {
     private Long messageId;
-    private Long repliedMessageId;
+    private Long repliedMessagePlacement;
     private Long userId;
     private String text;
     private Media media;
     @CreationTimestamp
     private Instant sendAt;
     private Instant editedAt;
+    private boolean isSeen;
 }

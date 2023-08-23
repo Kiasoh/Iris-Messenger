@@ -28,7 +28,7 @@ public class PinController extends BaseController {
     private final PinService pinService;
     private final PermissionService permissionService;
     @PostMapping("/pin-message")
-    public ResponseEntity<GetPinDto> pinMessage (@RequestBody @Valid PinDto pinDto) {
+    public ResponseEntity<?> pinMessage (@RequestBody @Valid PinDto pinDto) {
         if (!permissionService.hasAccess(getUserByToken().getUserId(),pinDto.getChatId(), Permission.PIN_MESSAGE))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
@@ -40,17 +40,17 @@ public class PinController extends BaseController {
         pin.setUser(getUserByToken());
         pin.setMessage(message);
         pin.setChat(chat);
-        pin = pinService.createOrUpdate(pin);
-        GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessageId(pin.getPinId());
-        return new ResponseEntity<GetPinDto>(getPinDto , HttpStatus.OK);
+        pinService.createOrUpdate(pin);
+        return ResponseEntity.ok("message pinned");
     }
+
     @GetMapping("/pinned-messages-of-one-chat/{chatId}")
     public ResponseEntity<List<GetPinDto>> allPinnedMessagesOfOneChat(@PathVariable Long chatId) {
         if(!chatService.isInChat(chatService.getById(chatId) , getUserByToken()))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetPinDto> getPinDtoList = new ArrayList<>();
         for (Pin pin:pinService.getByChat(chatService.getById(chatId))) {
-            GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessageId(pin.getPinId());
+            GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessagePlacement(messageService.messagePlacementInChat(chatId ,pin.getMessage().getMessageId())); getPinDto.setMessageText(pin.getMessage().getText());
             getPinDtoList.add(getPinDto);
         }
         return new ResponseEntity<>(getPinDtoList , HttpStatus.OK);

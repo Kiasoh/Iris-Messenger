@@ -19,6 +19,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     Long findChatByMessageId(@Param("id") Long id);
 
+    @Query(value = """
+            select count (m)
+            from Message m
+            where m.messageId > ?1 and m.chat = ?2
+""")
+    Long messagePlacementInChat(Long messageId , Long chatId);
     List<Message> findBySender(User user);
 
     List<Message> findByChat(Chat chat);
@@ -41,7 +47,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = """
                 select s
                 From Subscription s
-                where s.lastMessageSeenId > :messageId and s.chat = :chatId
+                where s.lastMessageSeenId > :messageId and s.chat.chatId = :chatId
             """)
     List<Subscription> usersSeen(@Param("messageId") Long messageId, @Param("chatId") Long chatId);
 
