@@ -155,9 +155,9 @@ public class MessageController extends BaseController {
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
-        // Subscription subscription =
-        // subscriptionService.getSubscriptionByChatAndUser(chat , user);
-        // subscription.setLastMessageSeenId();
+//         Subscription subscription =
+//         subscriptionService.getSubscriptionByChatAndUser(chat , user);
+//         subscription.setLastMessageSeenId();
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
 

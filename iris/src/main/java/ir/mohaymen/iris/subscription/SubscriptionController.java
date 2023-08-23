@@ -14,6 +14,7 @@ import ir.mohaymen.iris.profile.UserProfile;
 import ir.mohaymen.iris.profile.UserProfileService;
 import ir.mohaymen.iris.search.chat.SearchChatDto;
 import ir.mohaymen.iris.search.chat.SearchChatService;
+import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
 import ir.mohaymen.iris.utility.Nameable;
@@ -99,14 +100,19 @@ public class SubscriptionController extends BaseController {
     @GetMapping("/chat-subs/{id}")
     public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
         List<SubDto> subDtoList = new ArrayList<>();
+        Chat chat = new Chat(); chat.setChatId(id);
+        User user = getUserByToken();
+        Subscription sub = subscriptionService.getSubscriptionByChatAndUser(chat , user);
+        if ( sub.getPermissions() == null ||(chat.getChatType() == ChatType.CHANNEL && !sub.getPermissions().contains(Permission.ADMIN) ) )
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         for (Subscription subscription : subscriptionService.getAllSubscriptionByChatId(id)) {
             SubDto subDto = new SubDto();
-            // contact
-            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()),
+            Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(user),
                     subscription.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
             subDto.setUserId(subscription.getUser().getUserId());
+            subDto.setLastSeen(subscription.getUser().getLastSeen());
             UserProfile profile = userProfileService.getLastUserProfile(subscription.getUser());
             if (profile != null)
                 subDto.setProfile(ProfileMapper.mapToProfileDto(profile));
