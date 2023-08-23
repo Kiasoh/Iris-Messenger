@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Getter
 @Setter
 @AllArgsConstructor
-@Document(indexName = "message")
+@Document(indexName = "message",createIndex = false)
 public class SearchMessageDto {
 
     @Id

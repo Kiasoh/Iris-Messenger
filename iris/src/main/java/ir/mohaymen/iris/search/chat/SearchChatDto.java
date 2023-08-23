@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(indexName = "chat")
+@Document(indexName = "chat",createIndex = false)
 public class SearchChatDto {
 
     @Id

@@ -6,8 +6,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
-      - elastic
+      db:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/iris
       - SPRING_DATASOURCE_USERNAME=root
@@ -33,6 +35,12 @@ services:
     restart: unless-stopped
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
   elastic:
     image: elasticsearch:7.17.9
     environment:
@@ -43,7 +51,11 @@ services:
     restart: unless-stopped
     volumes:
       - "elastic_data:/usr/share/elasticsearch/data"
-
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
 volumes:
   postgres_data:
   app_files:

@@ -20,6 +20,12 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
                 where c.chatId=:id
             """)
     ChatType getChatType(@Param("id") Long id);
+    @Query("""
+                select c.title
+                from Chat c
+                where c.chatId=:id
+            """)
+    String getTitle(@Param("id") Long id);
 
     // @Query(value = """
     // select new ir.mohaymen.iris.chat.MenuChatDto(
