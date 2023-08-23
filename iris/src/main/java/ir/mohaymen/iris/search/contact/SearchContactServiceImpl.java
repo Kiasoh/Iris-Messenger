@@ -58,13 +58,14 @@ public class SearchContactServiceImpl implements SearchContactService {
                                 .multiMatchQuery(name)
                                 .field("firstName")
                                 .field("lastName")
-                                .fuzziness(Fuzziness.AUTO);
+                                .fuzziness(Fuzziness.ONE);
 
-                MatchQueryBuilder userQuery = QueryBuilders
-                                .matchQuery("userId", userId);
+                TermQueryBuilder userQuery = QueryBuilders
+                                .termQuery("userId", userId);
 
 
                 Query searchQuery = new NativeSearchQueryBuilder()
+                                .withFilter(userQuery)
                                 .withQuery(nameQuery)
                                 .build();
 

@@ -53,7 +53,7 @@ public class SearchChatServiceImpl implements SearchChatService {
 
                 MatchQueryBuilder titleQuery = QueryBuilders
                                 .matchQuery("title", text)
-                                .fuzziness(Fuzziness.AUTO);
+                                .fuzziness(Fuzziness.ONE);
 
                 TermQueryBuilder userQuery = QueryBuilders
                                 .termQuery("userId", userId);
