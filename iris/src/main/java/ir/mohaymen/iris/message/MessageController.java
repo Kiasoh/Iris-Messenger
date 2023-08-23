@@ -118,25 +118,26 @@ public class MessageController extends BaseController {
     @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         User user = getUserByToken();
-        Chat chat = chatService.getById(messageDto.getChatId());
+        Chat chat = Chat.builder().chatId(messageDto.getChatId()).build();
+
         logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to send message in chat:{1}!",
                 user.getPhoneNumber(), chat.getChatId()));
 
         Message repliedMessage = (messageDto.getRepliedMessageId() != null)
-                ? messageService.getById(messageDto.getRepliedMessageId())
+                ? Message.builder().messageId(messageDto.getRepliedMessageId()).build()
                 : null;
 
-        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId())) {
-            logger.info(MessageFormat.format(
-                    "user with phoneNumber:{0} attempts to reply a message which is in another chat!",
-                    user.getPhoneNumber()));
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        } else if (!chatService.isInChat(chat, user)
+        if (!chatService.isInChat(chat, user)
                 || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE)) {
             logger.info(
                     MessageFormat.format("user with phoneNumber:{0} does not have access to send message in chat{1}!",
                             user.getPhoneNumber(), chat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        } else if (repliedMessage != null && !messageService.getChatIdByMessageId(repliedMessage.getMessageId()).equals(chat.getChatId())) {
+            logger.info(MessageFormat.format(
+                    "user with phoneNumber:{0} attempts to reply a message which is in another chat!",
+                    user.getPhoneNumber()));
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
 
         MultipartFile file = messageDto.getFile();

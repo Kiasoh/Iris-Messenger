@@ -17,6 +17,8 @@ public interface MessageService {
 
     Message getLastMessageByChatId(Chat chat);
 
+    Long getChatIdByMessageId(Long messageId);
+
     List<Subscription> usersSeen(Long messageId, Long chatId);
 
     Iterable<Message> getAll();
