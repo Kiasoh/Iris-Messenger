@@ -1,6 +1,7 @@
 package ir.mohaymen.iris.auth;
 
 import ir.mohaymen.iris.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<AuthDto> login(
-      @RequestBody LoginDto request) {
+      @RequestBody @Valid LoginDto request) {
     return ResponseEntity.ok(authService.login(request));
   }
 

@@ -1,6 +1,5 @@
 package ir.mohaymen.iris.user;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -35,5 +34,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             set u.lastSeen =:updateTime
             where u.userId=:userId
             """)
-    void updateLastSeen(@Param("userId") Long userId, @Param("updateTime") Instant updateTime);
+    void updateLastSeenById(@Param("userId") Long userId, @Param("updateTime") Instant updateTime);
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update User u
+            set u.lastSeen =:updateTime
+            where u.phoneNumber=:phoneNumber
+            """)
+    void updateLastSeenByPhoneNumber(@Param("phoneNumber") String phoneNumber, @Param("updateTime") Instant updateTime);
 }

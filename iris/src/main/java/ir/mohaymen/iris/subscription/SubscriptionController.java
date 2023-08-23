@@ -48,7 +48,7 @@ public class SubscriptionController extends BaseController {
 
     @PostMapping("/add-user-to-chat")
     public ResponseEntity<GetChatDto> addToChat(@RequestBody @Valid AddSubDto addSubDto) {
-        var user = getUserByToken();
+        User user = getUserByToken();
         if (!permissionService.hasAccess(user.getUserId(), addSubDto.getChatId(), Permission.ADD_USER))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
@@ -62,8 +62,8 @@ public class SubscriptionController extends BaseController {
         for (Long id : addSubDto.getUserIds()) {
             Subscription savedSub = subscriptionService.createOrUpdate(new Subscription(null, userService.getById(id),
                     chat, lastMessageSeenId, Permission.getDefaultPermissions(chat.getChatType())));
-            searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
-
+            if (!chat.getChatType().equals(ChatType.PV))
+                searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
         }
         GetChatDto getChatDto = modelMapper.map(chat, GetChatDto.class);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));

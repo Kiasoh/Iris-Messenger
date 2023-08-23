@@ -71,7 +71,7 @@ public class SMSService {
                 // Handle parsing error
             }
         } else {
-            throw new Exception("خطایی در ارسال پیامک به وجود آمده است.");
+            throw new Exception("error in sending message");
         }
         return resultCode;
     }

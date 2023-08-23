@@ -28,8 +28,7 @@ public class ContactSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (contactRepository.count() != 0)
-            return;
+        if (contactRepository.count() != 0) return;
 
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)
             generateRandomContact();

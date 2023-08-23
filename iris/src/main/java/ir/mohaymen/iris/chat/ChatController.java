@@ -217,7 +217,8 @@ public class ChatController extends BaseController {
         sub.setUser(user);
         sub.setPermissions(permissions);
         Subscription savedSub = subscriptionService.createOrUpdate(sub);
-        searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
+        if (!chat.getChatType().equals(ChatType.PV))
+            searchChatService.index(new SearchChatDto(savedSub.getSubId(), savedSub.getUser().getUserId(), savedSub.getChat().getChatId(), savedSub.getChat().getTitle()));
         return savedSub;
     }
 
