@@ -79,6 +79,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<Message> createOrUpdate(List<Message> messageList) {
+        return messageRepository.saveAll(messageList);
+    }
+
+    @Override
     public void deleteById(Long id) {
         messageRepository.deleteById(id);
     }
@@ -141,7 +146,24 @@ public class MessageServiceImpl implements MessageService {
     public Message getLastMessageByChatId(Long chatId){
         return messageRepository.getLastMessageByChatId(chatId).get(0);
     }
+
+    @Override
+    public Media getMediaByMessageId(Long messageId) {
+        return messageRepository.findMediaByMessageId(messageId);
+    }
+
+    @Override
+    public GetForwardMessageDto getForwardMessageDto(Long messageId) {
+
+        return messageRepository.findForwardMessageByMessageId(messageId);
+    }
+
     public Message getLastMessageByChatId(Chat chat) {
         return messageRepository.findFirstByChatOrderByMessageIdDesc(chat);
+    }
+
+    @Override
+    public Long getChatIdByMessageId(Long messageId) {
+        return messageRepository.findChatByMessageId(messageId);
     }
 }

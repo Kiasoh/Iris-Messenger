@@ -11,7 +11,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ForwardMessageDto {
+public class SendForwardMessageDto {
 
     @NotNull
     private Long messageId;

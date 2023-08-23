@@ -38,8 +38,7 @@ public class MediaSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (mediaRepository.count() != 0)
-            return;
+        if (mediaRepository.count() != 0) return;
 
         readFiles();
         for (int i = 0; i < NUMBER_OF_INSTANCES; i++)

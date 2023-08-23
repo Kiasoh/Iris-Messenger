@@ -25,8 +25,7 @@ public class ChatSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (chatRepository.count() != 0)
-            return;
+        if (chatRepository.count() != 0) return;
 
         for (int i = 1; i <= NUMBER_OF_INSTANCES; i++)
             generateRandomChat(i);
@@ -76,8 +75,7 @@ public class ChatSeeder implements Seeder {
     }
 
     private String generateBio(long seed) {
-        if (seed % 3 == 0)
-            return null;
+        if (seed % 3 == 0) return null;
         String bio = switch ((int) (seed % 5)) {
             case 0 -> faker.harryPotter().quote();
             case 1 -> faker.gameOfThrones().quote();

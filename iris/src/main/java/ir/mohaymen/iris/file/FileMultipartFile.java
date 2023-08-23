@@ -11,14 +11,20 @@ import java.nio.file.Path;
 
 public class FileMultipartFile implements MultipartFile {
     private Path path;
+    private String fileName;
 
+    public FileMultipartFile(Path path,String fileName) {
+        this.path = path;
+        this.fileName=fileName;
+    }
     public FileMultipartFile(Path path) {
         this.path = path;
+        this.fileName=path.getFileName().toString();
     }
 
     @Override
     public String getName() {
-        return path.getFileName().toString();
+        return this.fileName;
     }
 
     @Override

@@ -17,6 +17,8 @@ public interface MessageService {
 
     Message getLastMessageByChatId(Chat chat);
 
+    Long getChatIdByMessageId(Long messageId);
+
     List<Subscription> usersSeen(Long messageId, Long chatId);
 
     Iterable<Message> getAll();
@@ -32,7 +34,14 @@ public interface MessageService {
     Iterable<Message> getByReplyMessage(Message message);
 
     Message createOrUpdate(Message message);
+
+    List<Message> createOrUpdate(List<Message> messageList);
+
     Message getLastMessageByChatId(Long chatId);
+
+    Media getMediaByMessageId(Long messageId);
+
+    GetForwardMessageDto getForwardMessageDto(Long messageId);
 
     void deleteById(Long id);
 

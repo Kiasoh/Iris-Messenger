@@ -77,13 +77,32 @@ public class FileServiceImpl implements FileService {
             Files.delete(foundFile);
     }
 
+    @Override
+    public Media duplicateMediaById(Media media) {
+        Path path = null;
+        try {
+            path = getPathById(media.getMediaId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MultipartFile multipartFile = new FileMultipartFile(path, media.getFileName());
+
+        Media duplicateMedia = null;
+        try {
+            duplicateMedia = saveFile(multipartFile.getOriginalFilename(), multipartFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return duplicateMedia;
+    }
+
     private Path getPathById(Long id) throws IOException {
         String fileCode = generateFileCodeByMediaId(id);
         Path dirPath = Paths.get(path);
 
-        Path foundFile = Files.list(dirPath).filter(file -> file.getFileName().toString().startsWith(fileCode))
+        return Files.list(dirPath).filter(file -> file.getFileName().toString().startsWith(fileCode))
                 .findFirst()
                 .orElse(null);
-        return foundFile;
     }
 }

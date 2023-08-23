@@ -41,8 +41,7 @@ public class MessageSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (messageRepository.count() != 0)
-            return;
+        if (messageRepository.count() != 0) return;
 
         for (int i = 0; i < NUMBER_OF_CHAT_MESSAGES; i++)
             generateRandomMessageForChat();
@@ -118,8 +117,7 @@ public class MessageSeeder implements Seeder {
     private Media generateRandomMedia(long seed) {
         Media media;
 
-        if (MediaSeeder.NUMBER_OF_USED_MEDIAS >= MediaSeeder.NUMBER_OF_INSTANCES)
-            return null;
+        if (MediaSeeder.NUMBER_OF_USED_MEDIAS >= MediaSeeder.NUMBER_OF_INSTANCES) return null;
 
         media = new Media();
         if (seed % 7 == 2 || seed % 7 == 6) {

@@ -29,8 +29,7 @@ public class SubscriptionSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (subscriptionRepository.count() != 0)
-            return;
+        if (subscriptionRepository.count() != 0) return;
 
         addOwnersToSubscription();
         for (int i = 0; i < NUMBER_OF_INSTANCES - ChatSeeder.NUMBER_OF_INSTANCES; i++)

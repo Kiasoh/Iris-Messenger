@@ -3,7 +3,6 @@ package ir.mohaymen.iris.message;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatService;
 import ir.mohaymen.iris.chat.ChatType;
-import ir.mohaymen.iris.contact.Contact;
 import ir.mohaymen.iris.contact.ContactService;
 import ir.mohaymen.iris.file.FileService;
 import ir.mohaymen.iris.media.Media;
@@ -11,7 +10,6 @@ import ir.mohaymen.iris.media.MediaService;
 import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.subscription.SubDto;
-import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
@@ -26,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -56,7 +55,7 @@ public class MessageController extends BaseController {
 
     @GetMapping("/get-messages/{chatId}/{floor}/{ceil}")
     public ResponseEntity<List<GetMessageDto>> getMessages(@PathVariable("chatId") Long chatId,
-            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
+                                                           @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<Message> messages = new ArrayList<>();
@@ -104,50 +103,47 @@ public class MessageController extends BaseController {
         Message message = messageService.getById(id);
         Chat chat = message.getChat();
         User user = getUserByToken();
-       if (!chatService.isInChat(chat, user)
-               || !permissionService.hasAccessToDeleteMessage(message,user.getUserId(), chat)) {
-           logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
-                   user.getPhoneNumber(), chat.getChatId()));
-           throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-       }
+        if (!chatService.isInChat(chat, user)
+                || !permissionService.hasAccessToDeleteMessage(message, user.getUserId(), chat)) {
+            logger.info(MessageFormat.format("user with phoneNumber:{0} does not have access to delete message in chat{1}!",
+                    user.getPhoneNumber(), chat.getChatId()));
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        }
         messageService.deleteById(id);
         return ResponseEntity.ok("If you only could delete feelings the same way you delete a text message");
     }
 
-    @RequestMapping(path = "/send-message", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(path = "/send-message", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<GetMessageDto> sendMessage(@ModelAttribute @Valid MessageDto messageDto) throws IOException {
         User user = getUserByToken();
-        Chat chat = chatService.getById(messageDto.getChatId());
+        Chat chat = Chat.builder().chatId(messageDto.getChatId()).build();
+
         logger.info(MessageFormat.format("user with phoneNumber:{0} attempts to send message in chat:{1}!",
                 user.getPhoneNumber(), chat.getChatId()));
 
         Message repliedMessage = (messageDto.getRepliedMessageId() != null)
-                ? messageService.getById(messageDto.getRepliedMessageId())
+                ? Message.builder().messageId(messageDto.getRepliedMessageId()).build()
                 : null;
 
-        if (repliedMessage != null && !repliedMessage.getChat().getChatId().equals(chat.getChatId())) {
-            logger.info(MessageFormat.format(
-                    "user with phoneNumber:{0} attempts to reply a message which is in another chat!",
-                    user.getPhoneNumber()));
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        } else if (!chatService.isInChat(chat, user)
+        if (!chatService.isInChat(chat, user)
                 || !permissionService.hasAccess(user.getUserId(), messageDto.getChatId(), Permission.SEND_MESSAGE)) {
             logger.info(
                     MessageFormat.format("user with phoneNumber:{0} does not have access to send message in chat{1}!",
                             user.getPhoneNumber(), chat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        } else if (repliedMessage != null && !messageService.getChatIdByMessageId(repliedMessage.getMessageId()).equals(chat.getChatId())) {
+            logger.info(MessageFormat.format(
+                    "user with phoneNumber:{0} attempts to reply a message which is in another chat!",
+                    user.getPhoneNumber()));
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
 
-        var file = messageDto.getFile();
-        Media media;
+        MultipartFile file = messageDto.getFile();
+        Media media = null;
         if (file == null || file.isEmpty()) {
-            media = null;
-            if (messageDto.getText().isBlank()) {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            media = fileService.saveFile(file.getOriginalFilename(), file);
-        }
+            if (messageDto.getText().isBlank()) throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        } else media = fileService.saveFile(file.getOriginalFilename(), file);
+
         Message message = new Message();
         message.setRepliedMessage(repliedMessage);
         message.setText(messageDto.getText());
@@ -155,10 +151,9 @@ public class MessageController extends BaseController {
         message.setSender(user);
         message.setMedia(media);
         message.setSendAt(Instant.now());
+        message.setRepliedMessage(repliedMessage);
+
         GetMessageDto getMessageDto = mapMessageToGetMessageDto(message);
-//        Subscription subscription =
-//         subscriptionService.getSubscriptionByChatAndUser(chat , user);
-//         subscription.setLastMessageSeenId(getMessageDto.getMessageId());
          subscriptionService.updateLastSeenMessage(chat.getChatId() , user.getUserId() , getMessageDto.getMessageId());
         return new ResponseEntity<>(getMessageDto, HttpStatus.OK);
     }
@@ -178,12 +173,34 @@ public class MessageController extends BaseController {
     }
 
     @PostMapping("/forward-message/{chatId}/{messageId}")
-    public ResponseEntity<ForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
+    public ResponseEntity<SendForwardMessageDto> forwardMessage(@PathVariable Long chatId, @PathVariable Long messageId) {
+        Message newMessage = generateForwardMessage(chatId, messageId);
+
+        Message savedMessage = messageService.createOrUpdate(newMessage);
+        return new ResponseEntity<>(mapMessageToForwardMessageDto(savedMessage), HttpStatus.OK);
+    }
+
+    @PostMapping("/forward-message/{chatId}")
+    public ResponseEntity<List<SendForwardMessageDto>> forwardMessage(@PathVariable Long chatId,
+                                                                      @RequestBody @Valid List<Long> messageIds) {
+        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward {1} message(s) to chat:{2}",
+                getUserByToken().getPhoneNumber(), messageIds.size(), chatId));
+
+        List<Message> messages = messageIds.stream().map(messageId -> generateForwardMessage(chatId, messageId)).toList();
+        messageService.createOrUpdate(messages);
+        List<SendForwardMessageDto> forwardMessageDtos = messages.stream().map(this::mapMessageToForwardMessageDto).toList();
+
+        return new ResponseEntity<>(forwardMessageDtos, HttpStatus.OK);
+    }
+
+    private Message generateForwardMessage(long chatId, long messageId) {
         User user = getUserByToken();
+        Chat newChat = Chat.builder().chatId(chatId).build();
+
+        GetForwardMessageDto originMessage = messageService.getForwardMessageDto(messageId);
+
         logger.info(MessageFormat.format("user with phone number:{0} attempts to forward message:{1} to chat:{2}!",
                 user.getPhoneNumber(), messageId, chatId));
-        Message message = messageService.getById(messageId);
-        Chat newChat = chatService.getById(chatId);
 
         if (!chatService.isInChat(newChat, user)
                 || !permissionService.hasAccess(user.getUserId(), newChat.getChatId(), Permission.SEND_MESSAGE)) {
@@ -191,7 +208,7 @@ public class MessageController extends BaseController {
                     "user with phoneNumber:{0} does not have access to forward message in chat{1}!",
                     user.getPhoneNumber(), newChat.getChatId()));
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        } else if (!chatService.isInChat(message.getChat(), user)) {
+        } else if (!chatService.isInChat(Chat.builder().chatId(originMessage.getChatId()).build(), user)) {
             logger.info(MessageFormat.format(
                     "user with phone number:{0} does not have access to message:{1} to forward it!",
                     user.getPhoneNumber(), messageId));
@@ -200,39 +217,18 @@ public class MessageController extends BaseController {
 
         Message newMessage = new Message();
         newMessage.setChat(newChat);
-        newMessage.setOriginMessage(message);
+        newMessage.setOriginMessage(Message.builder().messageId(messageId).build());
         newMessage.setSender(user);
-        newMessage.setText(message.getText());
+        newMessage.setText(originMessage.getText());
         newMessage.setSendAt(Instant.now());
 
-        if (message.getMedia() != null) {
-            Media media = message.getMedia();
-
-            Media newMedia = new Media();
-            newMedia.setFileName(media.getFileName());
-            newMedia.setFilePath(media.getFilePath());
-            newMedia.setFileMimeType(media.getFileMimeType());
-
-            newMedia = mediaService.createOrUpdate(newMedia);
+        Media media = messageService.getMediaByMessageId(messageId);
+        if (media != null) {
+            Media newMedia = fileService.duplicateMediaById(media);
             newMessage.setMedia(newMedia);
         }
 
-        return new ResponseEntity<>(mapMessageToForwardMessageDto(newMessage), HttpStatus.OK);
-    }
-
-    @PostMapping("/forward-message/{chatId}")
-    public ResponseEntity<List<ForwardMessageDto>> forwardMessage(@PathVariable Long chatId,
-            @RequestBody @Valid List<Long> messageIds) {
-        logger.info(MessageFormat.format("user with phone number:{0} attempts to forward {} message(s) to chat:{2}",
-                getUserByToken().getPhoneNumber(), messageIds.size(), chatId));
-        List<ForwardMessageDto> forwardMessageDtos = new ArrayList<>();
-        for (Long messageId : messageIds) {
-            ResponseEntity<ForwardMessageDto> forwardMessageDtoResponseEntity = forwardMessage(chatId, messageId);
-            ForwardMessageDto forwardMessageDto = forwardMessageDtoResponseEntity.getBody();
-            forwardMessageDtos.add(forwardMessageDto);
-        }
-
-        return new ResponseEntity<>(forwardMessageDtos, HttpStatus.OK);
+        return newMessage;
     }
 
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
@@ -247,9 +243,8 @@ public class MessageController extends BaseController {
         return getMessageDto;
     }
 
-    private ForwardMessageDto mapMessageToForwardMessageDto(Message message) {
-        ForwardMessageDto forwardMessageDto = modelMapper.map(messageService.createOrUpdate(message),
-                ForwardMessageDto.class);
+    private SendForwardMessageDto mapMessageToForwardMessageDto(Message message) {
+        SendForwardMessageDto forwardMessageDto = modelMapper.map(message, SendForwardMessageDto.class);
         forwardMessageDto.setUserId(message.getSender().getUserId());
         return forwardMessageDto;
     }
