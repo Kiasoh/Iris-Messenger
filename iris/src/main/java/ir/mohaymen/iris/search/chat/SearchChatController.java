@@ -31,7 +31,7 @@ public class SearchChatController extends BaseController {
 
     @PostMapping("/multi")
     public ResponseEntity<List<String>> bulkIndex(@RequestBody List<SearchChatDto> chats){
-        List<String> indexIds = searchChatService.bulkIndex(chats, getUserByToken().getUserId());
+        List<String> indexIds = searchChatService.bulkIndex(chats);
         return new ResponseEntity<>(indexIds, HttpStatus.OK);
     }
 }

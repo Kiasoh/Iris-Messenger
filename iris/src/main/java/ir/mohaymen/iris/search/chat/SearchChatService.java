@@ -8,7 +8,7 @@ public interface SearchChatService {
 
     String index(SearchChatDto chat);
 
-    List<String> bulkIndex(List<SearchChatDto> chats, Long userId);
+    List<String> bulkIndex(List<SearchChatDto> chats);
 
     void deleteById(Long id);
 

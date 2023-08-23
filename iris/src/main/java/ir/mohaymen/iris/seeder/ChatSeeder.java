@@ -3,7 +3,6 @@ package ir.mohaymen.iris.seeder;
 import ir.mohaymen.iris.chat.Chat;
 import ir.mohaymen.iris.chat.ChatRepository;
 import ir.mohaymen.iris.chat.ChatType;
-import ir.mohaymen.iris.subscription.Subscription;
 import ir.mohaymen.iris.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,8 @@ public class ChatSeeder implements Seeder {
 
     @Override
     public void load() {
-        if (chatRepository.count() != 0) return;
+        if (chatRepository.count() != 0)
+            return;
 
         for (int i = 1; i <= NUMBER_OF_INSTANCES; i++)
             generateRandomChat(i);
@@ -76,7 +76,8 @@ public class ChatSeeder implements Seeder {
     }
 
     private String generateBio(long seed) {
-        if (seed % 3 == 0) return null;
+        if (seed % 3 == 0)
+            return null;
         String bio = switch ((int) (seed % 5)) {
             case 0 -> faker.harryPotter().quote();
             case 1 -> faker.gameOfThrones().quote();
@@ -90,7 +91,8 @@ public class ChatSeeder implements Seeder {
     private String generateLink() {
         String link;
         do {
-            link = faker.artist().name().replaceAll("\\s", "_").concat(faker.regexify("_\\d{2,5}_")).concat(faker.lordOfTheRings().character().replaceAll("\\s", "_"));
+            link = faker.artist().name().replaceAll("\\s", "_").concat(faker.regexify("_\\d{2,5}_"))
+                    .concat(faker.lordOfTheRings().character().replaceAll("\\s", "_"));
         } while (links.contains(link));
         links.add(link);
         return link;

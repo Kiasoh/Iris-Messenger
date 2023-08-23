@@ -12,7 +12,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Getter
 @Setter
 @Document(indexName = "contact")
-@NoArgsConstructor
 @AllArgsConstructor
 public class SearchContactDto {
 
