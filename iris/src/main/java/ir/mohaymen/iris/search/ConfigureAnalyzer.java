@@ -5,170 +5,67 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 @Component
+@Order(1)
 @RequiredArgsConstructor
 public class ConfigureAnalyzer implements CommandLineRunner {
-    Logger logger= LoggerFactory.getLogger(ConfigureAnalyzer.class);
-
+    Logger logger = LoggerFactory.getLogger(ConfigureAnalyzer.class);
+    @Value("${application.resource.path}")
+    private String resourcePath;
     @Value("${application.elasticsearch.host}")
-    private String host="localhost";
-    @Override
+    private String host = "localhost";
+
     public void run(String... args) throws Exception {
+
         try {
-            logger.info(configureMessage());
-            logger.info(configureChat());
-            logger.info(configureContact());
+            logger.info("start curl configure analyzer");
+            configureMessage();
+            configureChat();
+            configureContact();
+            logger.info("end curl configure analyzer");
         } catch (Exception e) {
             logger.error("error on configuring analyzer");
         }
     }
-
-    private String executeCommand(String command) {
-
-        StringBuffer output = new StringBuffer();
-
-        Process p;
+    private void executeCommandWithArgs(String path,String args) {
+        String command=path+" "+args;
         try {
-            p = Runtime.getRuntime().exec(command);
-            p.waitFor();
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
-            }
-
-        } catch (Exception e) {
+            logger.info(command);
+            Process process = Runtime.getRuntime().exec(command);
+            logOutput(process.getInputStream(), "");
+            logOutput(process.getErrorStream(), "Error: ");
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-
-        return output.toString();
-
+    }
+    private void logOutput(InputStream inputStream, String prefix) {
+        new Thread(() -> {
+            Scanner scanner = new Scanner(inputStream, "UTF-8");
+            while (scanner.hasNextLine()) {
+                synchronized (this) {
+                    logger.info(prefix + scanner.nextLine());
+                }
+            }
+            scanner.close();
+        }).start();
+    }
+    private void configureMessage() {
+        executeCommandWithArgs(resourcePath + "/scripts/elastic_configure_analyzer_message.sh", host);
     }
 
-    private String configureMessage() {
-        return executeCommand(MessageFormat.format("""
-                curl -X PUT {0}:9200/message -H 'Content-Type: application/json' -d'
-                {
-                  "settings": {
-                    "analysis": {
-                      "filter": {
-                        "my_edge_ngram_filter":{
-                          "type": "edge_ngram",
-                          "min_gram": 1,
-                          "max_gram": 10
-                        }
-                      },
-                      "analyzer": {
-                        "my_edge_ngram_analyzer":{
-                          "type": "custom",
-                          "tokenizer": "standard",
-                          "filter": [
-                            "lowercase",
-                            "my_edge_ngram_filter"
-                            ]
-                        }
-                      }
-                    }
-                  },
-                  "mappings": {
-                    "properties": {
-                      "text":{
-                        "type": "text",\s
-                        "search_analyzer": "standard",
-                        "analyzer": "my_edge_ngram_analyzer"
-                      }
-                    }
-                  }
-                }'
-                """,host));
+    private void configureChat() {
+        executeCommandWithArgs(resourcePath + "/scripts/elastic_configure_analyzer_chat.sh", host);
     }
 
-    private String configureChat() {
-        return executeCommand(MessageFormat.format("""
-                curl -X PUT {0}:9200/chat -H 'Content-Type: application/json' -d'
-                {
-                  "settings": {
-                    "analysis": {
-                      "filter": {
-                        "my_edge_ngram_filter":{
-                          "type": "edge_ngram",
-                          "min_gram": 1,
-                          "max_gram": 10
-                        }
-                      },
-                      "analyzer": {
-                        "my_edge_ngram_analyzer":{
-                          "type": "custom",
-                          "tokenizer": "standard",
-                          "filter": [
-                            "lowercase",
-                            "my_edge_ngram_filter"
-                            ]
-                        }
-                      }
-                    }
-                  },
-                  "mappings": {
-                    "properties": {
-                      "title":{
-                        "type": "text",\s
-                        "search_analyzer": "standard",
-                        "analyzer": "my_edge_ngram_analyzer"
-                      }
-                    }
-                  }
-                }'
-                """,host));
-    }
-
-    private String configureContact() {
-        return executeCommand(MessageFormat.format("""
-                curl -X PUT {0}:9200/contact -H 'Content-Type: application/json' -d'
-                {
-                  "settings": {
-                    "analysis": {
-                      "filter": {
-                        "my_edge_ngram_filter":{
-                          "type": "edge_ngram",
-                          "min_gram": 1,
-                          "max_gram": 10
-                        }
-                      },
-                      "analyzer": {
-                        "my_edge_ngram_analyzer":{
-                          "type": "custom",
-                          "tokenizer": "standard",
-                          "filter": [
-                            "lowercase",
-                            "my_edge_ngram_filter"
-                            ]
-                        }
-                      }
-                    }
-                  },
-                  "mappings": {
-                    "properties": {
-                      "firstName":{
-                        "type": "text",\s
-                        "search_analyzer": "standard",
-                        "analyzer": "my_edge_ngram_analyzer"
-                      },
-                      "secondName":{
-                        "type": "text",\s
-                        "search_analyzer": "standard",
-                        "analyzer": "my_edge_ngram_analyzer"
-                      }
-                    }
-                  }
-                }'
-                """,host));
+    private void configureContact() {
+        executeCommandWithArgs(resourcePath + "/scripts/elastic_configure_analyzer_contact.sh", host);
     }
 }
