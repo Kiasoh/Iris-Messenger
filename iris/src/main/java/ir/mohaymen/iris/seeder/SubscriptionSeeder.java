@@ -39,7 +39,7 @@ public class SubscriptionSeeder implements Seeder {
         var savedSubs = subscriptionRepository.saveAll(subscriptions);
         searchChatService
                 .bulkIndex(savedSubs.stream()
-                        .map(s -> new SearchChatDto(s.getSubId(), s.getUser().getUserId(), s.getChat().getTitle()))
+                        .map(s -> new SearchChatDto(s.getSubId(), s.getUser().getUserId(), s.getChat().getChatId(), s.getChat().getTitle()))
                         .toList());
         clearReferences();
     }
