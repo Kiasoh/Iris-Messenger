@@ -32,7 +32,14 @@ public interface MessageService {
     Iterable<Message> getByReplyMessage(Message message);
 
     Message createOrUpdate(Message message);
+
+    List<Message> createOrUpdate(List<Message> messageList);
+
     Message getLastMessageByChatId(Long chatId);
+
+    Media getMediaByMessageId(Long messageId);
+
+    GetForwardMessageDto getForwardMessageDto(Long messageId);
 
     void deleteById(Long id);
 

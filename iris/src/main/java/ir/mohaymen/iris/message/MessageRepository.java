@@ -49,7 +49,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                     select m
                     from Message m
                     where m.chat.chatId = :chatId
-                    order by m.messageId desc 
+                    order by m.messageId desc
             """)
     List<Message> getLastMessageByChatId(@Param("chatId") Long chatId);
 
@@ -62,4 +62,17 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     List<Subscription> getSubSeen(@Param("messageId") Long messageId, @Param("chatId") Long chatId);
 
+    @Query("""
+            select new ir.mohaymen.iris.message.GetForwardMessageDto(m.chat.chatId, m.text)
+            from Message m
+            where m.messageId=:messageId
+            """)
+    GetForwardMessageDto findForwardMessageByMessageId(@Param("messageId") Long messageId);
+
+    @Query("""
+            select m.media
+            from Message m
+            where m.messageId=:messageId
+            """)
+    Media findMediaByMessageId(@Param("messageId") Long messageId);
 }

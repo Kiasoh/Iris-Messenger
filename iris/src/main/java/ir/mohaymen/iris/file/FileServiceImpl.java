@@ -78,23 +78,23 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Media duplicateMediaById(Long mediaId) {
+    public Media duplicateMediaById(Media media) {
         Path path = null;
         try {
-            path = getPathById(mediaId);
+            path = getPathById(media.getMediaId());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        MultipartFile multipartFile = new FileMultipartFile(path);
+        MultipartFile multipartFile = new FileMultipartFile(path, media.getFileName());
 
-        Media media = null;
+        Media duplicateMedia = null;
         try {
-            media = saveFile(multipartFile.getOriginalFilename(), multipartFile);
+            duplicateMedia = saveFile(multipartFile.getOriginalFilename(), multipartFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return media;
+        return duplicateMedia;
     }
 
     private Path getPathById(Long id) throws IOException {

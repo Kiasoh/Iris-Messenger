@@ -15,5 +15,5 @@ public interface FileService {
 
     void deleteFile(Long id) throws IOException;
 
-    Media duplicateMediaById(Long mediaId);
+    Media duplicateMediaById(Media media);
 }
