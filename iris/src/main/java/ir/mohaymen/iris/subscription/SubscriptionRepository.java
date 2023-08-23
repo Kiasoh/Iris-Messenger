@@ -77,7 +77,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     @Query("""
                 SELECT sub1.chat
                 from Subscription sub1 inner join Subscription sub2 on sub1.chat.chatId=sub2.chat.chatId
-                where sub1.user.userId = :userId1 and sub2.user.userId = :userId2
+                where sub1.user.userId = :userId1 and sub2.user.userId = :userId2 and sub1.chat.chatType=ir.mohaymen.iris.chat.ChatType.PV
             """)
     Chat PVExists(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 

@@ -144,7 +144,8 @@ public class ChatController extends BaseController {
         getChatDto.setChatId(chat.getChatId());
         getChatDto.setProfileDtoList(profileDtoList);
         getChatDto.setSubCount(subscriptionService.subscriptionCount(chat.getChatId()));
-        getChatDto.setOwnerId(chat.getOwner().getUserId());
+        if (chat.getOwner() != null)
+            getChatDto.setOwnerId(chat.getOwner().getUserId());
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
