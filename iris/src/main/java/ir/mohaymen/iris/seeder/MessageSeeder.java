@@ -51,9 +51,11 @@ public class MessageSeeder implements Seeder {
 
         updateUsersLastSeen();
         messages.sort(Comparator.comparing(Message::getSendAt));
-        var savedMessages = messageRepository.saveAll(messages);
+        List<Message> savedMessages = messageRepository.saveAll(messages);
         searchMessageService
-                .createBulk(savedMessages.stream().map(m -> modelMapper.map(m, SearchMessageDto.class)).toList());
+                .bulkIndex(savedMessages.stream()
+                        .map(message -> new SearchMessageDto(message.getMessageId(), message.getText()))
+                        .toList());
         clearReferences();
     }
 

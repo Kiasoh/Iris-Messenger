@@ -36,7 +36,8 @@ public class ContactSeeder implements Seeder {
 
         List<Contact> savedContacts = contactRepository.saveAll(contacts);
         searchContactService
-                .bulkIndex(savedContacts.stream().map(c -> modelMapper.map(c, SearchContactDto.class)).toList());
+                .bulkIndex(savedContacts.stream().map(c -> new SearchContactDto(c.getId(), c.getFirstUser().getUserId(),
+                        c.getSecondUser().getUserId(), c.getFirstName(), c.getLastName())).toList());
 
         clearReferences();
     }
