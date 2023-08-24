@@ -12,6 +12,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 public class SubDto {
+    private Long subId;
     private Long userId;
     private String firstName;
     private String lastName;
