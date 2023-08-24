@@ -47,7 +47,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = """
                 select s
                 From Subscription s
-                where s.lastMessageSeenId > :messageId and s.chat.chatId = :chatId
+                where s.lastMessageSeenId >= :messageId and s.chat.chatId = :chatId
             """)
     List<Subscription> usersSeen(@Param("messageId") Long messageId, @Param("chatId") Long chatId);
 
