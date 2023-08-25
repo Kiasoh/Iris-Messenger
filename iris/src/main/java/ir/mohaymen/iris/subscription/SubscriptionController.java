@@ -111,7 +111,7 @@ public class SubscriptionController extends BaseController {
                     subscription.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
-            subDto.setSubId(sub.getSubId());
+            subDto.setSubId(subscription.getSubId());
             subDto.setUserId(subscription.getUser().getUserId());
             subDto.setLastSeen(subscription.getUser().getLastSeen());
             subDto.setAdmin(Permission.isAdmin(subscription.getPermissions()));
