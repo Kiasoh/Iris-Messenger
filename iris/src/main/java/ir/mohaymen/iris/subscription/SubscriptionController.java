@@ -80,7 +80,7 @@ public class SubscriptionController extends BaseController {
     @DeleteMapping("/delete-sub/{subId}")
     public ResponseEntity<?> leaveGroupBySubId(@PathVariable Long subId) throws Exception {
         Subscription subscription = subscriptionService.getSubscriptionBySubscriptionId(subId);
-        if (subscription.getUser().getUserId() != getUserByToken().getUserId() && (!subscription.getPermissions().contains(Permission.ADD_USER) ||!subscription.getPermissions().contains(Permission.ADMIN) ))
+        if (subscription.getUser().getUserId() != getUserByToken().getUserId() && !(subscription.getPermissions().contains(Permission.ADD_USER) || subscription.getPermissions().contains(Permission.ADMIN) ))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         if (subscription.getChat().getChatType() == ChatType.PV) {
             chatService.deleteById(subscription.getChat().getChatId());
