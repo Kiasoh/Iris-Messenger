@@ -144,7 +144,10 @@ public class MessageServiceImpl implements MessageService {
     }
     @Override
     public Message getLastMessageByChatId(Long chatId){
-        return messageRepository.getLastMessageByChatId(chatId).get(0);
+        List<Message> messages = messageRepository.getLastMessageByChatId(chatId);
+        if (messages == null || messages.size() == 0)
+            return null;
+        return messages.get(0);
     }
 
     @Override

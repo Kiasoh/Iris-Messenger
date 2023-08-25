@@ -43,7 +43,7 @@ public class SubscriptionController extends BaseController {
     private final ModelMapper modelMapper;
     private final ContactService contactService;
     private final PermissionService permissionService;
-    SearchChatService searchChatService;
+    private final SearchChatService searchChatService;
     private final MessageService messageService;
     private final UserProfileService userProfileService;
 
@@ -80,7 +80,8 @@ public class SubscriptionController extends BaseController {
     @DeleteMapping("/delete-sub/{subId}")
     public ResponseEntity<?> leaveGroupBySubId(@PathVariable Long subId) throws Exception {
         Subscription subscription = subscriptionService.getSubscriptionBySubscriptionId(subId);
-        if (subscription.getUser().getUserId() != getUserByToken().getUserId() && !(subscription.getPermissions().contains(Permission.ADD_USER) || subscription.getPermissions().contains(Permission.ADMIN) ))
+        Subscription clientSub = subscriptionService.getSubscriptionByChatAndUser(subscription.getChat() , getUserByToken());
+        if ( subscription.getChat().getChatId() != clientSub.getChat().getChatId() || (subscription.getUser().getUserId() != clientSub.getUser().getUserId() && !(clientSub.getPermissions().contains(Permission.ADD_USER) || clientSub.getPermissions().contains(Permission.ADMIN) )))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         if (subscription.getChat().getChatType() == ChatType.PV) {
             chatService.deleteById(subscription.getChat().getChatId());
