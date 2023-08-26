@@ -13,6 +13,7 @@ import ir.mohaymen.iris.subscription.SubDto;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.EncryptionUtils;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class MessageController extends BaseController {
     private final ContactService contactService;
     private final FileService fileService;
     private final PermissionService permissionService;
+    private final EncryptionUtils encryptionUtils;
 
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -58,14 +60,15 @@ public class MessageController extends BaseController {
                                                            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Message> messages = new ArrayList<>();
-        messageService.getByChat(chatService.getById(chatId)).forEach(m -> messages.add(m));
+        Chat chat = new Chat(); chat.setChatId(chatId);
+        List<Message> messages = messageService.getByChat(chat);
         if (messages.size() < ceil)
             ceil = (messages.size());
         if (floor < 0)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
         for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
+            message.setText(encryptionUtils.decrypt(message.getText()));
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         List<GetMessageDto> sorted = getMessageDtoList.stream()
@@ -148,7 +151,7 @@ public class MessageController extends BaseController {
 
         Message message = new Message();
         message.setRepliedMessage(repliedMessage);
-        message.setText(messageDto.getText());
+        message.setText(encryptionUtils.encrypt(messageDto.getText()));
         message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
@@ -169,7 +172,7 @@ public class MessageController extends BaseController {
                     user.getPhoneNumber(), message.getMessageId()));
             return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
         }
-        message.setText(editMessageDto.getText());
+        message.setText(encryptionUtils.encrypt(editMessageDto.getText()));
         message.setEditedAt(Instant.now());
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }

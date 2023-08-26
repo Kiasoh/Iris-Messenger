@@ -11,6 +11,7 @@ import ir.mohaymen.iris.search.message.SearchMessageService;
 import ir.mohaymen.iris.subscription.SubscriptionRepository;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserRepository;
+import ir.mohaymen.iris.utility.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,7 @@ public class MessageSeeder implements Seeder {
     private final UserRepository userRepository;
     private final SearchMessageService searchMessageService;
     private final ModelMapper modelMapper;
+    private final EncryptionUtils encryptionUtils;
 
     private static final int NUMBER_OF_CHAT_MESSAGES = ChatSeeder.NUMBER_OF_INSTANCES * 10;
     private static final int NUMBER_OF_PV_MESSAGES = PVSeeder.NUMBER_OF_INSTANCES * 2;
@@ -96,7 +98,7 @@ public class MessageSeeder implements Seeder {
         Instant editingTime = id % 6 == 0 ? date.past(100, TimeUnit.DAYS).toInstant() : null;
 
         Message message = new Message();
-        message.setText(text);
+        message.setText(encryptionUtils.encrypt(text));
         message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
