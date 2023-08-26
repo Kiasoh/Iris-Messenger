@@ -15,6 +15,7 @@ import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.EncryptionUtils;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -47,6 +48,7 @@ public class ChatController extends BaseController {
     private final UserProfileService userProfileService;
     private final SearchChatService searchChatService;
     private final Logger logger = LoggerFactory.getLogger(ChatController.class);
+    private final EncryptionUtils encryptionUtils;
 
     @PutMapping("/edit-chat-info")
     public ResponseEntity<?> editChatInfo(@RequestBody EditChatDto editChatDto) {
@@ -154,7 +156,7 @@ public class ChatController extends BaseController {
         return new ResponseEntity<>(getChatDto, HttpStatus.OK);
     }
 
-    public MenuChatDto createMenuChat(Subscription sub) {
+    private MenuChatDto createMenuChat(Subscription sub) {
         Chat chat = sub.getChat();
         MenuChatDto menuChatDto = modelMapper.map(chat, MenuChatDto.class);
         if (chat.getChatType() != ChatType.PV) {
@@ -174,7 +176,7 @@ public class ChatController extends BaseController {
         Message message = messageService.getLastMessageByChatId(chat);
         if (message != null) {
             menuChatDto.setUnSeenMessages(messageService.countUnSeenMessages(sub.getLastMessageSeenId(), chat.getChatId()));
-            menuChatDto.setLastMessage(message.getText());
+            menuChatDto.setLastMessage(encryptionUtils.decrypt(message.getText()));
             menuChatDto.setSentAt(message.getSendAt());
             User user = message.getSender();
             Nameable nameable = subscriptionService.setName(contactService.getContactByFirstUser(getUserByToken()), user);

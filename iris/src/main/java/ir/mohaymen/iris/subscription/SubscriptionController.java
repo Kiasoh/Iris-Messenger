@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -42,7 +43,7 @@ public class SubscriptionController extends BaseController {
     private final ModelMapper modelMapper;
     private final ContactService contactService;
     private final PermissionService permissionService;
-    SearchChatService searchChatService;
+    private final SearchChatService searchChatService;
     private final MessageService messageService;
     private final UserProfileService userProfileService;
 
@@ -79,24 +80,27 @@ public class SubscriptionController extends BaseController {
     @DeleteMapping("/delete-sub/{subId}")
     public ResponseEntity<?> leaveGroupBySubId(@PathVariable Long subId) throws Exception {
         Subscription subscription = subscriptionService.getSubscriptionBySubscriptionId(subId);
+        Subscription clientSub = subscriptionService.getSubscriptionByChatAndUser(subscription.getChat() , getUserByToken());
+        if ( subscription.getChat().getChatId() != clientSub.getChat().getChatId() || (subscription.getUser().getUserId() != clientSub.getUser().getUserId() && !(clientSub.getPermissions().contains(Permission.ADD_USER) || clientSub.getPermissions().contains(Permission.ADMIN) )))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         if (subscription.getChat().getChatType() == ChatType.PV) {
             chatService.deleteById(subscription.getChat().getChatId());
             return ResponseEntity.ok("PV deleted.");
         }
         subscriptionService.deleteById(subId);
-        return ResponseEntity.ok("you have left the group!");
+        return ResponseEntity.ok(MessageFormat.format("{0} have left the group!" , subId.toString()));
     }
-    @DeleteMapping("/delete-sub/{chatId}")
-    public ResponseEntity<?> leaveGroupByChatId(@PathVariable Long chatId) throws Exception {
-        Chat chat = new Chat(); chat.setChatId(chatId); chat.setChatType(ChatType.PV); chat.setCreatedAt(Instant.now());
-        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser( chat, getUserByToken());
-        if (subscription.getChat().getChatType() == ChatType.PV) {
-            chatService.deleteById(subscription.getChat().getChatId());
-            return ResponseEntity.ok("PV deleted.");
-        }
-        subscriptionService.deleteById(subscription.getSubId());
-        return ResponseEntity.ok("you have left the group!");
-    }
+//    @DeleteMapping("/delete-sub/{chatId}")
+//    public ResponseEntity<?> leaveGroupByChatId(@PathVariable Long chatId) throws Exception {
+//        Chat chat = new Chat(); chat.setChatId(chatId); chat.setChatType(ChatType.PV); chat.setCreatedAt(Instant.now());
+//        Subscription subscription = subscriptionService.getSubscriptionByChatAndUser( chat, getUserByToken());
+//        if (subscription.getChat().getChatType() == ChatType.PV) {
+//            chatService.deleteById(subscription.getChat().getChatId());
+//            return ResponseEntity.ok("PV deleted.");
+//        }
+//        subscriptionService.deleteById(subscription.getSubId());
+//        return ResponseEntity.ok("you have left the group!");
+//    }
     @GetMapping("/chat-subs/{id}")
     public ResponseEntity<List<SubDto>> subsOfOneChat(@PathVariable Long id) {
         List<SubDto> subDtoList = new ArrayList<>();
@@ -111,6 +115,7 @@ public class SubscriptionController extends BaseController {
                     subscription.getUser());
             subDto.setFirstName(nameable.getFirstName());
             subDto.setLastName(nameable.getLastName());
+            subDto.setSubId(subscription.getSubId());
             subDto.setUserId(subscription.getUser().getUserId());
             subDto.setLastSeen(subscription.getUser().getLastSeen());
             subDto.setAdmin(Permission.isAdmin(subscription.getPermissions()));

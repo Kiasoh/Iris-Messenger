@@ -8,6 +8,7 @@ import ir.mohaymen.iris.permission.Permission;
 import ir.mohaymen.iris.permission.PermissionService;
 import ir.mohaymen.iris.user.UserService;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.EncryptionUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class PinController extends BaseController {
     private final UserService userService;
     private final PinService pinService;
     private final PermissionService permissionService;
+    private final EncryptionUtils encryptionUtils;
     @PostMapping("/pin-message")
     public ResponseEntity<?> pinMessage (@RequestBody @Valid PinDto pinDto) {
         if (!permissionService.hasAccess(getUserByToken().getUserId(),pinDto.getChatId(), Permission.PIN_MESSAGE))
@@ -50,7 +52,7 @@ public class PinController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetPinDto> getPinDtoList = new ArrayList<>();
         for (Pin pin:pinService.getByChat(chatService.getById(chatId))) {
-            GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessagePlacement(messageService.messagePlacementInChat(chatId ,pin.getMessage().getMessageId())); getPinDto.setMessageText(pin.getMessage().getText());
+            GetPinDto getPinDto = new GetPinDto(); getPinDto.setMessagePlacement(messageService.messagePlacementInChat(chatId ,pin.getMessage().getMessageId())); getPinDto.setMessageText(encryptionUtils.decrypt(pin.getMessage().getText()));
             getPinDtoList.add(getPinDto);
         }
         return new ResponseEntity<>(getPinDtoList , HttpStatus.OK);

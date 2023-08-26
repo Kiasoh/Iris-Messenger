@@ -13,6 +13,7 @@ import ir.mohaymen.iris.subscription.SubDto;
 import ir.mohaymen.iris.subscription.SubscriptionService;
 import ir.mohaymen.iris.user.User;
 import ir.mohaymen.iris.utility.BaseController;
+import ir.mohaymen.iris.utility.EncryptionUtils;
 import ir.mohaymen.iris.utility.Nameable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class MessageController extends BaseController {
     private final ContactService contactService;
     private final FileService fileService;
     private final PermissionService permissionService;
+    private final EncryptionUtils encryptionUtils;
 
     private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -58,8 +60,8 @@ public class MessageController extends BaseController {
                                                            @PathVariable("floor") Integer floor, @PathVariable("ceil") Integer ceil) {
         if (ceil - floor > 50)
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        List<Message> messages = new ArrayList<>();
-        messageService.getByChat(chatService.getById(chatId)).forEach(m -> messages.add(m));
+        Chat chat = new Chat(); chat.setChatId(chatId);
+        List<Message> messages = messageService.getByChat(chat);
         if (messages.size() < ceil)
             ceil = (messages.size());
         if (floor < 0)
@@ -148,7 +150,7 @@ public class MessageController extends BaseController {
 
         Message message = new Message();
         message.setRepliedMessage(repliedMessage);
-        message.setText(messageDto.getText());
+        message.setText(encryptionUtils.encrypt(messageDto.getText()));
         message.setChat(chat);
         message.setSender(user);
         message.setMedia(media);
@@ -238,6 +240,7 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setText(encryptionUtils.decrypt(message.getText()));
         getMessageDto.setSeen(
                 messageService.usersSeen(message.getMessageId(), message.getChat().getChatId()).size() > 1);
         if (message.getRepliedMessage() != null)
