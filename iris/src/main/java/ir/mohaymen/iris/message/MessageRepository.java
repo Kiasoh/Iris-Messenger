@@ -29,6 +29,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findByChat(Chat chat);
 
+    @Query(value = """
+            select m
+            from Message m
+            where m.chat.chatId = :chatId and m.media != null and m.messageId > :messageId
+            """)
+    List<Message> findNextMedia(@Param("chatId") Long chatId , @Param("messageId") Long messageId);
+
     List<Message> findAllByMedia(Media media);
 
     Iterable<Message> findByRepliedMessage(Message message);

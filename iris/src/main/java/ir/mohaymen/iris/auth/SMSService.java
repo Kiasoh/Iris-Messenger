@@ -33,7 +33,7 @@ public class SMSService {
     public void sendSms(String number, String message)
     {
         logger.info(MessageFormat.format("sms {0} to phone number:{1} with message:{2}",(isEnabled?"sent":"not sent"),number,message));
-        if(!isEnabled) return;
+        if(!isEnabled || senderNumber.equals("null")) return;
         try {
             sendSmsMessageWithPost(number, message, username, password, senderNumber);
         }

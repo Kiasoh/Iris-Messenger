@@ -15,8 +15,7 @@ import java.util.Base64;
 
 @Component
 public class EncryptionUtils {
-    @Value("${application.security.jwt.secret-key}")
-    private String SECRET_KEY;
+    private String SECRET_KEY="eFMAIStiCSNSii75xyZ2OA==";
 
     public String encrypt(String plainText)  {
         if (plainText==null) return null;

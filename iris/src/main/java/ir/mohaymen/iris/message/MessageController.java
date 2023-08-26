@@ -68,7 +68,6 @@ public class MessageController extends BaseController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         List<GetMessageDto> getMessageDtoList = new ArrayList<>();
         for (Message message : messages.subList(messages.size() - ceil, messages.size() - floor)) {
-            message.setText(encryptionUtils.decrypt(message.getText()));
             getMessageDtoList.add(mapMessageToGetMessageDto(message));
         }
         List<GetMessageDto> sorted = getMessageDtoList.stream()
@@ -172,7 +171,7 @@ public class MessageController extends BaseController {
                     user.getPhoneNumber(), message.getMessageId()));
             return new ResponseEntity<>("Access violation", HttpStatus.FORBIDDEN);
         }
-        message.setText(encryptionUtils.encrypt(editMessageDto.getText()));
+        message.setText(editMessageDto.getText());
         message.setEditedAt(Instant.now());
         return new ResponseEntity<>(mapMessageToGetMessageDto(message), HttpStatus.OK);
     }
@@ -241,6 +240,7 @@ public class MessageController extends BaseController {
     private GetMessageDto mapMessageToGetMessageDto(Message message) {
         GetMessageDto getMessageDto = modelMapper.map(messageService.createOrUpdate(message), GetMessageDto.class);
         getMessageDto.setUserId(message.getSender().getUserId());
+        getMessageDto.setText(encryptionUtils.decrypt(message.getText()));
         getMessageDto.setSeen(
                 messageService.usersSeen(message.getMessageId(), message.getChat().getChatId()).size() > 1);
         if (message.getRepliedMessage() != null)
